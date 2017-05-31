@@ -43,7 +43,7 @@ names(verify) <- c("Site", "AQS ID", "Region", "Ozone AQI", "Ozone obs count",
 
 # Ozone table
 verify_o3 <- filter(verify[ , c("Region", "Site", "AQS ID", "Ozone AQI", 
-                         "Ozone forecast", "Ozone cmaq forecast", "Ozone obs count")], 
+                                "Ozone forecast", "Ozone cmaq forecast", "Ozone obs count")], 
                     !is.na(`Ozone AQI`))
 
 
@@ -61,8 +61,8 @@ verify_pm <- datatable(verify_pm, rownames = FALSE, options = list(searching=F, 
 
 verify_pm <- formatStyle(verify_pm, 
                          c("PM2.5 AQI", "PM2.5 forecast"),
-                         fontWeight = styleInterval(c(50), c("normal","bold")),
-                         backgroundColor =  styleInterval(c(0,50,100,150,200), aqi_colors))
+                           fontWeight = styleInterval(c(50), c("normal","bold")),
+                           backgroundColor =  styleInterval(c(0,50,100,150,200), aqi_colors))
 
 saveRDS(verify_pm, "pm_table.rdata")
 

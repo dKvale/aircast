@@ -9,7 +9,7 @@ library(methods)
 
 
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/hysplit")
-source("cmaq_forecast.R")
+source("get_cmaq_forecast.R")
 
 sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
 
@@ -28,7 +28,7 @@ for(i in 1:nrow(sites)) {
   
   print(site$air_monitor)
   
-  o3_max   <- cmaq_forecast(site$monitor_lat, site$monitor_long, hour_gmt = NULL)
+  o3_max   <- get_cmaq_forecast(site$monitor_lat, site$monitor_long, hour_gmt = NULL)
   
   o3_max$site_catid <- site$site_catid
   

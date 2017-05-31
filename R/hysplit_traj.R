@@ -1,7 +1,7 @@
 library(SplitR)
 library(lubridate)
 
-source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/hysplit/support_functions.R")
+source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/hysplit/hysplit_support_functions.R")
 
 hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                          lon            = -93.22,

@@ -8,7 +8,7 @@ library(tidyr)
 library(methods)
 
 
-cmaq_forecast <- function(lat, long, hour_gmt = NULL) {  
+get_cmaq_forecast <- function(lat, long, hour_gmt = NULL) {  
 
   url       <- paste0('http://airquality.weather.gov/probe_aq_data.php?latitude=', lat, "&longitude=", long, '&Submit=Get+Guidance')
   

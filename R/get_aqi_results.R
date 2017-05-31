@@ -6,7 +6,7 @@ library(stringr)
 library(RCurl)
 
 
-# Grab yesterday's actuals  #
+# Get yesterday's actuals  #
 #--------------------------#
 sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
 
@@ -55,8 +55,6 @@ aqi <- filter(aqi[ -c(5,7:8)],
 aqi <- spread(aqi, Parameter, Concentration)
 
 names(aqi)[c(4:5)] <-  c("max_ozone_8hr", "pm25_24hr")
-
-
 
 
 # QC MPCA sites using AirVision data

@@ -9,7 +9,7 @@ if(current_time <= 10) {
   # Grab yesterdays actuals
   print("Downloading yesterday actuals")
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/hysplit")
-  try(source("grab_actuals.R"))
+  try(source("get_aqi_results.R"))
   
   # Update verification table
   print("Updating verification table")
@@ -53,15 +53,10 @@ if(current_time == 12) {
 
 if(current_time > 12) {
   
-  # Grab Sonoma's forecast
-  #print("Downloading Sonoma")
-  #setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/hysplit")
-  #try(source("grab_sonoma_forecast.R"))
-  
   # Grab CMAQ forecast
   print("Downloading CMAQ")
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/hysplit")
-  try(source("grab_cmaq.R"))
+  try(source("update_cmaq_forecast.R"))
   
   
   # Run HYSPLIT model
