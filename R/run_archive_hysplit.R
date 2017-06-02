@@ -10,7 +10,7 @@ library(readxl)
 library(tidyr)
 library(stringr)
 
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/hysplit")
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R/")
 source("hysplit_traj.R")
 
 # Load site locations

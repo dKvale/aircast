@@ -7,7 +7,7 @@ library(magrittr)
 setwd("~")
 setwd("../Desktop/hysplit")
 
-source("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff folders\\Dorian\\AQI\\Current forecast\\hysplit\\get_forecast_nams.R")
+source("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff folders\\Dorian\\AQI\\Current forecast\\hysplit\\get_nams_forecast.R")
 
 # Delete old data
 delete("__yesterday")
@@ -34,10 +34,10 @@ print(new_date)
 options(timeout = 120)
 
 # Todays forecast
-get_forecast_nams(date = new_date, folder = "__today", type = "f", time_step = 3)
-get_forecast_nams(date = new_date, folder = "__today", type = "a", time_step = 3)
-get_forecast_nams(date = new_date, folder = "__today", type = "a", time_step = 1)
-get_forecast_nams(date = new_date, folder = "__today", type = "f", time_step = 1)
+get_nams_forecast(date = new_date, folder = "__today", type = "f", time_step = 3)
+get_nams_forecast(date = new_date, folder = "__today", type = "a", time_step = 3)
+get_nams_forecast(date = new_date, folder = "__today", type = "a", time_step = 1)
+get_nams_forecast(date = new_date, folder = "__today", type = "f", time_step = 1)
 
 closeAllConnections()
 

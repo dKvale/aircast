@@ -8,7 +8,7 @@ aqi_update:
 FormatTime, TimeToMeet,,HHmm
 
 
-if (TimeToMeet = 0733)
+if (TimeToMeet = 0515)
 {
 
         Run, "C:\Users\dkvale\Desktop\hysplit\BATCH_R_forecast_Update.bat"
@@ -38,7 +38,7 @@ if (TimeToMeet = 1225)
 
 
 
-if (TimeToMeet = 1323)
+if (TimeToMeet = 1322)
 {
 
         Run, "C:\Users\dkvale\Desktop\hysplit\BATCH_R_forecast_Update.bat"

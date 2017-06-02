@@ -1,0 +1,134 @@
+---
+title: ''
+output:
+  html_document:
+    keep_md: false
+    theme: null
+    highlight: null
+    mathjax: null
+  
+---
+
+
+## AQI Report for `r format(Sys.Date() - 1, '%A %b %d, %Y')` 
+
+<b>IT.  IS.  GO TIME!!  </b>  
+  
+```{r echo=FALSE, message =FALSE, warnings =FALSE}
+library(formattable)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(lubridate)
+
+
+aqi_colors <- c("#FFF",     # White
+"#9BF59B",  # Green
+"#ffff00",  
+"#ff7e00", 
+"#ff0000",  
+"#99004c")  
+
+days_past <- 0
+
+#-- Load yesterdays observations
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
+
+verify <- readRDS(paste0("Archive/", Sys.Date() - days_past, "_verification_table.Rdata"))
+
+verify <- verify[!duplicated(verify$site_catid), ]
+
+names(verify)[grep("site_catid", names(verify))] <- "aqs_id"
+
+
+#-- Filter to yesterdays results
+verify <- filter(verify, forecast_date == Sys.Date() - days_past - 1, forecast_day == 0)
+
+verify <- filter(verify, forecast_day == min(verify$forecast_day, na.rm = T))
+
+verify <- select(verify, short_name, group,  aqs_id,
+                 count_ozone_obs, obs_ozone_aqi,  fcst_ozone_aqi, 
+                 #cmaq_ozone_aqi,
+                 count_pm25_obs, obs_pm25_aqi, fcst_pm25_aqi)
+
+
+names(verify) <- c("Site", "Group", "AQS ID", 
+                   "Ozone obs count", "Ozone AQI", "Ozone forecast", #"Ozone cmaq forecast",
+                   "PM2.5 obs count", "PM2.5 AQI", "PM2.5 forecast")
+
+# Remove underscores from names
+verify$Site <- gsub("_", " ", verify$Site)
+
+verify$Group <- gsub("_", " ", verify$Group)
+
+# Ozone table
+verify_o3 <- select(verify, -c(`PM2.5 obs count`, `PM2.5 AQI`, `PM2.5 forecast`)) %>% 
+  filter(!is.na(`Ozone AQI`)) %>%
+  arrange(-`Ozone AQI`)
+
+
+# Web format
+margin_left <- function(i) {
+  
+  formatter("span",
+            style = x ~ style("margin-left" = paste0(i + 20, "px")))
+}
+
+col_format <- function(i) {
+  
+  formatter("span", 
+            style = x ~ style("padding-left"  = "20px",
+                              "padding-right" = "4px",
+                              "margin-left"   = paste0(i, "px"),
+                              "font-weight"   = 600,
+                              "background-color" = 
+                                ifelse(x <= 50, aqi_colors[2], 
+                                       ifelse(x <= 100, aqi_colors[3],
+                                              ifelse(x <= 150, aqi_colors[4], 
+                                                     ifelse(x <= 200, aqi_colors[5], "white"))))))
+}
+
+
+verify_o3 <- formattable(verify_o3, 
+                         list(Site                  = margin_left(20),
+                              Group                 = margin_left(20),
+                              `AQS ID`              = margin_left(20),
+                              `Ozone obs count`     = margin_left(95),
+                              `Ozone AQI`           = col_format(70),
+                              `Ozone forecast`      = col_format(95)))
+
+
+saveRDS(verify_o3, "o3_table.rdata")
+
+
+# PM table
+verify_pm <- select(verify, -c(`Ozone obs count`, `Ozone AQI`, `Ozone forecast`)) %>%  #`Ozone cmaq forecast`
+  filter(!is.na(`PM2.5 AQI`)) %>% 
+  arrange(-`PM2.5 AQI`)
+
+# Web format
+verify_pm <- formattable(verify_pm, 
+                         list(Site                  = margin_left(20),
+                              Group                 = margin_left(20),
+                              `AQS ID`              = margin_left(20),
+                              `PM2.5 obs count`     = margin_left(95),
+                              `PM2.5 AQI`           = col_format(70),
+                              `PM2.5 forecast`      = col_format(95)))
+
+if(FALSE) {
+  verify_pm <- datatable(verify_pm, rownames = FALSE, options = list(searching=F, paging=F, scrollX=T))
+  
+  verify_pm <- formatStyle(verify_pm, 
+                           c("PM2.5 AQI", "PM2.5 forecast"),
+                           fontWeight      = styleInterval(c(50), c("normal","bold")),
+                           backgroundColor = styleInterval(c(-1,0,50,100,150,200), aqi_colors))
+}
+
+saveRDS(verify_pm, "pm_table.rdata")
+#devtools::install_github("renkun-ken/formattable")
+
+```
+  
+## Ozone results  
+`r o3_df <- readRDS('o3_table.rdata'); o3_df`  
+  

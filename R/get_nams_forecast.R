@@ -1,10 +1,9 @@
 #
 library(downloader)
 
-get_forecast_nams <- function(date        = Sys.Date(), 
+get_nams_forecast <- function(date        = Sys.Date(), 
                               hour        = 12, 
                               folder      = date, 
-                              #path        = NULL,
                               resolution  = "12km",  # "12km" or "3km"
                               type        = "a",
                               time_step   = 1        # 1 or 3 hrs

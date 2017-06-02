@@ -9,6 +9,8 @@ bg_alert_subsribers <- c("dorian.kvale@state.mn.us",
                          "steve.irwin@state.mn.us",
                          "daniel.dix@state.mn.us")
 
+bg_alert_subsribers <- bg_alert_subsribers[2]
+
 #-- Open NAM data folder on desktop
 setwd("~")
 setwd("../Desktop/hysplit")

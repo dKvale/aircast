@@ -1,73 +1,54 @@
-library(gmailr)
+#! /usr/bin/env Rscript
+
+library(R.utils)
 library(dplyr)
 library(readr)
 library(tidyr)
-#library(knitr)
 library(lubridate)
-library(DT)
-
-aqi_subsribers <- c("dorian.kvale@state.mn.us")
-
-aqi_colors <- c("#FFF",     # White
-                "#9BF59B",  
-                "#ffff00",  
-                "#ff7e00", 
-                "#ff0000",  
-                "#99004c")  
-
-days_past <- 0
-
-#-- Load e-mail credentials
-#creds  <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
-
-#-- Load yesterday's observations
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
-
-verify <- readRDS(paste0("Archive/", Sys.Date() - days_past, "_verification_table.Rdata"))
+library(gmailr)
+#library(mailR)
 
 
-names(verify)[grep("site_catid", names(verify))] <- "aqs_id"
+aqi_team <- paste0(c("dorian.kvale",
+                     "steve.irwin",
+                     "daniel.dix",
+                     "monika.vadali",
+                     "ruth.roberson",
+                     "david.l.brown"), "@state.mn.us")
 
-#-- Filter to yesterday's results
-verify <- filter(verify, day_forecast_made == Sys.Date() - 1)
+#aqi_team <- aqi_team[1]
 
-verify <- select(verify, air_monitor, aqs_id, group,
-                 obs_ozone_aqi, count_ozone_obs, fcst_ozone_aqi, 
-                 cmaq_ozone_aqi,
-                 obs_pm25_aqi, count_pm25_obs, fcst_pm25_aqi)
-
-
-names(verify) <- c("Site", "AQS ID", "Region", "Ozone AQI", "Ozone obs count",
-                   "Ozone forecast", "Ozone cmaq forecast",
-                   "PM2.5 AQI", "PM2.5 obs count", "PM2.5 forecast")
-
-# Ozone table
-verify_o3 <- filter(verify[ , c("Region", "Site", "AQS ID", "Ozone AQI", 
-                                "Ozone forecast", "Ozone cmaq forecast", "Ozone obs count")], 
-                    !is.na(`Ozone AQI`))
-
-
-# Web format
+aqi_team <- paste0(aqi_team, collapse = ", ")
 
 
 
-# PM table
-verify_pm <- filter(verify[ , c("Region", "Site", "AQS ID", "PM2.5 AQI", 
-                                "PM2.5 forecast", "PM2.5 obs count")], 
-                    !is.na(`PM2.5 AQI`))
+#-- Load credentials
+creds <- read.csv("C:\\Users\\dkvale\\Desktop\\credentials.csv", stringsAsFactors = F)
 
-# Web format
-verify_pm <- datatable(verify_pm, rownames = FALSE, options = list(searching=F, paging=F, scrollX=T))
 
-verify_pm <- formatStyle(verify_pm, 
-                         c("PM2.5 AQI", "PM2.5 forecast"),
-                           fontWeight = styleInterval(c(50), c("normal","bold")),
-                           backgroundColor =  styleInterval(c(0,50,100,150,200), aqi_colors))
-
-saveRDS(verify_pm, "pm_table.rdata")
 
 #-- Create AQI table
-setwd("../Verification/")
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification")
+
+
+#formatter("span",
+#           style = x ~ style(color = ifelse(rank(-x) <= 3, "green", "gray")) ))
+
+if(FALSE) {   
+  verify_o3 <- datatable(verify_o3, rownames = FALSE, options = list(searching=F, paging=F, scrollX=T))
+  
+  verify_o3 <- formatStyle(verify_o3, 
+                           c("Ozone AQI", "Ozone forecast", "Ozone cmaq forecast"),
+                           fontWeight      = styleInterval(c(50), c("normal","bold")),
+                           backgroundColor = styleInterval(c(-1,0,50,100,150,200), aqi_colors))
+}
+
+
+#use "output: html_fragment:"
+  #when javascript not required
+#"    theme: null",
+#"    highlight: null",
+#"    mathjax: null",
 
 aqi_message <- c("---",
                  "title: ''",
@@ -78,16 +59,138 @@ aqi_message <- c("---",
                  "\n",
 
 "## AQI Report for `r format(Sys.Date() - 1, '%A %b %d, %Y')` \n",
-"<i>Preliminary results</i> \n\n", 
-"### Ozone",
+#"<i>Preliminary results</i>  <br>  ",
+"<b>IT.  IS.  GO TIME!!  </b>  ",
+"  ",
+"```{r echo=FALSE, message =FALSE, warnings =FALSE}",
+'library(formattable)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(lubridate)
+
+
+aqi_colors <- c("#FFF",     # White
+"#9BF59B",  # Green
+"#ffff00",  
+"#ff7e00", 
+"#ff0000",  
+"#99004c")  
+
+days_past <- 0
+
+#-- Load yesterdays observations
+#setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
+
+verify <- readRDS(paste0("Archive/", Sys.Date() - days_past, "_verification_table.Rdata"))
+
+verify <- verify[!duplicated(verify$site_catid), ]
+
+names(verify)[grep("site_catid", names(verify))] <- "aqs_id"
+
+
+#-- Filter to yesterdays results
+verify <- filter(verify, forecast_date == Sys.Date() - days_past - 1, forecast_day == 0)
+
+verify <- filter(verify, forecast_day == min(verify$forecast_day, na.rm = T))
+
+verify <- select(verify, short_name, group,  aqs_id,
+                 count_ozone_obs, obs_ozone_aqi,  fcst_ozone_aqi, 
+                 #cmaq_ozone_aqi,
+                 count_pm25_obs, obs_pm25_aqi, fcst_pm25_aqi)
+
+
+names(verify) <- c("Site", "Group", "AQS ID", 
+                   "Ozone obs count", "Ozone AQI", "Ozone forecast", #"Ozone cmaq forecast",
+                   "PM2.5 obs count", "PM2.5 AQI", "PM2.5 forecast")
+
+# Remove underscores from names
+verify$Site <- gsub("_", " ", verify$Site)
+
+verify$Group <- gsub("_", " ", verify$Group)
+
+# Ozone table
+verify_o3 <- select(verify, -c(`PM2.5 obs count`, `PM2.5 AQI`, `PM2.5 forecast`)) %>% 
+  filter(!is.na(`Ozone AQI`)) %>%
+  arrange(-`Ozone AQI`)
+
+
+# Web format
+margin_left <- function(i) {
+  
+  formatter("span",
+            style = x ~ style("margin-left" = paste0(i + 20, "px")))
+}
+
+col_format <- function(i) {
+  
+  formatter("span", 
+            style = x ~ style("padding-left"  = "20px",
+                              "padding-right" = "4px",
+                              "margin-left"   = paste0(i, "px"),
+                              "font-weight"   = 600,
+                              "background-color" = 
+                                ifelse(x <= 50, aqi_colors[2], 
+                                       ifelse(x <= 100, aqi_colors[3],
+                                              ifelse(x <= 150, aqi_colors[4], 
+                                                     ifelse(x <= 200, aqi_colors[5], "white"))))))
+}
+
+
+verify_o3 <- formattable(verify_o3, 
+                         list(Site                  = margin_left(20),
+                              Group                 = margin_left(20),
+                              `AQS ID`              = margin_left(20),
+                              `Ozone obs count`     = margin_left(95),
+                              `Ozone AQI`           = col_format(70),
+                              `Ozone forecast`      = col_format(95)))
+
+
+saveRDS(verify_o3, "o3_table.rdata")
+
+
+# PM table
+verify_pm <- select(verify, -c(`Ozone obs count`, `Ozone AQI`, `Ozone forecast`)) %>%  #`Ozone cmaq forecast`
+  filter(!is.na(`PM2.5 AQI`)) %>% 
+  arrange(-`PM2.5 AQI`)
+
+# Web format
+verify_pm <- formattable(verify_pm, 
+                         list(Site                  = margin_left(20),
+                              Group                 = margin_left(20),
+                              `AQS ID`              = margin_left(20),
+                              `PM2.5 obs count`     = margin_left(95),
+                              `PM2.5 AQI`           = col_format(70),
+                              `PM2.5 forecast`      = col_format(95)))
+
+if(FALSE) {
+  verify_pm <- datatable(verify_pm, rownames = FALSE, options = list(searching=F, paging=F, scrollX=T))
+  
+  verify_pm <- formatStyle(verify_pm, 
+                           c("PM2.5 AQI", "PM2.5 forecast"),
+                           fontWeight      = styleInterval(c(50), c("normal","bold")),
+                           backgroundColor = styleInterval(c(-1,0,50,100,150,200), aqi_colors))
+}
+
+saveRDS(verify_pm, "pm_table.rdata")
+#devtools::install_github("renkun-ken/formattable")',
+"",
+"```",
+"  ",
+"## Ozone results  ",
 #paste0(kable(verify_o3), collapse="\n"),
-#paste0(verify_o3, collapse="\n"),
+"```{r, echo=F, warning=F, message=F}",
+#"setwd(\"X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification\")",
+"o3_df <- readRDS('o3_table.rdata')",
+"o3_df",
+"```",
+"  "
 
-
-"### PM2.5",
+#"## PM2.5 results  ",
 #paste0(kable(verify_pm), collapse="\n"))
 #paste0(verify_pm, collapse="\n"))
-"`r pm_df <- readRDS('pm_table.rdata'); pm_df`"
+#"`r pm_df <- readRDS('pm_table.rdata'); pm_df`  ",
+#"  "
 )
 
 writeLines(aqi_message, "aqi_message.Rmd")
@@ -98,15 +201,59 @@ rmarkdown::render("aqi_message.Rmd")
 
 
 #-- Create e-mail message
-html_msg <- mime() %>%
-            to(aqi_subsribers) %>%
-            from("mpca.aqi@gmail.com") %>%
-            subject("AQI report") %>%
-            html_body(paste0(readLines("aqi_message.html"), collapse = "\n"))
-                  
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
 
-#-- Send e-mail
-send_message(html_msg)
+msg_body <- readLines("aqi_message.html")
+
+#msg_body <- msg_body[(grep("<body>", msg_body) + 1):(grep("</body>", msg_body) - 1)]
+
+msg_body <- paste0(msg_body, collapse = "")
+
+
+
+#-- Send message function
+send_msg <- function(x) {
+  
+  html_msg <- mime(to       = x,
+                   from     = "mpca.aqi@gmail.com",
+                   subject  = "AQI report")
+  
+  html_msg <- html_body(html_msg, msg_body)
+  
+  send_message(html_msg)
+  
+}
+                  
+#-- Send e-mail one person at a time
+#set_config(use_proxy(url="10.3.100.207",port=8080))
+
+for(i in aqi_team) {
+
+  setwd("~")
+  setwd("../Desktop")
+ 
+  #tryCatch(send_msg(aqi_team[1]), error = function(e) NA)
+  
+  run_count <- 0
+
+  send_fail <- NA
+  
+  while(is.na(send_fail) & run_count < 12) {
+    
+    detach("package:gmailr", unload=TRUE)
+    library(gmailr)
+    use_secret_file("gmail-credentials.json")
+    
+    #-- Set time limit on run time
+    send_fail <- tryCatch(evalWithTimeout(send_msg(i), timeout = 3, onTimeout = "error"), TimeoutException = function(ex) NA, error = function(e) NA)
+    
+    Sys.sleep(3)
+    
+    run_count <- run_count + 1
+
+  }
+}
+       
 
 
 ##
