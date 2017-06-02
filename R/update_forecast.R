@@ -31,7 +31,8 @@ if(current_time <= 10) {
 
 if(current_time >= 10 & current_time < 12) {
   
-  # Update background trajectories
+  # Update background NAMS data
+  print("Downloading NAMS data...")
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("update_nams_forecast.R"))
   
@@ -40,13 +41,19 @@ if(current_time >= 10 & current_time < 12) {
 
 if(current_time == 12) {
   
-  # Update background trajectories (backup in case NOAA files did not download)
+  # Update background NAMS data (backup in case NOAA files did not download)
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("check_nams_forecast.R"))
   
   # Send e-mail alert if today's background NAM data is missing
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("background_alert_msg.R"))
+  
+  
+  # Run HYSPLIT model
+  print("Running HYSPLIT")
+  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
+  try(source("run_current_hysplit.R"))
   
 }
 
@@ -59,13 +66,8 @@ if(current_time > 12) {
   try(source("update_cmaq_forecast.R"))
   
   
-  # Run HYSPLIT model
-  print("Running CMAQ")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("run_current_hysplit.R"))
-  
   # Attach background monitoring results
-  print("Downloading monitoring results")
+  print("Attaching monitoring results")
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("update_background_aqi.R"))
   
