@@ -28,7 +28,10 @@ yesterday <- gsub("-", "", Sys.Date() - 1)
 
 year      <- format(Sys.Date() - 1, "%Y")
 
+
 # Connect to AirNow data site
+#https://files.airnowtech.org/
+
 airnow_link <- paste0("https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/",
                       year, "/",
                       yesterday,
@@ -151,12 +154,12 @@ miss_sites <- filter(sites,
                      !gsub("-", "", alt_siteid) %in% aqi$aqsid)
 
 
-# Use average of AirNow and AirVis values
+# Use AirNow value if AirVis is missing
 air_all <- group_by(air_all, aqsid) %>% 
-           mutate(a_max_ozone_8hr_ppb = round(mean(c(max_ozone_8hr, max_ozone_8hr_vis), na.rm = T), 2))
+           mutate(a_max_ozone_8hr_ppb = ifelse(is.na(max_ozone_8hr_vis), round(max_ozone_8hr, 1), round(max_ozone_8hr_vis, 1)))
 
 air_all <- group_by(air_all, aqsid) %>% 
-           mutate(a_pm25_24hr_ugm3 = round(mean(c(pm25_24hr, pm25_24hr_vis), na.rm = T), 2))
+           mutate(a_pm25_24hr_ugm3 = ifelse(is.na(pm25_24hr_vis), round(pm25_24hr, 1), round(pm25_24hr_vis, 1)))
 
 
 # Drop daily value if less than 14 observations

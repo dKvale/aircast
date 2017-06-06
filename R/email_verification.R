@@ -58,9 +58,8 @@ aqi_message <- c("---",
                  "---",  
                  "\n",
 
-"## AQI Report for `r format(Sys.Date() - 1, '%A %b %d, %Y')` \n",
-#"<i>Preliminary results</i>  <br>  ",
-"<b>IT.  IS.  GO TIME!!  </b>  ",
+"## Minnesota AQI report  ",
+"<i>Preliminary results for `r format(Sys.Date() - 1, '%A %b %d, %Y')`</i>  <br>  ",
 "  ",
 "```{r echo=FALSE, message =FALSE, warnings =FALSE}",
 'library(formattable)
@@ -114,20 +113,36 @@ verify_o3 <- select(verify, -c(`PM2.5 obs count`, `PM2.5 AQI`, `PM2.5 forecast`)
   filter(!is.na(`Ozone AQI`)) %>%
   arrange(-`Ozone AQI`)
 
+names(verify_o3)[3:6] <- c("AQS ID       ", "Obs count", "Obs AQI   ", "Forecast AQI")
+
+# Add paddding to columns
+verify_o3$`Site` <- paste0(verify_o3$`Site`, "    ")
+
+#verify_o3$`Obs count   ` <- paste0(verify_o3$`Obs count   `, "             ")
+#verify_o3$`Obs count`  <- paste0("( ", verify_o3$`Obs count`, " )")
 
 # Web format
 margin_left <- function(i) {
   
   formatter("span",
-            style = x ~ style("margin-left" = paste0(i + 20, "px")))
+            style = x ~ style("padding-left"  = paste0(i, "px")))
+}
+
+margin_right <- function(i) {
+  
+  formatter("span",
+            style = x ~ style("padding-right"  = paste0(i, "px")))
 }
 
 col_format <- function(i) {
   
-  formatter("span", 
-            style = x ~ style("padding-left"  = "20px",
-                              "padding-right" = "4px",
-                              "margin-left"   = paste0(i, "px"),
+#"margin-left"   = paste0(i, "px"),
+#"margin-right"  = paste0(i, "px"),
+
+formatter("span", 
+            style = x ~ style("padding-left"  = "42px",
+                              "padding-right" = "34px",
+                              "margin-right"  = paste0(i, "px"),
                               "font-weight"   = 600,
                               "background-color" = 
                                 ifelse(x <= 50, aqi_colors[2], 
@@ -137,13 +152,14 @@ col_format <- function(i) {
 }
 
 
-verify_o3 <- formattable(verify_o3, 
-                         list(Site                  = margin_left(20),
-                              Group                 = margin_left(20),
-                              `AQS ID`              = margin_left(20),
-                              `Ozone obs count`     = margin_left(95),
-                              `Ozone AQI`           = col_format(70),
-                              `Ozone forecast`      = col_format(95)))
+verify_o3 <- formattable(verify_o3,
+                         list(Site              = margin_right(20),
+                              Group             = margin_right(20),
+                              `AQS ID       `   = margin_right(20),
+                              `Obs count`       = margin_right(65),
+                              `Obs AQI   `      = col_format(15),
+                              `Forecast AQI`    = col_format(15)), 
+                          align = c("l","l","l","l","l","l"))
 
 
 saveRDS(verify_o3, "o3_table.rdata")
@@ -151,17 +167,20 @@ saveRDS(verify_o3, "o3_table.rdata")
 
 # PM table
 verify_pm <- select(verify, -c(`Ozone obs count`, `Ozone AQI`, `Ozone forecast`)) %>%  #`Ozone cmaq forecast`
-  filter(!is.na(`PM2.5 AQI`)) %>% 
-  arrange(-`PM2.5 AQI`)
+             filter(!is.na(`PM2.5 AQI`)) %>% 
+             arrange(-`PM2.5 AQI`)
+
+
+names(verify_pm)[3:6] <- c("AQS ID       ", "( Obs count )", "Obs AQI   ", "Forecast AQI")
 
 # Web format
 verify_pm <- formattable(verify_pm, 
-                         list(Site                  = margin_left(20),
-                              Group                 = margin_left(20),
-                              `AQS ID`              = margin_left(20),
-                              `PM2.5 obs count`     = margin_left(95),
-                              `PM2.5 AQI`           = col_format(70),
-                              `PM2.5 forecast`      = col_format(95)))
+                         list(#Site               = margin_left(0),
+                              Group               = margin_left(20),
+                              `AQS ID       `     = margin_left(20),
+                              `( Obs count )`      = margin_left(65),
+                              `Obs AQI   `        = col_format(50),
+                              `Forecast AQI`      = col_format(85)))
 
 if(FALSE) {
   verify_pm <- datatable(verify_pm, rownames = FALSE, options = list(searching=F, paging=F, scrollX=T))
@@ -177,7 +196,7 @@ saveRDS(verify_pm, "pm_table.rdata")
 "",
 "```",
 "  ",
-"## Ozone results  ",
+"### Ozone results  ",
 #paste0(kable(verify_o3), collapse="\n"),
 "```{r, echo=F, warning=F, message=F}",
 #"setwd(\"X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification\")",
@@ -186,15 +205,17 @@ saveRDS(verify_pm, "pm_table.rdata")
 "```",
 "  "
 
-#"## PM2.5 results  ",
+#"### PM2.5 results  ",
 #paste0(kable(verify_pm), collapse="\n"))
 #paste0(verify_pm, collapse="\n"))
 #"`r pm_df <- readRDS('pm_table.rdata'); pm_df`  ",
 #"  "
 )
 
+#-- Knit Rmarkdown document
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification")
 writeLines(aqi_message, "aqi_message.Rmd")
-  
+
 rmarkdown::render("aqi_message.Rmd")
 
 #knit2html("aqi_message.Rmd", force_v1 = T)

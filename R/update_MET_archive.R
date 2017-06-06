@@ -31,8 +31,6 @@ all_met$site_date <- paste(all_met$site_catid, all_met$date)
 
 
 # Site list
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/hysplit")
-
 sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
 
 # Remove duplicate sites

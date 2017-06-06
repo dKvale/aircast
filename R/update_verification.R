@@ -162,12 +162,20 @@ verify <- filter(verify, !is.na(forecast_day), !is.na(site_catid))
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
 print("Loading previous day verifications...")
 
-all_verify <- read_csv("2017_verification_table.csv")
+#all_verify <- read_csv("2017_verification_table.csv")
+
+all_verify <- readRDS(paste0("Archive/", Sys.Date(), "_verification_table.Rdata"))
 
 #all_verify$forecast_date <- as.character(all_verify$forecast_date)
 
 #all_verify <- filter(all_verify, !date %in% verify$date)
 #names(all_verify)[grep("date", names(all_verify))][1] <- "forecast_date"
+
+#-- Remove duplicates and NA forecast days
+all_verify <- filter(all_verify, 
+                     !paste(forecast_date, forecast_day) %in% paste(verify$forecast_date, verify$forecast_day),
+                     !is.na(forecast_day),
+                     !is.na(forecast_date))
 
 all_verify <- bind_rows(verify, all_verify)
 
@@ -206,13 +214,13 @@ yesterday_fcst <- filter(all_verify, forecast_date == Sys.Date() - 1) %>%
                             obs_pm25_ugm3, obs_ozone_aqi, obs_pm25_aqi))
 
 # Attach actuals to yesterday forecasts
-actuals    <- left_join(yesterday_fcst, select(actuals, -air_monitor, -aqsid))
+yesterday_fcst <- left_join(yesterday_fcst, select(actuals, -air_monitor, -aqsid))
 
 
 # Join attached data to master table
 all_verify <- filter(all_verify, forecast_date != (Sys.Date() - 1))
 
-all_verify <- bind_rows(actuals, all_verify)
+all_verify <- bind_rows(yesterday_fcst, all_verify)
 
 
 # Save master verification table
@@ -225,7 +233,9 @@ saveRDS(all_verify, paste0("Archive/", Sys.Date(), "_verification_table.Rdata"))
 
 
 #-- Create event table
-events <- filter(actuals, forecast_day == 0) %>% select(forecast_date, short_name, site_catid, obs_ozone_aqi, obs_pm25_aqi)
+events <- filter(actuals, forecast_date == Sys.Date() - 1) %>% 
+          left_join(select(sites, short_name, site_catid)) %>%
+          select(forecast_date, short_name, site_catid, obs_ozone_aqi, obs_pm25_aqi)
 
 # Add event flag and comments
 events$event_flag      <- NA
@@ -237,7 +247,7 @@ print("Loading previous event flags...")
 # Load
 all_events <- read_csv("2017_event_table.csv")
 
-#all_events$forecast_date <- as.character(all_events$forecast_date)
+all_events <- filter(all_events, !forecast_date %in% events$forecast_date)
 
 # Join
 all_events <- bind_rows(events, all_events)

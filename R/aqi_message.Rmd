@@ -1,18 +1,13 @@
 ---
 title: ''
 output:
-  html_document:
+  html_fragment:
     keep_md: false
-    theme: null
-    highlight: null
-    mathjax: null
-  
 ---
 
 
-## AQI Report for `r format(Sys.Date() - 1, '%A %b %d, %Y')` 
-
-<b>IT.  IS.  GO TIME!!  </b>  
+## Minnesota AQI report  
+<i>Preliminary results for `r format(Sys.Date() - 1, '%A %b %d, %Y')`</i>  <br>  
   
 ```{r echo=FALSE, message =FALSE, warnings =FALSE}
 library(formattable)
@@ -32,7 +27,7 @@ aqi_colors <- c("#FFF",     # White
 days_past <- 0
 
 #-- Load yesterdays observations
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
+#setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
 
 verify <- readRDS(paste0("Archive/", Sys.Date() - days_past, "_verification_table.Rdata"))
 
@@ -66,20 +61,23 @@ verify_o3 <- select(verify, -c(`PM2.5 obs count`, `PM2.5 AQI`, `PM2.5 forecast`)
   filter(!is.na(`Ozone AQI`)) %>%
   arrange(-`Ozone AQI`)
 
+names(verify_o3)[4:6] <- c("Obs count", "Obs AQI", "Forecast AQI")
 
 # Web format
 margin_left <- function(i) {
   
   formatter("span",
-            style = x ~ style("margin-left" = paste0(i + 20, "px")))
+            style = x ~ style("margin-left"  = paste0(i + 20, "px")))
 }
 
 col_format <- function(i) {
   
-  formatter("span", 
-            style = x ~ style("padding-left"  = "20px",
-                              "padding-right" = "4px",
-                              "margin-left"   = paste0(i, "px"),
+#"margin-left"   = paste0(i, "px"),
+  
+formatter("span", 
+            style = x ~ style("padding-left"  = "30px",
+                              "padding-right" = "30px",
+                              
                               "font-weight"   = 600,
                               "background-color" = 
                                 ifelse(x <= 50, aqi_colors[2], 
@@ -89,13 +87,13 @@ col_format <- function(i) {
 }
 
 
-verify_o3 <- formattable(verify_o3, 
-                         list(Site                  = margin_left(20),
-                              Group                 = margin_left(20),
-                              `AQS ID`              = margin_left(20),
-                              `Ozone obs count`     = margin_left(95),
-                              `Ozone AQI`           = col_format(70),
-                              `Ozone forecast`      = col_format(95)))
+verify_o3 <- formattable(verify_o3, align = c("l","r","r","r","r","r"),
+                         list(Site              = margin_left(0),
+                              Group             = margin_left(20),
+                              `AQS ID`          = margin_left(20),
+                              `Obs count`       = margin_left(55),
+                              `Obs AQI`         = col_format(50),
+                              `Forecast AQI`    = col_format(85)))
 
 
 saveRDS(verify_o3, "o3_table.rdata")
@@ -106,14 +104,17 @@ verify_pm <- select(verify, -c(`Ozone obs count`, `Ozone AQI`, `Ozone forecast`)
   filter(!is.na(`PM2.5 AQI`)) %>% 
   arrange(-`PM2.5 AQI`)
 
+
+names(verify_pm)[4:6] <- c("Obs count", "Obs AQI", "Forecast AQI")
+
 # Web format
 verify_pm <- formattable(verify_pm, 
-                         list(Site                  = margin_left(20),
-                              Group                 = margin_left(20),
-                              `AQS ID`              = margin_left(20),
-                              `PM2.5 obs count`     = margin_left(95),
-                              `PM2.5 AQI`           = col_format(70),
-                              `PM2.5 forecast`      = col_format(95)))
+                         list(Site               = margin_left(0),
+                              Group              = margin_left(20),
+                              `AQS ID`           = margin_left(20),
+                              `Obs count`        = margin_left(55),
+                              `PM2.5 AQI`        = col_format(50),
+                              `Forecast AQI`     = col_format(85)))
 
 if(FALSE) {
   verify_pm <- datatable(verify_pm, rownames = FALSE, options = list(searching=F, paging=F, scrollX=T))
@@ -129,6 +130,9 @@ saveRDS(verify_pm, "pm_table.rdata")
 
 ```
   
-## Ozone results  
-`r o3_df <- readRDS('o3_table.rdata'); o3_df`  
+### Ozone results  
+```{r, echo=F, warning=F, message=F}
+o3_df <- readRDS('o3_table.rdata')
+o3_df
+```
   

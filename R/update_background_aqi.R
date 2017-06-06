@@ -35,7 +35,7 @@ year        <- format(Sys.Date(), "%Y")
 
 gmt_time    <- (as.numeric(format(Sys.time() - 2100, tz = "GMT", "%H")) - 1) %% 24 
 
-if(gmt_time > 17) gmt_time <- 17
+if(gmt_time > 17 | gmt_time < 14) gmt_time <- 17
 
 airnow_base <- paste0('https://s3-us-west-1.amazonaws.com/files.airnowtech.org/airnow/', year, '/', day, '/')
 
@@ -125,7 +125,13 @@ missing_conc <- filter(aqi, is.na(OZONE))
 aqi          <- filter(aqi, !is.na(OZONE) | !is.na(PM25))
 
 
-# Find nearest AQS monitoring sites within designated distance.
+# Drop malfunctioning monitors
+bad_monitors <- c('000070118')
+
+aqi <- filter(aqi, !AqsID %in% bad_monitors)
+
+
+# Set nearest distance buffers for AQS monitoring sites
 max_distance <- 250 # miles
 inner_buffer <- 85  # miles
 
@@ -227,74 +233,97 @@ hys$backgr_o3_site_distance   <- round(hys$backgr_o3_site_distance)
 hys$backgr_pm25_site_distance <- round(hys$backgr_pm25_site_distance)
 
 
+# Site id column
+hys$site_catid <- hys$receptor
+
+hys$receptor   <- NULL
+
 #-- Fill missing values with nearest monitor
-missing <- filter(hys, is.na(wtd_Ozone_Noon_ppb) | is.na(wtd_pm25_Noon))
+
+#-- Create dummy table with all site + forecast day combinations
+blank_bg <- merge(data_frame(site_catid      = unique(sites$site_catid)),
+                  data_frame(forecast_day    = c("day0", "day1", "day2", "day3")),
+                  all = T)
+
+
+blank_bg <- merge(blank_bg, data_frame(receptor_height = c(10, 500)))
+
+                  
+#-- Find missing background entries
+missing <- filter(blank_bg, !paste(site_catid, forecast_day) %in% paste(hys$site_catid, hys$forecast_day))
+
+#-- Join time columns and coords
+missing <- merge(missing, filter(select(hys, -site_catid, -receptor_height), !duplicated(receptor_date)))
+
+#-- Background with NAs
+missing_na <- filter(hys, is.na(wtd_Ozone_Noon_ppb) | is.na(wtd_pm25_Noon))
+
+#-- Combine missing with NA
+missing    <- bind_rows(missing, missing_na)
+
 
 if(nrow(missing) > 0) {
 
+  
 # Add coords
-missing$site_catid <- missing$receptor
-
 missing <- left_join(missing, sites[ , c("site_catid", "monitor_lat", "monitor_long")])
 
 print("Filling missing sites...")
+
+# Add concentration columns
+missing$wtd_Ozone_Noon_ppb <- NA
+
+missing$wtd_pm25_Noon      <- NA
+
 
 for(i in 1:nrow(missing)) {
   
   print(i)
   
-  hys_coords <- with(missing[i, ], as.numeric(c(monitor_long, monitor_lat)))
+  hys_coords      <- with(missing[i, ], as.numeric(c(monitor_long, monitor_lat)))
   
-  near_sites_all  <- subset(hys, parcel_date == missing[i, ]$parcel_date)
+  near_sites_all  <- subset(hys, forecast_day == missing[i, ]$forecast_day)
   
   near_sites_all  <- subset(near_sites_all, receptor_height == missing[i, ]$receptor_height)
   
   
   # Add coords
-  near_sites_all$site_catid <- near_sites_all$receptor
-  
   near_sites_all  <- left_join(near_sites_all, sites[ , c("site_catid", "monitor_lat", "monitor_long")])
   
   near_sites_all  <- near_sites_all %>% 
                      rowwise() %>%
                      mutate(dist_to_hys = distVincentyEllipsoid(as.numeric(c(monitor_long, monitor_lat)), hys_coords) / 1609)
   
- if(is.na(missing[i, ]$wtd_Ozone_Noon_ppb)) { 
+  # Get nearest background ozone value
+  missing[i, ]$wtd_Ozone_Noon_ppb <- arrange(subset(near_sites_all, !is.na(wtd_Ozone_Noon_ppb)), dist_to_hys)$wtd_Ozone_Noon_ppb[1]
       
-      # Get nearest background ozone value
-      missing[i, ]$wtd_Ozone_Noon_ppb <- arrange(subset(near_sites_all, !is.na(wtd_Ozone_Noon_ppb)), dist_to_hys)$wtd_Ozone_Noon_ppb[1]
+  missing[i, ]$backgr_o3_site_distance <- NA
+
+  # Get nearest background PM2.5 value
+  missing[i, ]$wtd_pm25_Noon <- arrange(subset(near_sites_all, !is.na(wtd_pm25_Noon)), dist_to_hys)$wtd_pm25_Noon[1]
       
-      missing[i, ]$backgr_o3_site_distance <- NA
-    }
-    
- if(is.na(missing[i, ]$wtd_pm25_Noon)) {
-    
-      # Get nearest background PM2.5 value
-      missing[i, ]$wtd_pm25_Noon <- arrange(subset(near_sites_all, !is.na(wtd_pm25_Noon)), dist_to_hys)$wtd_pm25_Noon[1]
-      
-      missing[i, ]$backgr_pm25_site_distance <- NA
-    }
+  missing[i, ]$backgr_pm25_site_distance <- NA
     
 }
-
 
 # Join missing sites
 hys <- filter(hys, !is.na(wtd_Ozone_Noon_ppb) & !is.na(wtd_pm25_Noon))
 
-hys <- bind_rows(hys, missing[ , names(hys)])
+hys <- bind_rows(hys, missing[ , names(missing)[names(missing) %in% names(hys)]])
 
 }
+
 
 # Clean results
 hys$traj_hours <- paste(hys$forecast_day, paste0(-hys$traj_hours, "hrs"), sep = "_")
 
-hys_mean <- group_by(hys, receptor, parcel_date, traj_hours, hour) %>%
+hys_mean <- group_by(hys, site_catid, parcel_date, traj_hours, hour) %>%
             summarise(mean_Ozone_Noon_ppb = mean(wtd_Ozone_Noon_ppb, na.rm = T),
                       mean_pm25_Noon      = mean(wtd_pm25_Noon, na.rm = T)) %>%
             ungroup()
 
 
-group_by(hys_mean, receptor, traj_hours) %>% summarize(count = n()) %>% .$count %>% range()
+group_by(hys_mean, site_catid, traj_hours) %>% summarize(count = n()) %>% .$count %>% range()
 
 
 #-- Wide format
@@ -313,8 +342,10 @@ hys_wide$row_id <- 1:nrow(hys_wide)
 names(hys_wide)[1:2] <- c("site_catid", "hour_gmt")
 
 
-# SAVE Results
+# SAVE results
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 
 write.csv(hys_wide[ , c(1:11)], paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
 
+
+##
