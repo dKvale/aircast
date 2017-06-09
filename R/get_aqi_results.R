@@ -73,7 +73,9 @@ year      <- format(Sys.Date() - 1, "%Y")
 airvis_link <- paste0("ftp://airvis:mpca@52.27.98.92/airvision/")
 
 # Find last file of the day
-file_list   <- getURL(airvis_link, verbose = T, dirlistonly = T) %>% strsplit("\r\n") %>% .[[1]]
+file_list   <- getURL(airvis_link, verbose = T, dirlistonly = T) %>%
+               strsplit("\r\n") %>% 
+               .[[1]]
 
 final_hour  <- file_list[grepl(today, file_list)][1]
 
@@ -107,7 +109,8 @@ airvis_pm       <- filter(airvis_df,
 
 
 # Ozone summary
-airvis_ozone <- group_by(airvis_ozone, aqsid, Parameter) %>%                
+airvis_ozone <- group_by(airvis_ozone, aqsid, Parameter) %>% 
+                arrange(date) %>%
                 mutate(row_id = 1:n())
 
 
@@ -199,6 +202,24 @@ keep_columns <- c("date",
 
 
 write.csv(air_all[ , keep_columns], paste0(Sys.Date() - 1, "_AQI_observed", ".csv"), row.names = F)
+
+
+#-- Clear outdated FTP files
+#-------------------------------#
+
+# Read .sh file
+sh <- readLines("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff Folders\\Dorian\\AQI\\aircast\\_sh scripts\\clear_ftp.sh")
+
+# Update file to search for yesterday's date
+new_line <- grep("grep", sh)
+
+sh[new_line] <- paste0("for i in `curl -s -l ftp://\"$ftp_username\":\"$ftp_password\"@$ftp_ip/$ftp_path/ | grep ", yesterday, "`; do")
+
+writeLines(sh, "X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff Folders\\Dorian\\AQI\\aircast\\_sh scripts\\clear_ftp.sh")
+
+# Run .sh file in command line to delete files from yesterday
+shell(paste0('C: & C:\\Users\\dkvale\\AppData\\Local\\Programs\\Git\\bin\\sh ',
+              '"X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff Folders\\Dorian\\AQI\\aircast\\_sh scripts\\clear_ftp.sh"'))
 
 
 ##

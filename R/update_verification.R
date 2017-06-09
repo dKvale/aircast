@@ -23,41 +23,50 @@ names(sites) <- gsub(" ", "_", tolower(names(sites)))
 sites[sites$site_catid == "27-137-9000", "site_catid"] <- sites[sites$site_catid == "27-137-9000", "alt_siteid"]
 
 
-# Yesterday's forecast
+# Yesterday's official forecast
 #--------------------------------#
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/Steve/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values")
-print("Loading forecasts...")
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values")
+print("Loading official forecasts...")
 
-# Check if forecast date is current
-#if(format(file.info("All_Values.csv")$mtime, "%m %d") == format(Sys.Date() - 1, "%m %d")) {
-  
 aqi_forc <- read.csv("All_Values.csv", stringsAsFactors = FALSE)
   
-# Spread day forecasts across multiple columns
-#aqi_forc <- spread(aqi_forc, DayIndex, 'Max Avg8Hr')
-#names(aqi_forc)[3:7] <- c("short_name", "f_day0_max_ozone_8hr_ppb", "f_day1_max_ozone_8hr_ppb", "f_day2_max_ozone_8hr_ppb", "f_day3_max_ozone_8hr_ppb")
-  
-names(aqi_forc) <- c("forecast_day", "fcst_ozone_ppb", "fcst_ozone_aqi", "Date", "Group", "site_catid",
-                     "Latitude", "Longitude","short_name", "fcst_pm25_ugm3","fcst_pm25_aqi")
-  
-# Add date
-#aqi_forc$day_forecast_made <- Sys.Date() - 1
-  
-aqi_forc$forecast_date  <- as.Date(aqi_forc$Date, "%m/%d/%Y")
-  
-aqi_forc$Date <- NULL
 
-# Change date for testing
-#aqi_forc <- filter(aqi_forc, forecast_day == 0)
-#aqi_forc$forecast_date  <- aqi_forc$forecast_date - 1
+# Yesterday's model output forecast
+#------------------------------------#
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values")
+print("Loading modeling forecasts...")
+
+#list.files()
+
+mod_o3   <- read.csv("All_Values_O3.csv", stringsAsFactors = FALSE)
+
+mod_pm   <- read.csv("All_Values_PM.csv", stringsAsFactors = FALSE)
+
+mod_forc <- full_join(mod_o3, mod_pm)
+
+
+# Change names of model forecast values to distinguish 
+# between official submitted forecast
+names(mod_forc)[c(2:3,10:11)] <- c("mod_max.avg8hr", "mod_aqi_o3", "mod_pm25avg", "mod_aqi_pm")
+
+# Join tables into new table - "verify"
+verify  <- left_join(aqi_forc, mod_forc)
+
+
+names(verify) <- c("forecast_day", "fcst_ozone_ppb", "fcst_ozone_aqi", "Date", "Group", "site_catid",
+                   "Latitude", "Longitude", "short_name", "fcst_pm25_ugm3", "fcst_pm25_aqi",
+                   "mod_max.avg8hr", "mod_aqi_o3", "mod_pm25avg", "mod_aqi_pm")
+
+# Add date
+verify$forecast_date  <- as.Date(verify$Date, "%m/%d/%Y")
+
+verify$Date <- NULL
+
 
 # Rearrange columns with dates first
-aqi_forc <- aqi_forc[ , c(ncol(aqi_forc), 1, 5, 2:4, 6:(ncol(aqi_forc)-1))]
-  
-aqi_forc <- select(aqi_forc, -Latitude, -Longitude)
-  
-# Add monitor's city name
-#aqi_forc <- left_join(aqi_forc, select(sites, air_monitor, site_catid))
+verify <- verify[ , c(ncol(verify), 1, 5, 4, 2:3, 6:(ncol(verify) - 1))]
+
+verify <- select(verify, -Latitude, -Longitude)
 
 
 # Yesterday's CMAQ forecast
@@ -87,13 +96,13 @@ cmaq_forc$forecast_day  <- as.numeric(gsub("day", "", cmaq_forc$forecast_day))
 cmaq_forc$forecast_date <- Sys.Date() - 1 + cmaq_forc$forecast_day
 
 
-# Join tables into new table "verify"
-verify  <- left_join(aqi_forc, cmaq_forc)
+# Join table to verify table
+verify  <- left_join(verify, cmaq_forc)
 
 
 # Yesterday's model inputs
 #--------------------------------#
-setwd("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\Air_Modeling\\Steve\\AQI_Forecasting\\Tree_Data\\Forecast\\Forecast_Met")
+setwd("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\Air_Modeling\\AQI_Forecasting\\Tree_Data\\Forecast\\Forecast_Met")
 print("Model inputs...")
 
 all_inputs <- read_csv("Met_View.csv")
@@ -101,7 +110,9 @@ all_inputs <- read_csv("Met_View.csv")
 names(all_inputs)[1:3] <- c("forecast_day", "short_name", "site_catid")
 
 #-- Update date name and format
-all_inputs$Date <- as.Date(all_inputs$Date, "%m/%d/%Y")
+#all_inputs$Date <- as.Date(all_inputs$Date, "%m/%d/%Y")
+
+all_inputs$Date <- as.Date(all_inputs$Date, "%Y-%m-%d")
 
 names(all_inputs)[grep("Date", names(all_inputs))] <- "forecast_date"
 
@@ -150,7 +161,6 @@ names(hys_origin)[1:2] <- c("site_catid", "forecast_date")
 verify <- left_join(verify, hys_origin)
 
 
-
 # Clean table
 #--------------------------------#
 names(verify) <- gsub(" ", "_", tolower(names(verify)))
@@ -164,12 +174,9 @@ print("Loading previous day verifications...")
 
 #all_verify <- read_csv("2017_verification_table.csv")
 
-all_verify <- readRDS(paste0("Archive/", Sys.Date(), "_verification_table.Rdata"))
+all_verify <- readRDS(paste0("Archive/", Sys.Date() - 1, "_verification_table.Rdata"))
 
 #all_verify$forecast_date <- as.character(all_verify$forecast_date)
-
-#all_verify <- filter(all_verify, !date %in% verify$date)
-#names(all_verify)[grep("date", names(all_verify))][1] <- "forecast_date"
 
 #-- Remove duplicates and NA forecast days
 all_verify <- filter(all_verify, 

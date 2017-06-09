@@ -18,6 +18,11 @@ min_exists <- function(file_name, min_size = 1E+8) {
 }
 
 
+# Check if HYSPLIT has already run
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
+
+if(!min_exists(paste0(Sys.Date(), "_AQI_raw_HYSPLIT.csv"), min_size = 100)) {
+
 # Load site locations
 sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
 
@@ -89,6 +94,7 @@ met_list      <- c("__today/hysplit.t12z.namsf", "__today/hysplit.t12z.namsa", "
 
 # Drop missing met data
 met_list      <- met_list[min_exists(met_list)]
+
 closeAllConnections()
 
 back_forecast <- aqi_traj(date = today, receptor_height = 10, traj_hours = 24)
@@ -128,5 +134,6 @@ back_forecast
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 write_csv(back_forecast, paste0(Sys.Date(), "_AQI_raw_HYSPLIT.csv"))
 
+}
 
 ##
