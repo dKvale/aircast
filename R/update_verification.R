@@ -69,36 +69,6 @@ verify <- verify[ , c(ncol(verify), 1, 5, 4, 2:3, 6:(ncol(verify) - 1))]
 verify <- select(verify, -Latitude, -Longitude)
 
 
-# Yesterday's CMAQ forecast
-#--------------------------------#
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
-print("CMAQ...")
-
-cmaq_forc <- read_csv(paste0(Sys.Date() - 1, "_CMAQ_forecast.csv"))
-
-cmaq_forc <- select(cmaq_forc, -cmaq_day0_max_ozone_1hr, -cmaq_day1_max_ozone_1hr)
-
-names(cmaq_forc) [1:2] <- c("day0", "day1") 
-
-# Flip to long format
-cmaq_forc <- tidyr::gather(data = cmaq_forc, key = forecast_day, value = cmaq_ozone_ppb, na.rm = FALSE, day0, day1)
-
-
-# Add category
-cmaq_forc <- ungroup(cmaq_forc) %>% 
-             rowwise() %>%
-             mutate(cmaq_ozone_aqi = conc2aqi(cmaq_ozone_ppb, "OZONE")) %>%
-             ungroup()
-
-# Add days
-cmaq_forc$forecast_day  <- as.numeric(gsub("day", "", cmaq_forc$forecast_day))
-
-cmaq_forc$forecast_date <- Sys.Date() - 1 + cmaq_forc$forecast_day
-
-
-# Join table to verify table
-verify  <- left_join(verify, cmaq_forc)
-
 
 # Yesterday's model inputs
 #--------------------------------#
@@ -224,13 +194,50 @@ yesterday_fcst <- filter(all_verify, forecast_date == Sys.Date() - 1) %>%
 yesterday_fcst <- left_join(yesterday_fcst, select(actuals, -air_monitor, -aqsid))
 
 
-# Join attached data to master table
+
+# Yesterday's CMAQ forecast
+#--------------------------------#
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
+print("CMAQ...")
+
+cmaq_forc <- read_csv(paste0(Sys.Date() - 1, "_CMAQ_forecast.csv"))
+
+cmaq_forc <- select(cmaq_forc, -cmaq_day0_max_ozone_1hr, -cmaq_day1_max_ozone_1hr)
+
+names(cmaq_forc) [1:2] <- c("day0", "day1") 
+
+# Flip to long format
+cmaq_forc <- tidyr::gather(data = cmaq_forc, key = forecast_day, value = cmaq_ozone_ppb, na.rm = FALSE, day0, day1)
+
+
+# Add category
+cmaq_forc <- ungroup(cmaq_forc) %>% 
+             rowwise() %>%
+             mutate(cmaq_ozone_aqi = conc2aqi(cmaq_ozone_ppb, "OZONE")) %>%
+             ungroup()
+
+# Add days
+cmaq_forc$forecast_day  <- as.numeric(gsub("day", "", cmaq_forc$forecast_day))
+
+cmaq_forc$forecast_date <- Sys.Date() - 1 + cmaq_forc$forecast_day
+
+
+# Attach CMAQ to yesterday forecasts
+yesterday_fcst <- left_join(select(yesterday_fcst, -cmaq_ozone_ppb, -cmaq_ozone_aqi),
+                            cmaq_forc)
+
+
+
+# Join yesterday actuals & CMAQ to master table
+#------------------------------------------------#
 all_verify <- filter(all_verify, forecast_date != (Sys.Date() - 1))
 
 all_verify <- bind_rows(yesterday_fcst, all_verify)
 
 
+
 # Save master verification table
+#------------------------------------------------#
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
 print("Saving file...")
 
