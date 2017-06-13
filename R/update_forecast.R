@@ -71,6 +71,12 @@ if(current_time > 12) {
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("update_background_aqi.R"))
   
+  
+  # E-mail background results
+  print("E-mailing background results")
+  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
+  try(source("email_background.R"))
+  
 }
 
 

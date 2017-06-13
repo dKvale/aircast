@@ -17,13 +17,12 @@ aqi_team <- paste0(c("dorian.kvale",
 
 #aqi_team <- aqi_team[1]
 
-aqi_team <- paste0(aqi_team, collapse = ", ")
+#aqi_team <- paste0(aqi_team, collapse = ",")
 
 
 
 #-- Load credentials
 creds <- read.csv("C:\\Users\\dkvale\\Desktop\\credentials.csv", stringsAsFactors = F)
-
 
 
 #-- Create AQI table
@@ -86,8 +85,9 @@ verify <- verify[!duplicated(verify$site_catid), ]
 names(verify)[grep("site_catid", names(verify))] <- "aqs_id"
 
 
+
 #-- Filter to yesterdays results
-#verify <- filter(verify, forecast_date == Sys.Date() - days_past - 1, forecast_day == 0)
+verify <- filter(verify, forecast_date == Sys.Date() - days_past - 1)
 
 verify <- filter(verify, forecast_day == min(verify$forecast_day, na.rm = T))
 
@@ -243,11 +243,11 @@ msg_body <- gsub("<table",
 send_msg <- function(x) {
   
   if(FALSE) {
-    html_msg <- mime(to       = x,
-                   from     = "mpca.aqi@gmail.com",
-                   subject  = "AQI report")
+    #html_msg <- mime(to       = x,
+    #                 from     = "mpca.aqi@gmail.com",
+    #                 subject  = "AQI report")
   
-    html_msg <- html_body(html_msg, msg_body)
+    #html_msg <- html_body(html_msg, msg_body)
   
     #send_message(html_msg)
   }
@@ -259,7 +259,7 @@ send_msg <- function(x) {
               passwd    = creds$mpca_aqi_pwd)
   
   send.mail(from         = "mpca.aqi@gmail.com",
-            to           = aqi_team,
+            to           = x,
             subject      = "AQI report",
             body         = msg_body,
             html         = TRUE,
@@ -271,9 +271,10 @@ send_msg <- function(x) {
 }
                   
 #-- Send e-mail one person at a time
-#for(i in aqi_team) {
+for(i in aqi_team) {
 
-  i <- aqi_team
+  #i <- aqi_team
+  print(i)
   
   setwd("~")
   setwd("../Desktop")
@@ -292,12 +293,12 @@ send_msg <- function(x) {
     #-- Set time limit on run time
     send_fail <- tryCatch(evalWithTimeout(send_msg(i), timeout = 5, onTimeout = "error"), TimeoutException = function(ex) NA, error = function(e) NA)
     
-    Sys.sleep(3)
+    Sys.sleep(1)
     
     run_count <- run_count + 1
 
   }
-#}
+}
        
 
 
