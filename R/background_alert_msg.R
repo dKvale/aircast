@@ -55,7 +55,7 @@ if(back_missing) {
                    "\n",
   
   "### NAMs Background data missing for `r format(Sys.Date(), '%A %b %d, %Y')` \n\n\n",
-  "Download these files to the <i>hysplit/__today</i> folder on your desktop:  \n",
+  "Download these files to the folder: `Documents/background script/hysplit/__today`  \n",
   paste0("1. ftp://arlftp.arlhq.noaa.gov/forecast/", date, "/hysplit.t12z.", "namf  "),
   paste0("1. ftp://arlftp.arlhq.noaa.gov/forecast/", date, "/hysplit.t12z.", "nama  "),
   paste0("1. ftp://arlftp.arlhq.noaa.gov/forecast/", date, "/hysplit.t12z.", "namsf  "),
@@ -63,12 +63,18 @@ if(back_missing) {
   "  \n ",
   "  \n",
   "  \n ",
-  "<br>",
-  "To run the HYSPLIT model for today:   \n",
-  "1. Open the _hysplit_ folder  
-      - X:\\\\Agency_Files\\\\Outcomes\\\\Risk_Eval_Air_Mod\\\\_Air_Risk_Evaluation\\\\Staff Folders\\\\Dorian\\\\AQI\\\\Current forecast",
-  "1. Open the file <i> run_current_hysplit </i> in R-Studio",
-  "1. Click the  <i>-> Source </i> button near the top middle of the screen"
+  "<br>  \n",
+  "  ",
+  "### Run the HYSPLIT model for today:   \n",
+  "1. Open the folder: `Documents/Background script`",
+  "1. Open the file: <i> 2 - run_hysplit.R </i> (it should open in R-Studio)",
+  "1. Click the <i> [-> Source] </i> button near the top middle of the screen   \n",
+  "  \n",
+  "  ",
+  "### Attach the air monitoring observations:   \n",
+  "1. Open the folder: `Documents/background script` ",
+  "1. Open the file: <i> download_background_aqi.R </i>",
+  "1. Click the <i> [-> Source] </i> button near the top middle of the screen   \n"
   )
   
   #-- Write html file

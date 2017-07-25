@@ -53,9 +53,9 @@ send_msg <- function(x) {
     
               
 #-- Send e-mail one person at a time
-#for(i in aqi_team) {
+for(i in aqi_team) {
 
-  i <- aqi_team
+  #i <- aqi_team
   print(i)
   
   setwd("~")
@@ -76,7 +76,7 @@ send_msg <- function(x) {
 
   }
 
-  #}
+  }
        
 
 

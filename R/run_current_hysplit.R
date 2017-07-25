@@ -59,7 +59,7 @@ aqi_traj <- function(date            = NULL,
                              direction    = "backward",
                              met_type     = "NAM",
                              met_dir      = "C:/Users/dkvale/Desktop/hysplit",
-                             extended_met = F,
+                             extended_met = TRUE,
                              vert_motion  = 0,
                              model_height = 20000,
                              traj_name    = as.character(round(runif(1), 5)),
@@ -69,6 +69,16 @@ aqi_traj <- function(date            = NULL,
     traj$receptor        <- site
     traj$receptor_height <- receptor_height
     traj$forecast_day    <- forecast_day
+    
+    # Aggregate MET observations
+    traj$traj_rain_sum    <- sum(traj$rainfall, na.rm = T)
+    traj$traj_rain_max    <- max(traj$rainfall, na.rm = T)
+    traj$traj_rain_hrs_02 <- sum(traj$rainfall > 0.2, na.rm = T)
+    traj$traj_rain_hrs_05 <- sum(traj$rainfall > 0.5, na.rm = T)
+    traj$traj_rh          <- mean(traj$rh, na.rm = T) %>% round(1)
+    traj$traj_sunflux     <- sum(traj$sunflux, na.rm = T) %>% round()
+    
+    traj <- select(traj, -rainfall, -rh, -sunflux)
     
     traj <- filter(traj, hour.inc %in% c(-24, -48, -72))
     
@@ -97,15 +107,39 @@ met_list      <- met_list[min_exists(met_list)]
 
 closeAllConnections()
 
+start.time <- Sys.time()
+
 back_forecast <- aqi_traj(date = today, receptor_height = 10, traj_hours = 24)
+
+end.time <- Sys.time()
+end.time - start.time
+
 back_forecast <- bind_rows(back_forecast, aqi_traj(date = today, receptor_height = 500, traj_hours = 24))
 
 # Tomorrow
 forecast_day  <- "day1"
 
-#back_forecast <- aqi_traj(date = Sys.Date() + 1, receptor_height = 10, traj_hours = 24)
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 1, receptor_height = 10, traj_hours = 24))
+day1 <- tryCatch(aqi_traj(date = today + 1, receptor_height = 10, traj_hours = 24), error = function(err) NA, silent = T)
+
+# If fail, use namsf      
+if(is.na(day1)) {
+  
+  met_list   <- c("__today/hysplit.t12z.namf", "__today/hysplit.t12z.nama", "__today/hysplit.t06z.namf", "__today/hysplit.t06z.nama")
+  
+  # Drop missing met data
+  met_list   <- met_list[min_exists(met_list)]
+  
+  # Run HYSPLIT
+  day1 <- aqi_traj(date = today + 1, receptor_height = 10, traj_hours = 24)
+  
+} 
+
+# Join
+back_forecast <- bind_rows(back_forecast, day1)
+
+# 500 meter background
 back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 1, receptor_height = 500, traj_hours = 24))
+
 
 # 2 days ahead
 forecast_day  <- "day2"

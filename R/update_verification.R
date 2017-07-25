@@ -1,6 +1,5 @@
 #! /usr/bin/env Rscript
 
-
 library(dplyr)
 library(readr)
 library(tidyr)
@@ -47,7 +46,7 @@ mod_forc <- full_join(mod_o3, mod_pm)
 
 # Change names of model forecast values to distinguish 
 # between official submitted forecast
-names(mod_forc)[c(2:3,10:11)] <- c("mod_max.avg8hr", "mod_aqi_o3", "mod_pm25avg", "mod_aqi_pm")
+names(mod_forc)[c(2:3,10:11)] <- c("mod_max_avg8hr", "mod_aqi_o3", "mod_pm25avg", "mod_aqi_pm")
 
 # Join tables into new table - "verify"
 verify  <- left_join(aqi_forc, mod_forc)
@@ -55,10 +54,16 @@ verify  <- left_join(aqi_forc, mod_forc)
 
 names(verify) <- c("forecast_day", "fcst_ozone_ppb", "fcst_ozone_aqi", "Date", "Group", "site_catid",
                    "Latitude", "Longitude", "short_name", "fcst_pm25_ugm3", "fcst_pm25_aqi",
-                   "mod_max.avg8hr", "mod_aqi_o3", "mod_pm25avg", "mod_aqi_pm")
+                   "mod_max_avg8hr", "mod_aqi_o3", "mod_pm25avg", "mod_aqi_pm")
 
-# Add date
-verify$forecast_date  <- as.Date(verify$Date, "%m/%d/%Y")
+#-- Check for "/" slash in date
+if(grepl("[/]", verify$Date[1])) {
+  verify$Date <- as.Date(verify$Date, "%m/%d/%Y")
+} else {
+  verify$Date <- as.Date(verify$Date, "%Y-%m-%d")
+}
+
+verify$forecast_date  <- verify$Date
 
 verify$Date <- NULL
 
@@ -67,7 +72,6 @@ verify$Date <- NULL
 verify <- verify[ , c(ncol(verify), 1, 5, 4, 2:3, 6:(ncol(verify) - 1))]
 
 verify <- select(verify, -Latitude, -Longitude)
-
 
 
 # Yesterday's model inputs
@@ -79,11 +83,16 @@ all_inputs <- read_csv("Met_View.csv")
 
 names(all_inputs)[1:3] <- c("forecast_day", "short_name", "site_catid")
 
-#-- Update date name and format
-#all_inputs$Date <- as.Date(all_inputs$Date, "%m/%d/%Y")
+#-- Update date format for consistency
 
-all_inputs$Date <- as.Date(all_inputs$Date, "%Y-%m-%d")
+#-- Check for "/" slash in date
+if(grepl("[/]", all_inputs$Date[1])) {
+   all_inputs$Date <- as.Date(all_inputs$Date, "%m/%d/%Y")
+} else {
+   all_inputs$Date <- as.Date(all_inputs$Date, "%Y-%m-%d")
+}
 
+#-- Set date column name
 names(all_inputs)[grep("Date", names(all_inputs))] <- "forecast_date"
 
 #-- Join all
@@ -95,26 +104,53 @@ verify   <- left_join(verify, select(all_inputs, -short_name))
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 print("Loading HYSPLIT...")
 
-hys <- read_csv(paste0(Sys.Date() - 1, "_AQI_raw_HYSPLIT.csv"))
+load_hys  <- FALSE
 
+days_past <- 1
+
+while(!load_hys) {
+  
+  hys <- tryCatch(read_csv(paste0(Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv")), error = function(e) NA)
+  
+  if(is.na(hys)) {
+    
+    days_past <- days_past + 1
+    
+  } else {
+    
+    load_hys <- TRUE
+  }
+  
+  if(days_past > 10) load_hys <- TRUE
+}
+  
 # Convert day index column
 hys$forecast_day <- as.numeric(gsub("day", "", hys$forecast_day))
 
 # Collapse origin coordinates
-hys$lat_long <- paste(hys$lat, hys$lon, sep = ", ")
+hys$background_origin <- paste(hys$lat, hys$lon, sep = ", ")
+
+#-- Drop new MET columns
+hys <- select(hys, -c(traj_rain_sum, 
+                      traj_rain_max, 
+                      traj_rain_hrs_02, 
+                      traj_rain_hrs_05, 
+                      traj_rh, 
+                      traj_sunflux))
+
 
 # Split 10m and 500m trajectory into 2 columns
 hys_10m    <- filter(hys, receptor_height == 10)
 hys_500m   <- filter(hys, receptor_height == 500)
 
 # Wide format by forecast day
-#hys_10m           <- spread(hys_10m[ , -c(2:13)], forecast_day, lat_long)
-hys_10m            <- hys_10m[ , -c(2:11,13)]
-names(hys_10m)[4]  <- "background_origin_10m"
+#hys_10m            <- spread(hys_10m[ , -c(2:13)], forecast_day, lat_long)
+hys_10m               <- hys_10m[ , -c(2:11,13)]
+names(hys_10m)[4:ncol(hys_10m)]  <- paste0(names(hys_10m)[4:ncol(hys_10m)], "_10m")
 
-#hys_500m          <- spread(hys_500m[ , -c(2:13)], forecast_day, lat_long)
-hys_500m           <- hys_500m[ , -c(2:11,13)]
-names(hys_500m)[4] <-  "background_origin_500m"
+#hys_500m           <- spread(hys_500m[ , -c(2:13)], forecast_day, lat_long)
+hys_500m              <- hys_500m[ , -c(2:11,13)]
+names(hys_500m)[4:ncol(hys_500m)] <- paste0(names(hys_500m)[4:ncol(hys_500m)], "_500m")
 
 
 #-- Join 10m and 500m tables
@@ -142,9 +178,9 @@ verify <- filter(verify, !is.na(forecast_day), !is.na(site_catid))
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
 print("Loading previous day verifications...")
 
-#all_verify <- read_csv("2017_verification_table.csv")
+all_verify <- read_csv("2017_verification_table.csv")
 
-all_verify <- readRDS(paste0("Archive/", Sys.Date() - 1, "_verification_table.Rdata"))
+#all_verify <- readRDS(paste0("Archive/", Sys.Date() - 1, "_verification_table.Rdata"))
 
 #all_verify$forecast_date <- as.character(all_verify$forecast_date)
 
@@ -153,6 +189,11 @@ all_verify <- filter(all_verify,
                      !paste(forecast_date, forecast_day) %in% paste(verify$forecast_date, verify$forecast_day),
                      !is.na(forecast_day),
                      !is.na(forecast_date))
+
+#-- Add new data to table
+verify$background_10m_500m_avg_24hr_ozone_noon_ppb <- as.numeric(verify$background_10m_500m_avg_24hr_ozone_noon_ppb)
+verify$background_origin_10m  <- as.character(verify$background_origin_10m)
+verify$background_origin_500m <- as.character(verify$background_origin_500m)
 
 all_verify <- bind_rows(verify, all_verify)
 
@@ -165,7 +206,7 @@ print("Loading actuals...")
 actuals <- read_csv(paste0(Sys.Date() - 1, "_AQI_observed", ".csv"))
 
 #-- Header names
-names(actuals)[c(1,5:8)] <- c("forecast_date","count_ozone_obs",
+names(actuals)[c(1, 5:8)] <- c("forecast_date","count_ozone_obs",
                               "count_pm25_obs","obs_ozone_ppb","obs_pm25_ugm3")
 
 
@@ -200,32 +241,39 @@ yesterday_fcst <- left_join(yesterday_fcst, select(actuals, -air_monitor, -aqsid
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 print("CMAQ...")
 
-cmaq_forc <- read_csv(paste0(Sys.Date() - 1, "_CMAQ_forecast.csv"))
+cmaq_all <- data_frame()
 
-cmaq_forc <- select(cmaq_forc, -cmaq_day0_max_ozone_1hr, -cmaq_day1_max_ozone_1hr)
-
-names(cmaq_forc) [1:2] <- c("day0", "day1") 
-
-# Flip to long format
-cmaq_forc <- tidyr::gather(data = cmaq_forc, key = forecast_day, value = cmaq_ozone_ppb, na.rm = FALSE, day0, day1)
-
-
-# Add category
-cmaq_forc <- ungroup(cmaq_forc) %>% 
-             rowwise() %>%
-             mutate(cmaq_ozone_aqi = conc2aqi(cmaq_ozone_ppb, "OZONE")) %>%
-             ungroup()
-
-# Add days
-cmaq_forc$forecast_day  <- as.numeric(gsub("day", "", cmaq_forc$forecast_day))
-
-cmaq_forc$forecast_date <- Sys.Date() - 1 + cmaq_forc$forecast_day
+# Load CMAQ forecast from past 2 days
+for(i in 1:2) {
+  cmaq_forc <- read_csv(paste0(Sys.Date() - i, "_CMAQ_forecast.csv"))
+  
+  cmaq_forc <- select(cmaq_forc, -cmaq_day0_max_ozone_1hr, -cmaq_day1_max_ozone_1hr)
+  
+  names(cmaq_forc) [1:2] <- c("day0", "day1") 
+  
+  # Flip to long format
+  cmaq_forc <- tidyr::gather(data = cmaq_forc, key = forecast_day, value = cmaq_ozone_ppb, na.rm = FALSE, day0, day1)
+  
+  
+  # Add category
+  cmaq_forc <- ungroup(cmaq_forc) %>% 
+               rowwise() %>%
+               mutate(cmaq_ozone_aqi = conc2aqi(cmaq_ozone_ppb, "OZONE")) %>%
+               ungroup()
+  
+  # Add days & date
+  cmaq_forc$forecast_day  <- as.numeric(gsub("day", "", cmaq_forc$forecast_day))
+  
+  cmaq_forc$forecast_date <- Sys.Date() - i + cmaq_forc$forecast_day
+  
+  # Combine
+  cmaq_all <- bind_rows(cmaq_forc, cmaq_all)
+  
+}
 
 
 # Attach CMAQ to yesterday forecasts
-yesterday_fcst <- left_join(select(yesterday_fcst, -cmaq_ozone_ppb, -cmaq_ozone_aqi),
-                            cmaq_forc)
-
+yesterday_fcst <- left_join(select(yesterday_fcst, -cmaq_ozone_ppb, -cmaq_ozone_aqi), cmaq_forc)
 
 
 # Join yesterday actuals & CMAQ to master table
@@ -233,7 +281,6 @@ yesterday_fcst <- left_join(select(yesterday_fcst, -cmaq_ozone_ppb, -cmaq_ozone_
 all_verify <- filter(all_verify, forecast_date != (Sys.Date() - 1))
 
 all_verify <- bind_rows(yesterday_fcst, all_verify)
-
 
 
 # Save master verification table

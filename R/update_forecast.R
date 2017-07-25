@@ -16,7 +16,6 @@ if(current_time <= 10) {
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("update_verification.R"))
   
-  
   # Email yesterday's monitoring results
   print("E-mailing yesterday's verification")
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
@@ -49,7 +48,6 @@ if(current_time == 12) {
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("background_alert_msg.R"))
   
-  
   # Run HYSPLIT model
   print("Running HYSPLIT")
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
@@ -65,12 +63,10 @@ if(current_time > 12) {
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("update_cmaq_forecast.R"))
   
-  
   # Attach background monitoring results
   print("Attaching monitoring results")
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("update_background_aqi.R"))
-  
   
   # E-mail background results
   print("E-mailing background results")
