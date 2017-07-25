@@ -10,7 +10,7 @@ d_key <- 'ea8610622c9d63c30ca25dea03ec3d90'
 
 Sys.setenv(DARKSKY_API_KEY = d_key)
 
-days <- data_frame(date = seq(as.Date("2010-12-31"), as.Date("2017-01-01"), 1),
+days <- data_frame(date = seq(as.Date("2009-12-31"), as.Date("2017-01-01"), 1),
                    join = 1)
 
 days[1:5, ]

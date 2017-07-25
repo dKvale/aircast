@@ -12,7 +12,7 @@ source("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Sta
 
 # Create minimum exists function
 # Checks if file exists and if meets minimum file size
-min_exists <- function(file_name, min_size = 1E+8) { 
+min_exists <- function(file_name, min_size = 7E+8) { 
   
   file.exists(file_name) & file.size(file_name) > min_size
   

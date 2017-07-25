@@ -55,10 +55,18 @@ aqi <- filter(aqi[ -c(5,7:8)],
 
 
 # Flip to wide format
+if(nrow(aqi) < 1) {
+  
+  aqi[1:2, ] <- NA
+  
+  aqi$Parameter <- c("OZONE-8HR", "PM2.5-24hr")
+ 
+}
+
 aqi <- spread(aqi, Parameter, Concentration)
-
+  
 names(aqi)[c(4:5)] <-  c("max_ozone_8hr", "pm25_24hr")
-
+  
 
 # QC MPCA sites using AirVision data
 
@@ -68,6 +76,7 @@ yesterday <- gsub("-", "", Sys.Date() - 1)
 today     <- gsub("-", "", Sys.Date())
 
 year      <- format(Sys.Date() - 1, "%Y")
+
 
 # Connect to aqi-watch FTP site
 airvis_link <- paste0("ftp://airvis:mpca@52.27.98.92/airvision/")
@@ -113,7 +122,7 @@ airvis_ozone <- group_by(airvis_ozone, aqsid, Parameter) %>%
                 arrange(date) %>%
                 mutate(row_id = 1:n())
 
-
+# Calculate 8-hr ozone values
 for(i in 1:nrow(airvis_ozone)) {
 
   aqs  <- airvis_ozone[i, ]$aqsid
@@ -124,7 +133,7 @@ for(i in 1:nrow(airvis_ozone)) {
 
 }    
 
-
+# Drop 8-hr averages from first 4 hours of day
 airvis_ozone[airvis_ozone$row_id %in% 1:4, ]$ozone_8hr <- NA
   
 
@@ -147,9 +156,11 @@ air_all <- full_join(aqi, airvis_ozone)
 air_all <- full_join(air_all, airvis_pm)
 
 
-# Join IDs
+# Join Sites and AQS-IDs
 air_all <- left_join(air_all, select(sites, c(air_monitor, site_catid, aqsid)))
 
+# Drop blank sites
+air_all <- filter(air_all, !is.na(aqsid))
 
 # Missing sites
 miss_sites <- filter(sites, 

@@ -3,24 +3,39 @@ library(lubridate)
 
 source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R/hysplit_support_functions.R")
 
+source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R/traj_read.R")
+
+
+# Test extended_met
+if(FALSE) {
+  
+  a = hysplit_trajectory(height = c(10),
+                         duration = 24,
+                         run_period = "2016-10-05",
+                         daily_hours = 12,
+                         direction = "backward",
+                         met_type = "reanalysis",
+                         extended_met = T) 
+}
+
 hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                          lon            = -93.22,
                          height         = 10,
                          duration       = 24,
                          run_period     = "2017-03-23",
-                         daily_hours    = c(17),
+                         daily_hours    = 17,
                          direction      = "backward",
-                         met_type       = "reanalysis",
+                         met_type       = "narr",
                          met_dir        = "C:/Users/dkvale/Desktop/hysplit",
-                         extended_met   = F,
+                         extended_met   = TRUE,
                          vert_motion    = 0,
                          model_height   = 20000,
                          return_traj_df = TRUE,
-                         traj_name      = NULL,
+                         traj_name      = as.character(round(runif(1), 5)),
                          exec_dir       = NULL,
                          binary_path    = NULL,
                          os             = "win",
-                         met_files      = NULL) {
+                         met_files      = met_list) {
   
   if(is.null(exec_dir)) exec_dir <- getwd()
   
@@ -49,6 +64,23 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
   # Write default versions of the SETUP.CFG and
   # ASCDATA.CFG files in the working directory
   hysplit_config_init(dir = exec_dir)
+  
+  
+  if (extended_met) {
+    #setup_cfg <- readLines('SETUP.CFG')
+    #setup_cfg <- gsub("(tm_.* )(0),", "\\11,", setup_cfg)
+    #cat(setup_cfg,
+    #    sep = "\n",
+    #    file = paste0(exec_dir, "/", "SETUP.CFG"))
+    
+    # dswf = DOWNWARD SHORT WAVE RADIATION FLUX
+    # tppa = TOTAL ACCUMULATED PRECIPITATION
+    
+    cat(c("&SETUP","kmsl = 0,","tm_rain = 1,", "tm_relh = 1,", "tm_dswf = 1,", "/ "),
+        sep = "\n",
+        file = paste0(exec_dir, "/", "SETUP.CFG"))
+  }
+  
   
   # Stop function if there are vectors of different
   # length for `lat` and `lon`
@@ -214,20 +246,20 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
           
         # Write name of output filename to 'CONTROL'
           
-        # Edited to always save to same file to limit new folders  - Dorian
+        # Edit to always save to same file to limit new folders  - Dorian
           if(FALSE) {cat("temp_traj_file", "\n",
               file = paste0(exec_dir, "/CONTROL"),
               sep = '', append = TRUE)
           }
           
-              cat(output_filename, "\n",
-              file = paste0(exec_dir, "/CONTROL"),
-              sep = '', append = TRUE)
+           cat(output_filename, "\n",
+               file = paste0(exec_dir, "/CONTROL"),
+               sep = '', append = TRUE)
           
         
         # The CONTROL file is now complete and in the
         # working directory, so, execute the model run
-          shell(paste0('C: &&', 'cd "', exec_dir, '" && "', binary_path, '"'))
+        shell(paste0('C: &&', 'cd "', exec_dir, '" && "', binary_path, '"'))
     
     # Create the output folder if it doesn't exist
     if (!dir.exists(paste0(exec_dir, "/",
@@ -247,11 +279,13 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
 
     
     # Obtain a trajectory data frame
-    traj_df <- trajectory_read(output_folder = paste0(exec_dir, "/", folder_name))
+    traj_df <- traj_read(output_folder = paste0(exec_dir, "/", folder_name))
     
-    col_names   <- names(traj_df)
+    col_names   <- colnames(traj_df)
+    
     ensemble_df <- data.frame(mat.or.vec(nr = 0, nc = length(col_names)))
-    names(ensemble_df) <- col_names
+    
+    colnames(ensemble_df) <- col_names
     
     traj_df[ , 1] <- z
     
