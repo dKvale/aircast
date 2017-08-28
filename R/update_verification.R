@@ -5,6 +5,9 @@ library(readr)
 library(tidyr)
 
 
+#AirNow credentials
+creds <- read_csv("C:\\Users\\dkvale\\Desktop\\credentials.csv")
+
 # AQI conversion functions
 source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-watch/R/aqi_convert.R")
 
@@ -14,7 +17,6 @@ source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fo
 print("Loading sites...")
 
 sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
-                  #stringsAsFactors = FALSE)
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
@@ -27,15 +29,50 @@ sites[sites$site_catid == "27-137-9000", "site_catid"] <- sites[sites$site_catid
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values")
 print("Loading official forecasts...")
 
+# Load forecasts from AirNow
+aqi_forc <- readLines(paste0("ftp://", creds$user, ":", creds$pwd, "@ftp.airnowapi.org/ReportingArea/reportingarea.dat"))
+
+aqi_forc <- gsub("[|]", ",", aqi_forc)
+
+aqi_forc <- read_csv(paste0(aqi_forc, collapse = "\n"), col_names = F)
+
+# Names 
+names(aqi_forc) <- c("date_issued", 
+                     "date_forecast", 
+                     "time_forecast", 
+                     "tzone", 
+                     "aqi_day", 
+                     "is_forecast", 
+                     "primary_aqi", 
+                     "Site", 
+                     "state",
+                     "lat",
+                     "long",
+                     "param",
+                     "aqi",
+                     "aqi_cat",
+                     "alert_day",
+                     "discussion",
+                     "agency") 
+  
+
+aqi_forc <- select(aqi_forc, -c(time_forecast, tzone, lat, long, alert_day, discussion, agency))
+  
+
+# Filter sites
+aqi_forc <- filter(aqi_forc, state %in% c("MN","WI","ND"))
+
+unique(aqi_forc$Site)
+
+# Load internal forecasts for missing sites
 aqi_forc <- read.csv("All_Values.csv", stringsAsFactors = FALSE)
   
+
 
 # Yesterday's model output forecast
 #------------------------------------#
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values")
 print("Loading modeling forecasts...")
-
-#list.files()
 
 mod_o3   <- read.csv("All_Values_O3.csv", stringsAsFactors = FALSE)
 
@@ -180,6 +217,8 @@ print("Loading previous day verifications...")
 
 all_verify <- read_csv("2017_verification_table.csv")
 
+all_verify <- filter(all_verify, !duplicated(paste0(forecast_date, forecast_day, site_catid)))
+
 #all_verify <- readRDS(paste0("Archive/", Sys.Date() - 1, "_verification_table.Rdata"))
 
 #all_verify$forecast_date <- as.character(all_verify$forecast_date)
@@ -273,12 +312,15 @@ for(i in 1:2) {
 
 
 # Attach CMAQ to yesterday forecasts
-yesterday_fcst <- left_join(select(yesterday_fcst, -cmaq_ozone_ppb, -cmaq_ozone_aqi), cmaq_forc)
+yesterday_fcst <- left_join(select(yesterday_fcst, -cmaq_ozone_ppb, -cmaq_ozone_aqi), cmaq_all)
 
 
 # Join yesterday actuals & CMAQ to master table
 #------------------------------------------------#
 all_verify <- filter(all_verify, forecast_date != (Sys.Date() - 1))
+
+all_verify$cmaq_ozone_aqi     <- as.numeric(all_verify$cmaq_ozone_aqi)
+all_verify$cmaq_ozone_ppb     <- as.numeric(all_verify$cmaq_ozone_ppb)
 
 all_verify <- bind_rows(yesterday_fcst, all_verify)
 

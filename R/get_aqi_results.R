@@ -17,8 +17,6 @@ sites[sites$site_catid == "27-137-9000", "site_catid"] <- sites[sites$site_catid
 
 # Drop dashes in IDs to match AQS
 sites$aqsid <- gsub("-", "", sites$site_catid)
-#sites$aqsid <- gsub("-", "", sites$site_catid)
-
 
 # Filter to one site per forecast city
 sites <- filter(sites, !site_catid %in% c('27-017-7416'))
@@ -45,6 +43,9 @@ aqi   <- try(read_delim(airnow_link, "|",
 closeAllConnections()
 
 
+if(class(aqi) == "try-error") aqi <- data_frame("date" = as.character(NA),
+                                                "aqsid" = as.character(NA),3,4,5,6,7,8)[0, ]
+
 # Clean
 names(aqi) <- c("date", "aqsid", "City", "Parameter", "Units", "Concentration", "Hours", "Agency")
 
@@ -54,13 +55,31 @@ aqi <- filter(aqi[ -c(5,7:8)],
               Parameter %in% c("OZONE-8HR", "PM2.5-24hr"))
 
 
+# Add missing sites from AirNow's "yesterday.dat" file
+
+
+
 # Flip to wide format
+
+# Create empty rows if table is blank
 if(nrow(aqi) < 1) {
   
   aqi[1:2, ] <- NA
   
   aqi$Parameter <- c("OZONE-8HR", "PM2.5-24hr")
- 
+}
+
+# Create blank results if parameter is missing
+if(length(unique(aqi$Parameter)) < 2) {
+  
+  # Duplicate table
+  aqi2 <- aqi
+  
+  aqi2$Parameter <- c("OZONE-8HR", "PM2.5-24hr")[!c("OZONE-8HR", "PM2.5-24hr") %in% unique(aqi$Parameter)]
+  
+  aqi2$Concentration <- NA
+  
+  aqi <- bind_rows(aqi, aqi2)
 }
 
 aqi <- spread(aqi, Parameter, Concentration)
@@ -139,13 +158,15 @@ airvis_ozone[airvis_ozone$row_id %in% 1:4, ]$ozone_8hr <- NA
 
 airvis_ozone <- group_by(airvis_ozone, aqsid) %>%                
                 summarize(max_ozone_8hr_vis = round(max(ozone_8hr, na.rm = T), 2),
-                          n_ozone_obs       = sum(!is.na(Concentration)))
+                          n_ozone_obs       = sum(!is.na(Concentration)),
+                          n_ozone_uniq      = length(unique(Concentration)))
 
 
 # PM 2.5 summary
 airvis_pm    <- group_by(airvis_pm, aqsid) %>%                
                 summarize(pm25_24hr_vis = round(mean(Concentration, na.rm = T), 2),
-                          n_pm25_obs    = sum(!is.na(Concentration)))
+                          n_pm25_obs    = sum(!is.na(Concentration)),
+                          n_pm25_uniq   = length(unique(Concentration)))
 
 
 
@@ -164,8 +185,8 @@ air_all <- filter(air_all, !is.na(aqsid))
 
 # Missing sites
 miss_sites <- filter(sites, 
-                     !aqsid %in% aqi$aqsid & 
-                     !gsub("-", "", alt_siteid) %in% aqi$aqsid)
+                     !aqsid %in% air_all$aqsid & 
+                     !gsub("-", "", alt_siteid) %in% air_all$aqsid)
 
 
 # Use AirNow value if AirVis is missing
@@ -176,14 +197,22 @@ air_all <- group_by(air_all, aqsid) %>%
            mutate(a_pm25_24hr_ugm3 = ifelse(is.na(pm25_24hr_vis), round(pm25_24hr, 1), round(pm25_24hr_vis, 1)))
 
 
+# Quality checks
+
 # Drop daily value if less than 14 observations
 air_all <- mutate(air_all, 
                   a_max_ozone_8hr_ppb = ifelse(n_ozone_obs < 14 & !is.na(n_ozone_obs), NA, a_max_ozone_8hr_ppb),
-                  a_pm25_24hr_ugm3    = ifelse(n_pm25_obs < 14 & !is.na(n_pm25_obs ), NA, a_pm25_24hr_ugm3))
+                  a_pm25_24hr_ugm3    = ifelse(n_pm25_obs < 14 & !is.na(n_pm25_obs), NA, a_pm25_24hr_ugm3))
+
+
+# Drop daily value if less than 6 unique values for ozone; 4 unique values for PM2.5
+air_all <- mutate(air_all, 
+                  a_max_ozone_8hr_ppb = ifelse(n_ozone_uniq < 7 & !is.na(n_ozone_uniq), NA, a_max_ozone_8hr_ppb),
+                  a_pm25_24hr_ugm3    = ifelse(n_pm25_uniq < 4 & !is.na(n_pm25_uniq), NA, a_pm25_24hr_ugm3))
 
 
 # Drop extra columns
-air_all <- select(air_all, -max_ozone_8hr, -pm25_24hr, -max_ozone_8hr_vis, -pm25_24hr_vis)
+air_all <- select(air_all, -max_ozone_8hr, -pm25_24hr, -max_ozone_8hr_vis, -pm25_24hr_vis, -n_pm25_uniq, -n_ozone_uniq)
 
 
 # Set date
