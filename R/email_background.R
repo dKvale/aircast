@@ -15,7 +15,7 @@ aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us")
 creds <- read.csv("C:\\Users\\dkvale\\Desktop\\credentials.csv", stringsAsFactors = F)
 
 
-#-- Load today's AQI background fild
+#-- Load today's AQI background file
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Current forecast")
 
 

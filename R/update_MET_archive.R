@@ -73,11 +73,16 @@ for(i in 1:nrow(sites)) {
   
     all_forecasts       <- bind_rows(day_forc, all_forecasts)
     
-  } else break()
+  } else {
+    
+    next()
+    
+  }
   
 }
 
 all_met$date      <- NULL
+
 all_met$site_date <- NULL
 
 # Add new data to archive

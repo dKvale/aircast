@@ -7,7 +7,8 @@ library(gmailr)
 
 bg_alert_subsribers <- c("dorian.kvale@state.mn.us",
                          "steve.irwin@state.mn.us",
-                         "daniel.dix@state.mn.us")
+                         "daniel.dix@state.mn.us",
+                         "david.l.brown@state.mn.us")
 
 bg_alert_subsribers <- bg_alert_subsribers[2]
 

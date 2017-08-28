@@ -22,9 +22,19 @@ if(current_time <= 10) {
   try(source("email_verification.R"))
   
   # Update MET archive from DarkSky
-  print("Updating MET archive from DarkSky")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("update_MET_archive.R"))
+  ##print("Updating MET archive from DarkSky")
+  ##setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
+  ##try(source("update_MET_archive.R"))
+  
+  # Update AQI history file
+  print("Updating site history")
+  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/R")
+  try(source("update_aqi_history.R"))
+  
+  # Update forecast maps
+  print("Updating forecast maps")
+  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/R")
+  try(source("update_forecast_maps.R"))
   
 }
 
@@ -56,7 +66,7 @@ if(current_time == 12) {
 }
 
 
-if(current_time > 12) {
+if(current_time > 12 & current_time < 15) {
   
   # Grab CMAQ forecast
   print("Downloading CMAQ")
@@ -75,5 +85,14 @@ if(current_time > 12) {
   
 }
 
+
+if(current_time >= 15) {
+  
+# Update forecast maps
+print("Updating forecast maps")
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/R")
+try(source("update_forecast_maps.R"))
+
+}
 
 ##

@@ -46,5 +46,14 @@ if (TimeToMeet = 1337)
 
 }
 
+
+if (TimeToMeet = 1520)
+{
+
+        Run, "C:\Users\dkvale\Desktop\hysplit\BATCH_R_forecast_Update.bat"
+	sleep, 60000
+
+}
+
 return
 
