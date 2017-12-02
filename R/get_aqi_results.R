@@ -1,9 +1,7 @@
 
-library(dplyr)
-library(readr)
-library(tidyr)
 library(stringr)
 library(RCurl)
+library(tidyverse)
 
 
 # Get yesterday's actuals  #
@@ -22,6 +20,8 @@ sites$aqsid <- gsub("-", "", sites$site_catid)
 sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 
 # Get date
+today     <- gsub("-", "", Sys.Date())
+
 yesterday <- gsub("-", "", Sys.Date() - 1)
 
 year      <- format(Sys.Date() - 1, "%Y")
@@ -49,14 +49,16 @@ if(class(aqi) == "try-error") aqi <- data_frame("date" = as.character(NA),
 # Clean
 names(aqi) <- c("date", "aqsid", "City", "Parameter", "Units", "Concentration", "Hours", "Agency")
 
+
 # Filter sites
-aqi <- filter(aqi[ -c(5,7:8)], 
+aqi <- filter(aqi[ , -c(5,7:8)], 
               aqsid %in% c(sites$aqsid, gsub("-", "", sites$alt_siteid)),
               Parameter %in% c("OZONE-8HR", "PM2.5-24hr"))
 
 
 # Add missing sites from AirNow's "yesterday.dat" file
-
+#...
+#...
 
 
 # Flip to wide format
@@ -89,13 +91,6 @@ names(aqi)[c(4:5)] <-  c("max_ozone_8hr", "pm25_24hr")
 
 # QC MPCA sites using AirVision data
 
-# Get date
-yesterday <- gsub("-", "", Sys.Date() - 1)
-
-today     <- gsub("-", "", Sys.Date())
-
-year      <- format(Sys.Date() - 1, "%Y")
-
 
 # Connect to aqi-watch FTP site
 airvis_link <- paste0("ftp://airvis:mpca@52.27.98.92/airvision/")
@@ -108,10 +103,34 @@ file_list   <- getURL(airvis_link, verbose = T, dirlistonly = T) %>%
 final_hour  <- file_list[grepl(today, file_list)][1]
 
 # Download monitoring data
+#download.file(paste0(airvis_link, final_hour), "temp.rData")
+#base::load("temp.rData")
+
 airvis_df   <- try(read_csv(paste0(airvis_link, final_hour),
                               col_names = F, 
                               col_types = c('cccccccdcccccccccccc')), 
                    silent = T)
+
+# Try again if fail
+if(class(airvis_df) == "try-error") {
+  
+  Sys.sleep(15)
+  
+  airvis_df   <- try(read_csv(paste0(airvis_link, final_hour),
+                              col_names = F, 
+                              col_types = c('cccccccdcccccccccccc')), 
+                     silent = T)
+}
+
+# Create empty table if fail
+if(class(airvis_df) == "try-error") {
+  
+  airvis_df <- data_frame(aqsid     = NA, x2=NA,x3=NA,
+                          date      = as.character(NA), 
+                          Parameter = NA, x6=NA,x7=NA,
+                          Concentration = NA, x9=NA, 
+                          qc_flag   = NA)
+}
 
 airvis_df   <- airvis_df[ , c(1,4,5,8,10)]
   
@@ -136,30 +155,33 @@ airvis_pm       <- filter(airvis_df,
                           aqsid %in% c(sites$aqsid, gsub("-", "", sites$alt_siteid)))
 
 
-# Ozone summary
-airvis_ozone <- group_by(airvis_ozone, aqsid, Parameter) %>% 
-                arrange(date) %>%
-                mutate(row_id = 1:n())
-
-# Calculate 8-hr ozone values
-for(i in 1:nrow(airvis_ozone)) {
-
-  aqs  <- airvis_ozone[i, ]$aqsid
+if(nrow(airvis_ozone) > 0) {
+  # Ozone summary
+  airvis_ozone <- group_by(airvis_ozone, aqsid, Parameter) %>% 
+                  arrange(date) %>%
+                  mutate(row_id = 1:n())
   
-  rows <- airvis_ozone[i, ]$row_id
+  # Calculate 8-hr ozone values
+  for(i in 1:nrow(airvis_ozone)) {
   
-  airvis_ozone[i , "ozone_8hr"] <- mean(filter(airvis_ozone, aqsid == aqs, row_id %in% (max(1, rows - 7):rows))$Concentration, na.rm = T)
+    aqs  <- airvis_ozone[i, ]$aqsid
+    
+    rows <- airvis_ozone[i, ]$row_id
+    
+    airvis_ozone[i , "ozone_8hr"] <- mean(filter(airvis_ozone, aqsid == aqs, row_id %in% (max(1, rows - 7):rows))$Concentration, na.rm = T)
+  
+  }    
+  
+  # Drop 8-hr averages from first 4 hours of day
+  airvis_ozone[airvis_ozone$row_id %in% 1:4, ]$ozone_8hr <- NA
 
 }    
-
-# Drop 8-hr averages from first 4 hours of day
-airvis_ozone[airvis_ozone$row_id %in% 1:4, ]$ozone_8hr <- NA
   
-
 airvis_ozone <- group_by(airvis_ozone, aqsid) %>%                
                 summarize(max_ozone_8hr_vis = round(max(ozone_8hr, na.rm = T), 2),
                           n_ozone_obs       = sum(!is.na(Concentration)),
                           n_ozone_uniq      = length(unique(Concentration)))
+
 
 
 # PM 2.5 summary
@@ -174,6 +196,7 @@ airvis_pm    <- group_by(airvis_pm, aqsid) %>%
 aqi$City <- NULL
 
 air_all <- full_join(aqi, airvis_ozone)
+
 air_all <- full_join(air_all, airvis_pm)
 
 
@@ -212,11 +235,11 @@ air_all <- mutate(air_all,
 
 
 # Drop extra columns
-air_all <- select(air_all, -max_ozone_8hr, -pm25_24hr, -max_ozone_8hr_vis, -pm25_24hr_vis, -n_pm25_uniq, -n_ozone_uniq)
+air_all <- dplyr::select(air_all, -c(max_ozone_8hr, pm25_24hr, max_ozone_8hr_vis, pm25_24hr_vis, n_pm25_uniq, n_ozone_uniq))
 
 
 # Set date
-air_all$date <- Sys.Date() - 1 
+air_all$date <-  Sys.Date() - 1
 
 # Check missing sites
 miss_sites <- filter(sites, 
@@ -230,7 +253,7 @@ names(air_all)[c(3:4,7:8)] <- c("count_ozone_obs","count_pm25_obs","obs_max_ozon
 
 # Save
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
-
+2
 keep_columns <- c("date", 
                   "site_catid", 
                   "air_monitor", 

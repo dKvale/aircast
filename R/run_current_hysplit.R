@@ -11,7 +11,7 @@ source("hysplit_traj.R")
 source("get_cmaq_forecast.R")
 
 # Check file size function
-min_exists <- function(file_name, min_size = 1E+8) { 
+min_exists <- function(file_name, min_size = 7.2E+8) { 
   
   file.exists(file_name) & file.size(file_name) > min_size
   
@@ -100,6 +100,7 @@ today <- Sys.Date() - days_past
 
 # Today
 forecast_day  <- "day0"
+
 met_list      <- c("__today/hysplit.t12z.namsf", "__today/hysplit.t12z.namsa", "__today/hysplit.t06z.namsf", "__today/hysplit.t06z.namsa")
 
 # Drop missing met data
@@ -166,6 +167,7 @@ back_forecast <- filter(back_forecast, as.Date(date2) %in% c(Sys.Date() - days_p
 back_forecast
 
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
+
 write_csv(back_forecast, paste0(Sys.Date(), "_AQI_raw_HYSPLIT.csv"))
 
 }

@@ -229,6 +229,7 @@ hys_bk <- hys
 # Round values
 hys$wtd_Ozone_Noon_ppb <- round(hys$wtd_Ozone_Noon_ppb, 1)
 hys$wtd_pm25_Noon      <- round(hys$wtd_pm25_Noon, 1)
+
 hys$backgr_o3_site_distance   <- round(hys$backgr_o3_site_distance) 
 hys$backgr_pm25_site_distance <- round(hys$backgr_pm25_site_distance)
 
@@ -332,8 +333,8 @@ hys_o3  <- spread(select(hys_mean, -parcel_date, -mean_pm25_Noon), traj_hours, m
 hys_pm  <- spread(select(hys_mean, -parcel_date, -mean_Ozone_Noon_ppb), traj_hours, mean_pm25_Noon)
 
 
-names(hys_o3)[3:6]  <- paste0(names(hys_o3)[3:6], "_mean_backgr_ozone")
-names(hys_pm)[3:6]  <- paste0(names(hys_pm)[3:6], "_mean_backgr_pm25")
+names(hys_o3)[3:ncol(hys_o3)]  <- paste0(names(hys_o3)[3:ncol(hys_o3)], "_mean_backgr_ozone")
+names(hys_pm)[3:ncol(hys_pm)]  <- paste0(names(hys_pm)[3:ncol(hys_pm)], "_mean_backgr_pm25")
 
 hys_wide <- left_join(hys_o3, hys_pm)
 
