@@ -22,9 +22,9 @@ if(current_time <= 10) {
   try(source("email_verification.R"))
   
   # Update MET archive from DarkSky
-  ##print("Updating MET archive from DarkSky")
-  ##setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  ##try(source("update_MET_archive.R"))
+  print("Updating MET archive from DarkSky")
+  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
+  try(source("update_MET_archive.R"))
   
   # Update AQI history file
   print("Updating site history")
@@ -63,6 +63,11 @@ if(current_time == 12) {
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("run_current_hysplit.R"))
   
+  # Attach background monitoring results for 16z
+  print("Attaching monitoring results")
+  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
+  try(source("update_background_aqi.R"))
+  
 }
 
 
@@ -73,7 +78,7 @@ if(current_time > 12 & current_time < 15) {
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("update_cmaq_forecast.R"))
   
-  # Attach background monitoring results
+  # Attach background monitoring results for 17z
   print("Attaching monitoring results")
   setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
   try(source("update_background_aqi.R"))

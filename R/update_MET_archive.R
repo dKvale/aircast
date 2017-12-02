@@ -10,7 +10,7 @@ d_key <- 'ea8610622c9d63c30ca25dea03ec3d90'
 
 Sys.setenv(DARKSKY_API_KEY = d_key)
 
-days <- data_frame(date = seq(as.Date("2009-12-31"), as.Date("2017-01-01"), 1),
+days <- data_frame(date = seq(as.Date("2008-12-31"), as.Date("2017-09-01"), 1),
                    join = 1)
 
 days[1:5, ]
@@ -36,6 +36,20 @@ sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluati
 # Remove duplicate sites
 #sites <- filter(sites, !short_name %in% c("Fond_Du_Lac2"))
 
+
+# Add air toxics sites
+all_sites <- read_csv("X:\\Programs\\Air_Quality_Programs\\Air Monitoring Data and Risks\\5 Air Toxics Web Application\\R Code to Summarize Daily Data\\1. Annual Summary\\Results\\Summary_AirToxics_Tableau.csv")
+
+all_sites <- filter(all_sites, Year %in% 2010:2017, !duplicated(AQS_ID)) %>%
+             select(Report_Name, AQS_ID, lat, long) %>% 
+             rowwise() %>%
+             mutate(AQS_ID = paste(substring(AQS_ID, 1, 2), substring(AQS_ID, 3, 5), substring(AQS_ID, 6, 9), sep = "-"))
+             
+names(all_sites) <- c("Air Monitor", "site_catid", "monitor_lat", "monitor_long")
+
+sites <- bind_rows(sites, filter(all_sites, !site_catid %in% sites$site_catid))
+
+
 sites$join <- 1
 
 sites <- left_join(sites, days)
@@ -51,18 +65,22 @@ sites <- arrange(sites, run_order, site_catid)
 # Loop through site table and send DarkSky request
 all_forecasts <- data_frame()
 
+requests <- 0
+
 for(i in 1:nrow(sites)) {
   
   site <- sites[i, ]
   
-  if(site$site_date %in% all_met$site_date) next()
+  if(requests > 995 | site$site_date %in% all_met$site_date) next()
   
   print(site$site_date)
+  
+  requests <- requests + 1
   
   day_forc <- tryCatch(get_forecast_for(site$monitor_lat, 
                                         site$monitor_long,
                                         paste0(site$date, "T12:00:00-0400"), 
-                                        exclude = "currently"), 
+                                        exclude = "currently,daily"), 
                        error = function(err) NA)
   
   if(!is.na(day_forc)) {
@@ -100,6 +118,42 @@ if(nrow(all_forecasts) > 0) {
   # Save to R file
   saveRDS(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata")
 
+  # Save for WAIR database
+  if(FALSE) {
+    
+    all_met2$date_time_gmt <- format(all_met2$time, tz = "UTC", usetz = T)
+    
+    all_met2$date_time_cst <- format(all_met2$time, tz = "America/Chicago", usetz = T)
+    
+    unique(difftime(all_met2$time[1:1000], all_met2$date_time_cst[1:1000]))
+    
+    unique(difftime(all_met2$time[1:1000], all_met2$date_time_gmt[1:1000]))
+    
+    
+    all_met2 <- all_met2 %>% select(site_catid, date_time_gmt, date_time_cst, summary, icon, temperature, 
+                                    dewPoint, humidity, pressure, visibility, 
+                                    windBearing, windSpeed, cloudCover, 
+                                    precipIntensity, precipAccumulation, precipType)
+  
+    names(all_met2) <- c("site_catid", "date_time_gmt", "date_time_cst", "summary", "icon", "temperature_f",       
+                         "dew_point_f", "humidity", "pressure_milbar", "visibility_miles", "wind_bearing_deg", "wind_speed_mph",         
+                         "cloud_cover", "precip_intensity_inph", "precip_type")
+  
+  # Time check
+  if(FALSE) {
+    a <- get_forecast_for(45.13768, -93.20762,
+                          paste0("2009-12-30", "T12:00:00-0400"), 
+                          exclude = "currently,daily")
+    
+  }
+  
+  saveRDS(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.rdata")
+  
+  write_csv(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.csv")
+  
+  check <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.rdata")
+  
+  }
 }
 
 
@@ -116,9 +170,9 @@ met_sum <- group_by(all_met2, as.Date(time)) %>%
 }
 
 if(FALSE) {
-#----------------#
-# Using purr
-#----------------#
+#------------------------------#
+# Using purr for multiple sites
+#-------------------------------#
 more_than_one <- data.frame(loc  = c("Maine", "Seattle"),
                             lon  = c(43.2672, 47.6097),
                             lat  = c(70.8617, 122.3331),

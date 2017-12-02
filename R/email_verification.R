@@ -18,9 +18,9 @@ aqi_team <- paste0(c("dorian.kvale",
 
 #aqi_team <- aqi_team[1]
 
-#aqi_team <- paste0(aqi_team, collapse = ",")
-
 #aqi_team <- "frank.kohlasch@state.mn.us"
+
+#aqi_team <- paste0(aqi_team, collapse = ",")
 
 
 #-- Load e-mail credentials
@@ -29,7 +29,6 @@ creds <- read.csv("C:\\Users\\dkvale\\Desktop\\credentials.csv", stringsAsFactor
 
 #-- Knit Rmarkdown document
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification")
-#writeLines(aqi_message, "aqi_message.Rmd")
 
 rmarkdown::render("aqi_message.Rmd")
 
@@ -44,6 +43,7 @@ msg_body <- paste0('<style type="text/css"> th, td {border-bottom: 1px solid #dd
 
 msg_body <- gsub("<table", 
                  '<table style = "padding-right: 10px; padding-bottom: 2px;', msg_body)
+
 
 #-- Send message function
 send_msg <- function(x) {

@@ -1,16 +1,17 @@
+#! /usr/bin/env Rscript
+
 library(gmailr)
-#library(knitr)
 
 
 #-- Load e-mail credentials
 #creds  <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
 
-bg_alert_subsribers <- c("dorian.kvale@state.mn.us",
+bg_alert_subscribers <- c("dorian.kvale@state.mn.us",
                          "steve.irwin@state.mn.us",
                          "daniel.dix@state.mn.us",
                          "david.l.brown@state.mn.us")
 
-bg_alert_subsribers <- bg_alert_subsribers[2]
+bg_alert_subscribers <- bg_alert_subscribers[1]
 
 #-- Open NAM data folder on desktop
 setwd("~")
@@ -18,7 +19,7 @@ setwd("../Desktop/hysplit")
 
 # Create minimum exists function
 # Checks if file exists and if meets minimum file size
-min_exists <- function(file_name, min_size = 1E+8) { 
+min_exists <- function(file_name, min_size = 7.3E+8) { 
   
   file.exists(file_name) & file.size(file_name) > min_size
   
@@ -36,10 +37,10 @@ met_list      <- met_list[min_exists(met_list)]
 
 
 #-- Check if the 4 required files exist: c("namf", "nama", "namsf", "namsa")
-back_missing  <- max(grepl("namf", met_list), na.rm = T) +
-                 max(grepl("nama", met_list), na.rm = T) +
-                 max(grepl("namsf", met_list), na.rm = T) +
-                 max(grepl("namsa", met_list), na.rm = T)   < 4
+back_missing  <- (max(grepl("namf", met_list), na.rm = T) +
+                  max(grepl("nama", met_list), na.rm = T) +
+                  max(grepl("namsf", met_list), na.rm = T) +
+                  max(grepl("namsa", met_list), na.rm = T))   < 4
 
 
 if(back_missing) {
@@ -86,7 +87,7 @@ if(back_missing) {
   
   #-- Create e-mail message
   html_msg <- mime() %>%
-              to(bg_alert_subsribers) %>%
+              to(bg_alert_subscribers) %>%
               from("mpca.aqi@gmail.com") %>%
               subject("AQI: NAM data download for HYSPLIT background") %>%
               html_body(paste0(readLines("alert_message.html"), collapse = "\n"))
