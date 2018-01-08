@@ -35,17 +35,17 @@ year        <- format(Sys.Date(), "%Y")
 
 gmt_time    <- (as.numeric(format(Sys.time() - 2100, tz = "GMT", "%H")) - 1) %% 24 
 
-if(gmt_time > 17 | gmt_time < 14) gmt_time <- 17
+if (gmt_time > 17 | gmt_time < 14) gmt_time <- 17
 
 airnow_base <- paste0('https://s3-us-west-1.amazonaws.com/files.airnowtech.org/airnow/', year, '/', day, '/')
 
 sites_url   <- paste0(airnow_base, 'monitoring_site_locations.dat')
 
-site_coords <- try(read_delim(sites_url, "|", col_names=F, col_types = paste0(rep('c', 23), collapse = "")), silent=T)
+site_coords <- try(read_delim(sites_url, "|", col_names = F, col_types = paste0(rep('c', 23), collapse = "")), silent = T)
 
 aqi_url     <- paste0(airnow_base, "HourlyData_", day, gmt_time, ".dat")
 
-aqi         <- try(read_delim(aqi_url, "|", col_names = F, col_types = c('ccccdccdc')), silent=T)
+aqi         <- try(read_delim(aqi_url, "|", col_names = F, col_types = c('ccccdccdc')), silent = T)
 
 
 # Add yesterday's AQI monitor readings for Noon
@@ -60,7 +60,7 @@ airnow_base   <- paste0('https://s3-us-west-1.amazonaws.com/files.airnowtech.org
 
 aqi_url       <- paste0(airnow_base, "HourlyData_", day, yesterday_gmt_time, ".dat")
 
-aqi_yesterday <- try(read_delim(aqi_url, "|", col_names = F, col_types = c('ccccdccdc')), silent=T)
+aqi_yesterday <- try(read_delim(aqi_url, "|", col_names = F, col_types = c('ccccdccdc')), silent = T)
 
 aqi           <- bind_rows(aqi, aqi_yesterday)
 
@@ -159,7 +159,7 @@ hys$parcel_date   <- as.character(format(as.Date(hys$parcel_date), "%m/%d/%y"))
 hys$receptor_date <- format(as.Date(hys$receptor_date), "%m/%d/%Y")
 
 
-for(i in 1:nrow(hys)) {
+for (i in 1:nrow(hys)) {
   
   print(i)
   
@@ -171,18 +171,18 @@ for(i in 1:nrow(hys)) {
                      rowwise() %>%
                      mutate(dist_to_hys = distVincentyEllipsoid(c(Long, Lat), hys_coords) / 1609)
   
-  for(pollut in c("OZONE", "PM25")) {
+  for (pollut in c("OZONE", "PM25")) {
     
-    if(pollut == "OZONE") near_sites <- subset(near_sites_all, !is.na(OZONE))
+    if (pollut == "OZONE") near_sites <- subset(near_sites_all, !is.na(OZONE))
     
-    if(pollut == "PM25") near_sites  <- subset(near_sites_all, !is.na(PM25))
+    if (pollut == "PM25") near_sites  <- subset(near_sites_all, !is.na(PM25))
     
     
     # If no monitors within maximum distance grab the CMAQ forecast 
-    if(min(near_sites$dist_to_hys, na.rm = T) > max_distance) { # & hys[i, ]$forecast_day %in% c("day0", "day1")) {
+    if (min(near_sites$dist_to_hys, na.rm = T) > max_distance) { # & hys[i, ]$forecast_day %in% c("day0", "day1")) {
       
       
-      if(pollut == "OZONE") {
+      if (pollut == "OZONE") {
         hys[i, ]$backgr_o3_site_distance  <- min(near_sites$dist_to_hys, na.rm = T) 
         
         hys[i, ]$wtd_Ozone_Noon_ppb    <- tryCatch(as.numeric(cmaq_forecast(hys_coords[2], 
@@ -190,7 +190,7 @@ for(i in 1:nrow(hys)) {
                                                                             hour_gmt = 17)[1, 3]), 
                                                    error = function(err) NA)
         
-        if(is.na(hys[i, ]$wtd_Ozone_Noon_ppb)) hys[i, ]$wtd_Ozone_Noon_ppb <- arrange(near_sites, dist_to_hys)[1, ]$OZONE
+        if (is.na(hys[i, ]$wtd_Ozone_Noon_ppb)) hys[i, ]$wtd_Ozone_Noon_ppb <- arrange(near_sites, dist_to_hys)[1, ]$OZONE
         
       } else {
         
@@ -203,9 +203,9 @@ for(i in 1:nrow(hys)) {
       
       near_sites_85 <- subset(near_sites, dist_to_hys <= inner_buffer)
       
-      if(nrow(near_sites_85) < 1) near_sites_85 <- arrange(near_sites, dist_to_hys)[1, ]
+      if (nrow(near_sites_85) < 1) near_sites_85 <- arrange(near_sites, dist_to_hys)[1, ]
       
-      if(pollut == "OZONE") { 
+      if (pollut == "OZONE") { 
         
         hys[i, ]$backgr_o3_site_distance  <- min(near_sites$dist_to_hys, na.rm = T) 
         
@@ -224,6 +224,7 @@ for(i in 1:nrow(hys)) {
 }
 
 
+
 hys_bk <- hys
 
 # Round values
@@ -238,6 +239,7 @@ hys$backgr_pm25_site_distance <- round(hys$backgr_pm25_site_distance)
 hys$site_catid <- hys$receptor
 
 hys$receptor   <- NULL
+
 
 #-- Fill missing values with nearest monitor
 
@@ -263,7 +265,7 @@ missing_na <- filter(hys, is.na(wtd_Ozone_Noon_ppb) | is.na(wtd_pm25_Noon))
 missing    <- bind_rows(missing, missing_na)
 
 
-if(nrow(missing) > 0) {
+if (nrow(missing) > 0) {
 
   
 # Add coords
@@ -277,7 +279,7 @@ missing$wtd_Ozone_Noon_ppb <- NA
 missing$wtd_pm25_Noon      <- NA
 
 
-for(i in 1:nrow(missing)) {
+for (i in 1:nrow(missing)) {
   
   print(i)
   
@@ -288,6 +290,7 @@ for(i in 1:nrow(missing)) {
   near_sites_all  <- subset(near_sites_all, receptor_height == missing[i, ]$receptor_height)
   
   
+  if (nrow(near_sites_all) > 0) {
   # Add coords
   near_sites_all  <- left_join(near_sites_all, sites[ , c("site_catid", "monitor_lat", "monitor_long")])
   
@@ -304,8 +307,10 @@ for(i in 1:nrow(missing)) {
   missing[i, ]$wtd_pm25_Noon <- arrange(subset(near_sites_all, !is.na(wtd_pm25_Noon)), dist_to_hys)$wtd_pm25_Noon[1]
       
   missing[i, ]$backgr_pm25_site_distance <- NA
+  }
     
 }
+
 
 # Join missing sites
 hys <- filter(hys, !is.na(wtd_Ozone_Noon_ppb) & !is.na(wtd_pm25_Noon))

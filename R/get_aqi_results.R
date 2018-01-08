@@ -10,8 +10,8 @@ sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluati
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
-# Switch Voyageurs AQS ID to alt
-sites[sites$site_catid == "27-137-9000", "site_catid"] <- sites[sites$site_catid == "27-137-9000", "alt_siteid"]
+# Drop outstate sites
+sites <- filter(sites, !fcst_region %in% c("CA", "ND", "SD", "WI", "IA"))
 
 # Drop dashes in IDs to match AQS
 sites$aqsid <- gsub("-", "", sites$site_catid)
@@ -43,8 +43,8 @@ aqi   <- try(read_delim(airnow_link, "|",
 closeAllConnections()
 
 
-if(class(aqi) == "try-error") aqi <- data_frame("date" = as.character(NA),
-                                                "aqsid" = as.character(NA),3,4,5,6,7,8)[0, ]
+if (class(aqi) == "try-error") aqi <- data_frame("date" = as.character(NA),
+                                                 "aqsid" = as.character(NA),3,4,5,6,7,8)[0, ]
 
 # Clean
 names(aqi) <- c("date", "aqsid", "City", "Parameter", "Units", "Concentration", "Hours", "Agency")
@@ -64,7 +64,7 @@ aqi <- filter(aqi[ , -c(5,7:8)],
 # Flip to wide format
 
 # Create empty rows if table is blank
-if(nrow(aqi) < 1) {
+if (nrow(aqi) < 1) {
   
   aqi[1:2, ] <- NA
   
@@ -72,7 +72,7 @@ if(nrow(aqi) < 1) {
 }
 
 # Create blank results if parameter is missing
-if(length(unique(aqi$Parameter)) < 2) {
+if (length(unique(aqi$Parameter)) < 2) {
   
   # Duplicate table
   aqi2 <- aqi
@@ -93,7 +93,7 @@ names(aqi)[c(4:5)] <-  c("max_ozone_8hr", "pm25_24hr")
 
 
 # Connect to aqi-watch FTP site
-airvis_link <- paste0("ftp://airvis:mpca@52.27.98.92/airvision/")
+airvis_link <- paste0("ftp://airvis:mpca@34.216.174.58/airvision/")
 
 # Find last file of the day
 file_list   <- getURL(airvis_link, verbose = T, dirlistonly = T) %>%
@@ -112,7 +112,7 @@ airvis_df   <- try(read_csv(paste0(airvis_link, final_hour),
                    silent = T)
 
 # Try again if fail
-if(class(airvis_df) == "try-error") {
+if (class(airvis_df) == "try-error") {
   
   Sys.sleep(15)
   
@@ -123,12 +123,12 @@ if(class(airvis_df) == "try-error") {
 }
 
 # Create empty table if fail
-if(class(airvis_df) == "try-error") {
+if (class(airvis_df) == "try-error") {
   
-  airvis_df <- data_frame(aqsid     = NA, x2=NA,x3=NA,
+  airvis_df <- data_frame(aqsid     = NA, x2 = NA,x3 = NA,
                           date      = as.character(NA), 
-                          Parameter = NA, x6=NA,x7=NA,
-                          Concentration = NA, x9=NA, 
+                          Parameter = NA, x6 = NA, x7 = NA,
+                          Concentration = NA, x9 = NA, 
                           qc_flag   = NA)
 }
 
@@ -155,14 +155,14 @@ airvis_pm       <- filter(airvis_df,
                           aqsid %in% c(sites$aqsid, gsub("-", "", sites$alt_siteid)))
 
 
-if(nrow(airvis_ozone) > 0) {
+if (nrow(airvis_ozone) > 0) {
   # Ozone summary
   airvis_ozone <- group_by(airvis_ozone, aqsid, Parameter) %>% 
                   arrange(date) %>%
                   mutate(row_id = 1:n())
   
   # Calculate 8-hr ozone values
-  for(i in 1:nrow(airvis_ozone)) {
+  for (i in 1:nrow(airvis_ozone)) {
   
     aqs  <- airvis_ozone[i, ]$aqsid
     
@@ -190,6 +190,10 @@ airvis_pm    <- group_by(airvis_pm, aqsid) %>%
                           n_pm25_obs    = sum(!is.na(Concentration)),
                           n_pm25_uniq   = length(unique(Concentration)))
 
+
+
+# Check Voyageur's site ID
+aqi[aqi$aqsid == "271370034", "aqsid"] <- "271379000"
 
 
 # Join AirNow with AirVis
@@ -253,7 +257,7 @@ names(air_all)[c(3:4,7:8)] <- c("count_ozone_obs","count_pm25_obs","obs_max_ozon
 
 # Save
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
-2
+
 keep_columns <- c("date", 
                   "site_catid", 
                   "air_monitor", 
@@ -276,7 +280,7 @@ sh <- readLines("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evalua
 # Update file to search for yesterday's date
 new_line <- grep("grep", sh)
 
-sh[new_line] <- paste0("for i in `curl -s -l ftp://\"$ftp_username\":\"$ftp_password\"@$ftp_ip/$ftp_path/ | grep ", yesterday, "`; do")
+sh[new_line] <- paste0("for i in `curl -s -l ftp://\"$ftp_username\":\"$ftp_password\"@$ftp_ip/$ftp_path/ | grep ", "_840.0700", "`; do")
 
 writeLines(sh, "X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff Folders\\Dorian\\AQI\\aircast\\_sh scripts\\clear_ftp.sh")
 
