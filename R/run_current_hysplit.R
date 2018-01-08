@@ -21,7 +21,7 @@ min_exists <- function(file_name, min_size = 7.2E+8) {
 # Check if HYSPLIT has already run
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 
-if(!min_exists(paste0(Sys.Date(), "_AQI_raw_HYSPLIT.csv"), min_size = 100)) {
+if (!min_exists(paste0(Sys.Date(), "_AQI_raw_HYSPLIT.csv"), min_size = 100)) {
 
 # Load site locations
 sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
@@ -44,7 +44,7 @@ aqi_traj <- function(date            = NULL,
   # Trajectory table
   traj_forecast <- data_frame()
     
-  for(site in unique(sites$site_catid)) {
+  for (site in unique(sites$site_catid)) {
   
     site_df <- filter(sites, site_catid == site)
     
@@ -80,7 +80,7 @@ aqi_traj <- function(date            = NULL,
     
     traj <- select(traj, -rainfall, -rh, -sunflux)
     
-    traj <- filter(traj, hour.inc %in% c(-24, -48, -72))
+    traj <- filter(traj, `hour.inc` %in% c(-24, -48, -72))
     
     Sys.sleep(0.7)
     
@@ -123,7 +123,7 @@ forecast_day  <- "day1"
 day1 <- tryCatch(aqi_traj(date = today + 1, receptor_height = 10, traj_hours = 24), error = function(err) NA, silent = T)
 
 # If fail, use namsf      
-if(is.na(day1)) {
+if (is.na(day1)) {
   
   met_list   <- c("__today/hysplit.t12z.namf", "__today/hysplit.t12z.nama", "__today/hysplit.t06z.namf", "__today/hysplit.t06z.nama")
   
@@ -155,8 +155,15 @@ back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 2, receptor_he
 # 3 days ahead
 forecast_day  <- "day3"
 
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 3, receptor_height = 10, traj_hours = 72))
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 3, receptor_height = 500, traj_hours = 72))
+back_forecast <- bind_rows(back_forecast, 
+                           aqi_traj(date = today + 3, receptor_height = 10, traj_hours = 72))
+
+day3_500m     <- aqi_traj(date = today + 3, receptor_height = 500, traj_hours = 72)
+
+back_forecast <- bind_rows(back_forecast, day3_500m)
+
+#back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 3, receptor_height = 500, traj_hours = 72))
+
 
 
 # Filter to start location
@@ -173,3 +180,4 @@ write_csv(back_forecast, paste0(Sys.Date(), "_AQI_raw_HYSPLIT.csv"))
 }
 
 ##
+
