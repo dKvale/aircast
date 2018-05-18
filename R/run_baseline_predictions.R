@@ -1,8 +1,9 @@
-# Generate baseline AQI forecasting metrics
-# Include results for these models
-## Persistance
-## Rolling 10 day median
-## Historical week median 
+# Yesterday's baseline AQI forecasting metrics
+
+# Include results for these models:
+#### - Persistance
+#### - Rolling 7 day median
+#### - Historical week median 
 
 
 # Packages
@@ -16,24 +17,26 @@ source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fo
 # Set dates
 today <- Sys.Date()
 
-yesterday <- today - 1 
+yesterday      <- today - 1 
+
+two_days_ago   <- today - 2
 
 three_days_ago <- today - 3
 
 
 # Load recent results
-results <- read_csv("../Verification/2017_event_table.csv")
+results <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/event_table.csv")
 
 
 # Persistance = Previous day result
 persist <- filter(results, forecast_date == three_days_ago) %>%
              mutate(forecast_date      = yesterday) %>%
              rename(persist_ozone_aqi  = obs_ozone_aqi,
-                    persist_pm25_aqi   =  obs_pm25_aqi) %>%
+                    persist_pm25_aqi   = obs_pm25_aqi) %>%
              select(forecast_date, short_name, site_catid, persist_ozone_aqi, persist_pm25_aqi)
 
 
-# Rolling 6-days
+# Rolling 7-days
 roll <- filter(results, forecast_date <= three_days_ago, forecast_date > (today - 10)) %>%
               group_by(short_name, site_catid) %>%
               summarize(forecast_date   = yesterday,
@@ -42,12 +45,12 @@ roll <- filter(results, forecast_date <= three_days_ago, forecast_date > (today 
               select(forecast_date, short_name, site_catid, roll_ozone_aqi, roll_pm25_aqi)
 
 
-# Week median
 
+# Week median
 if (FALSE) {
 
 # Load historical results
-data <- read_csv("../Forecast data/All Ozone and PM25 forecast fields - DarkSky.csv")
+data <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Forecast data/All Ozone and PM25 forecast fields - DarkSky.csv")
 
 
 # Set all years to 2012
@@ -92,11 +95,12 @@ week_med <- bind_rows(week_med, leech_lake)
 #
 
 # SAVE
-write_csv(week_med, "../Forecast data/rolling_11-day_averages.csv")
+write_csv(week_med, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Forecast data/rolling_11-day_averages.csv")
+
 }
 
 
-week_med <- read_csv("../Forecast data/rolling_11-day_averages.csv") %>%
+week_med <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Forecast data/rolling_11-day_averages.csv") %>%
                filter(forecast_date == format(yesterday, "2012-%m-%d")) %>%
                mutate(forecast_date = yesterday)
 
@@ -110,8 +114,8 @@ blend3 <- bind_rows(blend3_bk, filter(blend3, !site_catid %in% blend3_bk$site_ca
 
 blend3 <- blend3 %>% 
             rowwise() %>% 
-            mutate(bb3_ozone_aqi = median(c(roll_ozone_aqi, persist_ozone_aqi, roll11_ozone_aqi), na.rm = T),
-                   bb3_pm25_aqi  = median(c(roll_pm25_aqi, persist_pm25_aqi, roll11_pm25_aqi), na.rm = T))
+            mutate(bb3_ozone_aqi = median(c(roll_ozone_aqi, persist_ozone_aqi, roll11_ozone_aqi) %>% as.numeric(), na.rm = T),
+                   bb3_pm25_aqi  = median(c(roll_pm25_aqi, persist_pm25_aqi, roll11_pm25_aqi) %>% as.numeric(), na.rm = T))
 
 
 ##

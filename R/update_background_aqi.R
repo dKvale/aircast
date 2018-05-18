@@ -351,7 +351,8 @@ names(hys_wide)[1:2] <- c("site_catid", "hour_gmt")
 # SAVE results
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 
-write.csv(hys_wide[ , c(1:11)], paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
+write.csv(hys_wide[ , c(1:11)], 
+          paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
 
 
 ##

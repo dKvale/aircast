@@ -1,8 +1,11 @@
+#! /usr/bin/env Rscript
 
 library(stringr)
 library(RCurl)
 library(tidyverse)
 
+#-- Load FTP credentials
+creds <- read.csv("C:/Users/dkvale/Desktop/credentials.csv", stringsAsFactors = F)
 
 # Get yesterday's actuals  #
 #--------------------------#
@@ -89,11 +92,11 @@ aqi <- spread(aqi, Parameter, Concentration)
 names(aqi)[c(4:5)] <-  c("max_ozone_8hr", "pm25_24hr")
   
 
+
 # QC MPCA sites using AirVision data
 
-
 # Connect to aqi-watch FTP site
-airvis_link <- paste0("ftp://airvis:mpca@34.216.174.58/airvision/")
+airvis_link <- paste0("ftp://", creds$airvis_ftp_usr_pwd, "@34.216.174.58/airvision/")
 
 # Find last file of the day
 file_list   <- getURL(airvis_link, verbose = T, dirlistonly = T) %>%
@@ -148,11 +151,11 @@ airvis_df$aqsid <- gsub("840", "", airvis_df$aqsid)
 
 airvis_ozone    <- filter(airvis_df, 
                           Parameter == 44201, 
-                          aqsid %in% c(sites$aqsid, gsub("-", "", sites$alt_siteid)))
+                          aqsid %in% gsub("-", "", c(sites$site_catid, sites$alt_siteid)))
 
 airvis_pm       <- filter(airvis_df, 
                           Parameter %in% c(88101), # 88502), 
-                          aqsid %in% c(sites$aqsid, gsub("-", "", sites$alt_siteid)))
+                          aqsid %in% gsub("-", "", c(sites$site_catid, sites$alt_siteid)))
 
 
 if (nrow(airvis_ozone) > 0) {
@@ -271,13 +274,17 @@ keep_columns <- c("date",
 write.csv(air_all[ , keep_columns], paste0(Sys.Date() - 1, "_AQI_observed", ".csv"), row.names = F)
 
 
+#-------------------------------#
 #-- Clear outdated FTP files
 #-------------------------------#
 
+
+if (nrow(air_all) > 5) {
+  
 # Read .sh file
 sh <- readLines("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff Folders\\Dorian\\AQI\\aircast\\_sh scripts\\clear_ftp.sh")
 
-# Update file to search for yesterday's date
+# Update file to search for dates from two days ago
 new_line <- grep("grep", sh)
 
 sh[new_line] <- paste0("for i in `curl -s -l ftp://\"$ftp_username\":\"$ftp_password\"@$ftp_ip/$ftp_path/ | grep ", "_840.0700", "`; do")
@@ -285,8 +292,8 @@ sh[new_line] <- paste0("for i in `curl -s -l ftp://\"$ftp_username\":\"$ftp_pass
 writeLines(sh, "X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff Folders\\Dorian\\AQI\\aircast\\_sh scripts\\clear_ftp.sh")
 
 # Run .sh file in command line to delete files from yesterday
-shell(paste0('C: & C:\\Users\\dkvale\\AppData\\Local\\Programs\\Git\\bin\\sh ',
+shell(paste0('C: & "C:\\Program Files\\Git\\bin\\sh" ',
               '"X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff Folders\\Dorian\\AQI\\aircast\\_sh scripts\\clear_ftp.sh"'))
-
+}
 
 ##

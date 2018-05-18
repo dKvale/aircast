@@ -24,3 +24,4 @@ vignettes/*.pdf
 *.knit.md
 .Rproj.user
 aircast.Rproj
+fcst_regression.png
