@@ -5,12 +5,15 @@ library(dplyr)
 library(readr)
 library(darksky)
 
+options(digits=16)
+
+# DarkSky key
 d_key <- 'ea8610622c9d63c30ca25dea03ec3d90'
 #darksky_api_key(key = d_key, force = T)
 
 Sys.setenv(DARKSKY_API_KEY = d_key)
 
-days <- data_frame(date = seq(as.Date("2008-12-31"), as.Date("2017-09-01"), 1),
+days <- data_frame(date = seq(as.Date("2002-12-31"), as.Date("2017-12-31"), 1),
                    join = 1)
 
 days[1:5, ]
@@ -38,7 +41,7 @@ sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluati
 
 
 # Add air toxics sites
-all_sites <- read_csv("X:\\Programs\\Air_Quality_Programs\\Air Monitoring Data and Risks\\5 Air Toxics Web Application\\R Code to Summarize Daily Data\\1. Annual Summary\\Results\\Summary_AirToxics_Tableau.csv")
+all_sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/AirToxics_sites.csv")
 
 all_sites <- filter(all_sites, Year %in% 2010:2017, !duplicated(AQS_ID)) %>%
              select(Report_Name, AQS_ID, lat, long) %>% 
@@ -47,9 +50,13 @@ all_sites <- filter(all_sites, Year %in% 2010:2017, !duplicated(AQS_ID)) %>%
              
 names(all_sites) <- c("Air Monitor", "site_catid", "monitor_lat", "monitor_long")
 
+all_sites$run_order <- 3
+
+sites$run_order <- 2
+
 sites <- bind_rows(sites, filter(all_sites, !site_catid %in% sites$site_catid))
 
-
+# Join sites to calendar
 sites$join <- 1
 
 sites <- left_join(sites, days)
@@ -58,20 +65,25 @@ sites$join <- NULL
 
 sites$site_date <- paste(sites$site_catid, sites$date)
 
-sites$run_order <- ifelse(sites$site_catid == "27-003-1002", 1, ifelse(sites$site_catid == "27-109-5008", 2, 3))
 
-sites <- arrange(sites, run_order, site_catid)
+# Put 909 first
+sites$run_order <- ifelse(sites$site_catid == "27-053-0909", 1, sites$run_order)
+
+sites <- arrange(sites, run_order, desc(date), site_catid)
+
 
 # Loop through site table and send DarkSky request
 all_forecasts <- data_frame()
 
 requests <- 0
 
-for(i in 1:nrow(sites)) {
+sites <- filter(sites, !site_date %in% all_met$site_date)
+
+for (i in 1:nrow(sites)) {
   
   site <- sites[i, ]
   
-  if(requests > 995 | site$site_date %in% all_met$site_date) next()
+  if (requests > 950) break()
   
   print(site$site_date)
   
@@ -83,7 +95,7 @@ for(i in 1:nrow(sites)) {
                                         exclude = "currently,daily"), 
                        error = function(err) NA)
   
-  if(!is.na(day_forc)) {
+  if (!is.na(day_forc)) {
   
     day_forc            <- day_forc$hourly 
   
@@ -99,12 +111,13 @@ for(i in 1:nrow(sites)) {
   
 }
 
+
 all_met$date      <- NULL
 
 all_met$site_date <- NULL
 
 # Add new data to archive
-if(nrow(all_forecasts) > 0) {
+if (nrow(all_forecasts) > 0) {
   
   all_met2 <- bind_rows(all_met, all_forecasts)
   
@@ -118,8 +131,34 @@ if(nrow(all_forecasts) > 0) {
   # Save to R file
   saveRDS(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata")
 
+  
+  # Update individual site files
+  for (i in unique(all_forecasts$site_catid)) {
+    
+    file_loc <- paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/sites/", i, ".csv")
+    
+    if (file.exists(file_loc)) {
+    
+      temp <- read_csv(file_loc)
+      
+      temp$precipAccumulation <- as.numeric(temp$precipAccumulation)
+      
+      site_met <- bind_rows(filter(all_forecasts, site_catid == i), temp)
+      
+      write_csv(site_met, file_loc)
+      
+    } else {
+      
+      site_met <- filter(all_forecasts, site_catid == i)
+      
+      write_csv(site_met, file_loc)
+      
+    }
+    
+  }
+  
   # Save for WAIR database
-  if(FALSE) {
+  if (FALSE) {
     
     all_met2$date_time_gmt <- format(all_met2$time, tz = "UTC", usetz = T)
     
@@ -140,7 +179,7 @@ if(nrow(all_forecasts) > 0) {
                          "cloud_cover", "precip_intensity_inph", "precip_type")
   
   # Time check
-  if(FALSE) {
+  if (FALSE) {
     a <- get_forecast_for(45.13768, -93.20762,
                           paste0("2009-12-30", "T12:00:00-0400"), 
                           exclude = "currently,daily")
@@ -158,7 +197,7 @@ if(nrow(all_forecasts) > 0) {
 
 
 # Count missing values
-if(FALSE) {
+if (FALSE) {
 met_sum <- group_by(all_met2, as.Date(time)) %>% 
            summarize(wind_ms        = mean(windSpeed, na.rm = T),
                      windspeed_miss = sum(is.na(windSpeed)),
@@ -169,7 +208,7 @@ met_sum <- group_by(all_met2, as.Date(time)) %>%
 
 }
 
-if(FALSE) {
+if (FALSE) {
 #------------------------------#
 # Using purr for multiple sites
 #-------------------------------#
@@ -190,8 +229,5 @@ bigger_list$Seattle
 
 }
 
-met_chk <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata")
-
-unique(met_chk$site_catid)
 
 ##

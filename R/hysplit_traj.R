@@ -7,7 +7,7 @@ source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fo
 
 
 # Test extended_met
-if(FALSE) {
+if (FALSE) {
   
   a = hysplit_trajectory(height = c(10),
                          duration = 24,
@@ -26,7 +26,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                          daily_hours    = 17,
                          direction      = "backward",
                          met_type       = "narr",
-                         met_dir        = "C:/Users/dkvale/Desktop/hysplit",
+                         met_dir        = "C:/Users/dkvale/Desktop/hysplit/archive_hysplit/NARR",
                          extended_met   = TRUE,
                          vert_motion    = 0,
                          model_height   = 20000,
@@ -37,28 +37,28 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                          os             = "win",
                          met_files      = met_list) {
   
-  if(is.null(exec_dir)) exec_dir <- getwd()
+  if (is.null(exec_dir)) exec_dir <- getwd()
   
-  if(is.null(met_dir)) met_dir   <- getwd()
+  if (is.null(met_dir)) met_dir   <- getwd()
   
   binary_path <- system.file("win/hyts_std.exe", package = "SplitR")
   
   # Generate name of output folder
   folder_name <- paste0("traj-", format(Sys.time(), "%Y-%m-%d-%H-%M-%S"))
   
-  if(length(run_period) == 1 &
-     class(run_period) == "character" &
-     all(grepl("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]",
-               run_period))) {
+  if (length(run_period) == 1 &
+      class(run_period) == "character" &
+      all(grepl("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]",
+                run_period))) {
     
     run_type <- "day"
     run_day  <- run_period
   }
   
-  if(length(run_period) == 1 &
-     class(run_period) == "numeric") {
-      run_type <- "years"
-      run_years <- run_period
+  if (length(run_period) == 1 &
+      class(run_period) == "numeric") {
+       run_type <- "years"
+       run_years <- run_period
   }
   
   # Write default versions of the SETUP.CFG and
@@ -247,7 +247,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
         # Write name of output filename to 'CONTROL'
           
         # Edit to always save to same file to limit new folders  - Dorian
-          if(FALSE) {cat("temp_traj_file", "\n",
+          if (FALSE) {cat("temp_traj_file", "\n",
               file = paste0(exec_dir, "/CONTROL"),
               sep = '', append = TRUE)
           }
@@ -262,8 +262,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
         shell(paste0('C: &&', 'cd "', exec_dir, '" && "', binary_path, '"'))
     
     # Create the output folder if it doesn't exist
-    if (!dir.exists(paste0(exec_dir, "/",
-                           folder_name))) {
+    if (!dir.exists(paste0(exec_dir, "/", folder_name))) {
       dir.create(path = paste0(exec_dir, "/", folder_name))
     }
     

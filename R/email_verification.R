@@ -23,8 +23,11 @@ aqi_team <- paste0(c("dorian.kvale",
 #aqi_team <- paste0(aqi_team, collapse = ",")
 
 
+# Set Pandoc location
+Sys.setenv(RSTUDIO_PANDOC="C:/Program Files/RStudio/bin/pandoc")
+
 #-- Load e-mail credentials
-creds <- read.csv("C:\\Users\\dkvale\\Desktop\\credentials.csv", stringsAsFactors = F)
+creds <- read.csv("C:/Users/dkvale/Desktop/credentials.csv", stringsAsFactors = F)
 
 
 #-- Knit Rmarkdown document
@@ -82,13 +85,13 @@ for(i in aqi_team) {
   while(is.na(send_fail) & run_count < 1) {
 
     #-- Set time limit on run time
-    send_fail <- tryCatch(evalWithTimeout(send_msg(i), timeout = 7, onTimeout = "error"), 
+    send_fail <- tryCatch(evalWithTimeout(send_msg(i), timeout = 8, onTimeout = "error"), 
                           TimeoutException = function(ex) NA, 
                           error = function(e) NA)
     
     run_count <- run_count + 1
     
-    Sys.sleep(1)
+    Sys.sleep(2)
 
   }
 }
