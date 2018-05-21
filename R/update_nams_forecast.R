@@ -12,14 +12,10 @@ source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fo
 # Delete old data
 delete("__yesterday")
 delete(list.files()[grepl("traj-", list.files())])
+delete("__today")
 
 
 # Create directory
-dir.create("__today")
-
-# Create a new folder for yesterday's files
-file.rename("__today", "__yesterday")
-
 dir.create("__today", mode = "777")
 
 # Download new forecasts
@@ -65,7 +61,6 @@ if(FALSE) {
       get_forecast_nams(date = new_date, folder = "__today", type = "a", time_step = 3)
       get_forecast_nams(date = new_date, folder = "__today", type = "f", time_step = 3)
       
-     
       
     } else {
       print(new_date)

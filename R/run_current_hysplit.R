@@ -165,7 +165,6 @@ back_forecast <- bind_rows(back_forecast, day3_500m)
 #back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 3, receptor_height = 500, traj_hours = 72))
 
 
-
 # Filter to start location
 back_forecast <- filter(back_forecast, as.Date(date2) %in% c(Sys.Date() - days_past, Sys.Date() - 1 - days_past))
 
