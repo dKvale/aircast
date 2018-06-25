@@ -7,6 +7,8 @@ library(darksky)
 
 options(digits=12)
 
+aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+
 # DarkSky key
 d_key <- 'ea8610622c9d63c30ca25dea03ec3d90'
 #darksky_api_key(key = d_key, force = T)
@@ -61,14 +63,14 @@ all_met$site_date <- paste(all_met$site_catid, all_met$date)
 
 
 # Site list
-sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
+sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 
 # Remove duplicate sites
 #sites <- filter(sites, !short_name %in% c("Fond_Du_Lac2"))
 
 # Add air toxics sites
-all_sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/AirToxics_sites.csv")
+all_sites <- read_csv(paste0(aircast_path, "data/air_toxics_sites.csv"))
 
 all_sites <- filter(all_sites, Year %in% 2010:2017, !duplicated(AQS_ID)) %>%
              select(Report_Name, AQS_ID, lat, long) %>% 
@@ -212,9 +214,10 @@ if (nrow(all_forecasts) > 0) {
     
   }
   
-  saveRDS(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.rdata")
   
-  write_csv(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.csv")
+  #saveRDS(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.rdata")
+  
+  #write_csv(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.csv")
   
   #check <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.rdata")
   

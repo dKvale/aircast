@@ -12,7 +12,7 @@ aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us")
 #aqi_team <- "dorian.kvale@state.mn.us"
 
 #-- Load credentials
-creds <- read.csv("C:\\Users\\dkvale\\Desktop\\credentials.csv", stringsAsFactors = F)
+creds <- read.csv("C:/Users/dkvale/Desktop/credentials.csv", stringsAsFactors = F)
 
 
 #-- Load today's AQI background file

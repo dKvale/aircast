@@ -25,3 +25,4 @@ vignettes/*.pdf
 .Rproj.user
 aircast.Rproj
 fcst_regression.png
+Thumbs.db

@@ -12,7 +12,9 @@ output:
 <div style="margin-top: -19px;"> <i>Preliminary results for `r format(Sys.Date() - 1, "%A %b %d, %Y")`</i></div>  
   
 ```{r echo=FALSE, message = FALSE, warning = FALSE}
-# C: & "C:\Users\dkvale\Documents\R\R-3.4.0\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\email_verification.R"
+# C: & "C:\Users\dkvale\Documents\R\R-3.4.0\bin\i386\Rscript.exe" --no-save --no-restore "~\..\Desktop\aircast\aircast\R\email_background.R"
+
+# C: & "C:\Users\dkvale\Documents\R\R-3.4.2\bin\i386\Rscript.exe" --no-save --no-restore "C:\Users\dkvale\Desktop\aircast\R\get_aqi_results.R"
 
 library(formattable) #devtools::install_github("renkun-ken/formattable")
 library(tidyverse)
@@ -21,6 +23,11 @@ library(ggrepel)
 library(gridExtra)
 
 days_past <- 0
+
+aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+
 
 # Test for weekend
 weekend <- weekdays(Sys.Date() - 1 - days_past) %in% c("Sunday","Monday")
@@ -31,7 +38,7 @@ ozone_season <- as.numeric(format(Sys.Date() - 1, "%m")) %in% 4:10
 
 
 # AQI conversion functions
-source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-watch/R/aqi_convert.R")
+source(paste0(aqiwatch_path, "R/aqi_convert.R"))
 
 
 #-- Load yesterdays observations
@@ -77,7 +84,7 @@ verify <- verify[!duplicated(verify$site_catid), ]
 
 
 #-- Join missing site names
-sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
+sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
@@ -114,7 +121,7 @@ verify <- mutate(verify,
 
 
 #-- Add baseline predictions
-source("../aircast/R/run_baseline_predictions.R")
+source(paste0(aircast_path, "R/run_baseline_predictions.R"))
 
 verify <- left_join(verify, select(blend3, -short_name)) %>% ungroup()
 

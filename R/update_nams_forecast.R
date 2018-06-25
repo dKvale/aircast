@@ -6,9 +6,12 @@ library(magrittr)
 
 
 
-aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/R/"
+aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 
-source(paste0(aircast_path, "get_nams_forecast.R"))
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+
+
+source(paste0(aircast_path, "R/get_nams_forecast.R"))
 
 
 # Navigate to user Desktop

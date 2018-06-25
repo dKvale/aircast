@@ -5,13 +5,16 @@
 #### - Rolling 7 day median
 #### - Historical week median 
 
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+
 
 # Packages
 library(tidyverse)
 
 
 # AQI conversion functions
-source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-watch/R/aqi_convert.R")
+source(paste0(aqiwatch_path, "R/aqi_convert.R"))
 
 
 # Set dates

@@ -4,12 +4,16 @@ library(stringr)
 library(RCurl)
 library(tidyverse)
 
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+
+
 #-- Load FTP credentials
 creds <- read.csv("C:/Users/dkvale/Desktop/credentials.csv", stringsAsFactors = F)
 
 # Get yesterday's actuals  #
 #--------------------------#
-sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
+sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 

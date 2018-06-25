@@ -1,9 +1,13 @@
 library(SplitR)
 library(lubridate)
 
-source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R/hysplit_support_functions.R")
 
-source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R/traj_read.R")
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+
+source(paste0(aircast_path, "R/hysplit_support_functions.R"))
+
+source(paste0(aircast_path, "R/traj_read.R"))
 
 
 # Test extended_met
@@ -26,7 +30,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                          daily_hours    = 17,
                          direction      = "backward",
                          met_type       = "narr",
-                         met_dir        = "C:/Users/dkvale/Desktop/hysplit/archive_hysplit/NARR",
+                         met_dir        = "C:/Users/dkvale/Desktop/aircast/hysplit/archive_hysplit/NARR",
                          extended_met   = TRUE,
                          vert_motion    = 0,
                          model_height   = 20000,

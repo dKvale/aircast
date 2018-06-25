@@ -2,13 +2,17 @@
 
 library(tidyverse)
 
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+
+
 
 #AirNow credentials
 creds <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
 
 
 # AQI conversion functions
-source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-watch/R/aqi_convert.R")
+source(paste0(aqiwatch_path, "R/aqi_convert.R"))
 
 
 #--------------------------#
@@ -16,7 +20,7 @@ source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fo
 #--------------------------#
 print("Loading sites...")
 
-sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
+sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
@@ -30,6 +34,7 @@ sites <- filter(sites, !fcst_region %in% c("CA", "ND", "SD", "WI", "IA"))
 # Yesterday's official submitted forecast
 #--------------------------------#
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values")
+
 print("Loading official forecasts...")
 
 # Load forecasts from AirNow for all days past yesterday
