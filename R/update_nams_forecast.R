@@ -4,13 +4,18 @@ library(downloader)
 library(reports)
 library(magrittr)
 
-setwd("~")
-setwd("../Desktop/hysplit")
 
-source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R/get_nams_forecast.R")
+
+aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/R/"
+
+source(paste0(aircast_path, "get_nams_forecast.R"))
+
+
+# Navigate to user Desktop
+setwd("~")
+setwd("../Desktop/aircast/hysplit")
 
 # Delete old data
-delete("__yesterday")
 delete(list.files()[grepl("traj-", list.files())])
 delete("__today")
 

@@ -1,14 +1,16 @@
 #! /usr/bin/env Rscript
 
-#devtools::install_github("rich-iannone/SplitR")
-library(SplitR)
+library(SplitR) #devtools::install_github("rich-iannone/SplitR")
 library(dplyr)
 library(readr)
 library(tidyr)
+library(here)
 
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-source("hysplit_traj.R")
-source("get_cmaq_forecast.R")
+aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/R/"
+
+source(paste0(aircast_path, "hysplit_traj.R"))
+
+source(paste0(aircast_path, "get_cmaq_forecast.R"))
 
 # Check file size function
 min_exists <- function(file_name, min_size = 7.2E+8) { 
@@ -33,7 +35,7 @@ sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 
 
 setwd("~")
-setwd("../Desktop/hysplit")
+setwd("../Desktop/aircast/hysplit")
 
 # Trajectory function to read all sites
 aqi_traj <- function(date            = NULL, 
@@ -58,7 +60,7 @@ aqi_traj <- function(date            = NULL,
                              daily_hours  = 17,
                              direction    = "backward",
                              met_type     = "NAM",
-                             met_dir      = "C:/Users/dkvale/Desktop/hysplit",
+                             met_dir      = "C:/Users/dkvale/Desktop/aircast/hysplit",
                              extended_met = TRUE,
                              vert_motion  = 0,
                              model_height = 20000,
@@ -91,7 +93,7 @@ aqi_traj <- function(date            = NULL,
   
 }
 
-setwd("C:/Users/dkvale/Desktop/hysplit")
+setwd("C:/Users/dkvale/Desktop/aircast/hysplit")
 
 # of days in the past, Zero is today
 days_past <- 0 
@@ -174,7 +176,7 @@ back_forecast
 
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 
-write_csv(back_forecast, paste0(Sys.Date(), "_AQI_raw_HYSPLIT.csv"))
+write_csv(back_forecast, paste0(Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
 
 }
 

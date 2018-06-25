@@ -5,7 +5,7 @@ library(dplyr)
 library(readr)
 library(darksky)
 
-options(digits=16)
+options(digits=12)
 
 # DarkSky key
 d_key <- 'ea8610622c9d63c30ca25dea03ec3d90'
@@ -13,7 +13,7 @@ d_key <- 'ea8610622c9d63c30ca25dea03ec3d90'
 
 Sys.setenv(DARKSKY_API_KEY = d_key)
 
-days <- data_frame(date = seq(as.Date("2002-12-31"), as.Date("2017-12-31"), 1),
+days <- data_frame(date = seq(as.Date("2006-12-31"), as.Date("2017-12-31"), 1),
                    join = 1)
 
 days[1:5, ]
@@ -23,22 +23,49 @@ day <- 5
 days[day, ]
 
 
+# Generate table of downloaded dates
+all_met <- data_frame() 
+  
+folder <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/sites" 
+    
+files <- list.files(folder)
+  
+for (file in files) {
+    
+    print(file)
+    
+    tmp <- read_csv(paste0(folder, "/", file))
+    
+    if (nrow(tmp) > 0) {
+    
+      tmp$date <- format(tmp$time, "%Y-%m-%d") 
+      
+      tmp <- select(tmp, site_catid, date) %>% group_by(date) %>% slice(1)
+      
+      all_met <- bind_rows(tmp, all_met)
+    
+}
+    
+}
+
+#saveRDS(all_met, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata") 
+  
+
 # Load previous archives
-all_met <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata")
+#all_met <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata")
 
 names(all_met)
 
-all_met$date      <- format(all_met$time, "%Y-%m-%d")
-
 all_met$site_date <- paste(all_met$site_catid, all_met$date)
+
 
 
 # Site list
 sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
 
+
 # Remove duplicate sites
 #sites <- filter(sites, !short_name %in% c("Fond_Du_Lac2"))
-
 
 # Add air toxics sites
 all_sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/AirToxics_sites.csv")
@@ -83,14 +110,14 @@ for (i in 1:nrow(sites)) {
   
   site <- sites[i, ]
   
-  if (requests > 950) break()
+  if (requests > 990) break()
   
   print(site$site_date)
   
   requests <- requests + 1
   
-  day_forc <- tryCatch(get_forecast_for(site$monitor_lat, 
-                                        site$monitor_long,
+  day_forc <- tryCatch(get_forecast_for(round(site$monitor_lat, 2), 
+                                        round(site$monitor_long, 2),
                                         paste0(site$date, "T12:00:00-0400"), 
                                         exclude = "currently,daily"), 
                        error = function(err) NA)
@@ -112,26 +139,21 @@ for (i in 1:nrow(sites)) {
 }
 
 
-all_met$date      <- NULL
-
-all_met$site_date <- NULL
-
 # Add new data to archive
 if (nrow(all_forecasts) > 0) {
   
-  all_met2 <- bind_rows(all_met, all_forecasts)
+  all_forecasts$time <- as.character(all_forecasts$time)
+  
+  all_forecasts$precipIntensity <- as.numeric(all_forecasts$precipIntensity)
   
   # Check date coverage
-  length(unique(all_met2$time))
+  length(unique(all_forecasts$time))
   
-  length(unique(as.Date(all_met2$time)))
+  length(unique(as.Date(all_forecasts$time)))
   
-  range(unique(as.Date(all_met2$time)))
+  range(unique(as.Date(all_forecasts$time)))
   
-  # Save to R file
-  saveRDS(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata")
 
-  
   # Update individual site files
   for (i in unique(all_forecasts$site_catid)) {
     
@@ -139,9 +161,9 @@ if (nrow(all_forecasts) > 0) {
     
     if (file.exists(file_loc)) {
     
-      temp <- read_csv(file_loc)
+      temp <- read_csv(file_loc)[ , names(all_forecasts)]
       
-      temp$precipAccumulation <- as.numeric(temp$precipAccumulation)
+      temp <- read_csv(format_csv(temp), col_types = "cccddcdddddddiddcdddddddd")
       
       site_met <- bind_rows(filter(all_forecasts, site_catid == i), temp)
       
@@ -150,6 +172,10 @@ if (nrow(all_forecasts) > 0) {
     } else {
       
       site_met <- filter(all_forecasts, site_catid == i)
+      
+      site_met$precipAccumulation <- as.numeric(site_met$precipAccumulation)
+      
+      site_met$time <- as.character(site_met$time)
       
       write_csv(site_met, file_loc)
       
@@ -190,7 +216,7 @@ if (nrow(all_forecasts) > 0) {
   
   write_csv(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.csv")
   
-  check <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.rdata")
+  #check <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.rdata")
   
   }
 }

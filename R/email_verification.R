@@ -33,6 +33,12 @@ creds <- read.csv("C:/Users/dkvale/Desktop/credentials.csv", stringsAsFactors = 
 #-- Knit Rmarkdown document
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification")
 
+
+file_name <- "email_sent.csv"
+
+# Update daily report if it hasn't been
+if(as.Date(file.info(file_name)$mtime) != Sys.Date()) {
+  
 rmarkdown::render("aqi_message.Rmd")
 
 
@@ -85,7 +91,7 @@ for(i in aqi_team) {
   while(is.na(send_fail) & run_count < 1) {
 
     #-- Set time limit on run time
-    send_fail <- tryCatch(evalWithTimeout(send_msg(i), timeout = 8, onTimeout = "error"), 
+    send_fail <- tryCatch(withTimeout(send_msg(i), timeout = 8, onTimeout = "error"), 
                           TimeoutException = function(ex) NA, 
                           error = function(e) NA)
     
@@ -95,6 +101,8 @@ for(i in aqi_team) {
 
   }
 }
-       
+ 
 
+write.csv(data.frame(x = 5), "email_sent.csv")      
+}
 ##

@@ -68,7 +68,7 @@ for(i in aqi_team) {
   while(is.na(send_fail) & run_count < 1) {
     
     #-- Set time limit on run time
-    send_fail <- tryCatch(evalWithTimeout(send_msg(i), timeout = 5, onTimeout = "error"), TimeoutException = function(ex) NA, error = function(e) NA)
+    send_fail <- tryCatch(withTimeout(send_msg(i), timeout = 5, onTimeout = "error"), TimeoutException = function(ex) NA, error = function(e) NA)
     
     Sys.sleep(1)
     

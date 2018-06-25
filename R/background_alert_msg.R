@@ -11,11 +11,11 @@ bg_alert_subscribers <- c("dorian.kvale@state.mn.us",
                          "daniel.dix@state.mn.us",
                          "david.l.brown@state.mn.us")
 
-bg_alert_subscribers <- bg_alert_subscribers[1]
+#bg_alert_subscribers <- bg_alert_subscribers[1]
 
 #-- Open NAM data folder on desktop
 setwd("~")
-setwd("../Desktop/hysplit")
+setwd("../Desktop/aircast/hysplit")
 
 # Create minimum exists function
 # Checks if file exists and if meets minimum file size
@@ -43,7 +43,7 @@ back_missing  <- (max(grepl("namf", met_list), na.rm = T) +
                   max(grepl("namsa", met_list), na.rm = T))   < 4
 
 
-if(back_missing) {
+if (back_missing) {
   
   #-- Create email text
   date <- format(Sys.Date(), "%Y%m%d")

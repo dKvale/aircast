@@ -3,10 +3,15 @@
 library(downloader)
 library(magrittr)
 
-setwd("~")
-setwd("../Desktop/hysplit/__today")
 
-source("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff folders\\Dorian\\AQI\\aircast\\R\\get_nams_forecast.R")
+
+aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/R/"
+
+source(paste0(aircast_path, "get_nams_forecast.R"))
+
+
+setwd("~")
+setwd("../Desktop/aircast/hysplit/__today")
 
 
 # Create minimum exists function

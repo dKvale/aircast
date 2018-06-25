@@ -1,0 +1,53 @@
+Air Monitor,site_catid,alt_siteid,monitor_lat,monitor_long,Receptor,Sfc Weather,Upper Air,Fcst_Region,short_name,elevation
+Anoka Airport,27-003-1002,NA,45.13768,-93.207615,TC_North,ANE,KMPX,North Twin Cities Metro,Anoka,NA
+Apple Valley,27-037-0470,NA,44.73846,-93.23725,TC_South,FCM,KMPX,South Twin Cities Metro,Apple_Valley,NA
+Ben Franklin Sch.,27-109-5008,NA,43.996908,-92.450366,Rochester,RST,KMPX,Rochester,Rochester,NA
+Blue Mounds Sp,27-133-9000,NA,43.71579,-96.191613,Marshall,OTG,KMPX,Marshall,Marshall2,NA
+Brainerd,27-035-3204,NA,46.39674,-94.1303,Brainerd,BRD,KMPX,Brainerd,Brainerd,NA
+Cedar Creek,27-003-1001,NA,45.40184,-93.20306,TC_North,CBG,KMPX,North Twin Cities Metro,Cedar_Creek,NA
+Detroit Lakes,27-005-2013,NA,46.851811,-95.846272,Detroit Lakes,DTL,KABR,Detroit Lakes,Detroit_Lakes,NA
+Fargo,38-017-1004,NA,46.9336,-96.854698,Fargo,FAR,KABR,Moorhead,Fargo,NA
+Fernberg Rd,27-075-0005,NA,47.948622,-91.495574,Ely,ELO,KINL,Ely,Ely,NA
+Fond Du Lac,27-017-7417,NA,46.713694,-92.511722,Duluth,COQ,KINL,Fond du Lac,Fond_Du_Lac,NA
+Fond Du Lac,27-017-7416,NA,46.70527,-92.52377,Duluth,COQ,KINL,Fond du Lac,Fond_Du_Lac2,NA
+Grand Portage,27-031-7810,NA,47.972085,-89.69098,Grand Portage,GNA,KINL,Grand Portage,Grand_Portage,NA
+Great Riv Bluffs,27-169-9000,NA,43.937299,-91.405348,Great River Bluffs,LSE,KMPX,Winona,Winona_pm,NA
+Harding High School,27-123-0871,NA,44.95939,-93.03587,TC_Center,STP,KMPX,Minneapolis-St. Paul,Harding,NA
+HC Anderson Sch,27-053-0963,NA,44.95366,-93.25821,TC_Center,MSP,KMPX,Minneapolis-St. Paul,HC_Anderson,NA
+LaCrosse,55-063-0012,NA,43.7781,-91.225,LaCrosse,LSE,KMPX,Winona,Winona,NA
+Laura McArthur Sch,27-137-7554,NA,46.743657,-92.165998,Duluth,SUW,KINL,Duluth,West_Duluth,NA
+Leech Lake,27-021-3410,NA,47.385,-94.602,Leech_Lake,BJI,KINL,Leech Lake,Leech_Lake,NA
+Marine on St Croix,27-163-6016,NA,45.168004,-92.765136,TC_East,RGK,KMPX,North Twin Cities Metro,Marine_St_Croix,NA
+Marshall,27-083-4210,NA,44.4438,-95.81789,Marshall,MML,KMPX,Marshall,Marshall,NA
+Mille Lacs,27-095-3051,NA,46.2053,-93.75945,Mille Lacs,AIT,KMPX,Mille Lacs,Mille_Lacs,NA
+Near Rd Lakeville,27-037-0480,NA,44.706123,-93.285803,TC_South,LVN,KMPX,South Twin Cities Metro,Lakeville,NA
+Near Rd MSP,27-053-0962,NA,44.965242,-93.254759,TC_Center,MSP,KMPX,Minneapolis-St. Paul,MSP,NA
+Ramsey Health Center,27-123-0868,NA,44.95072,-93.09827,TC_Center,STP,KMPX,Minneapolis-St. Paul,Ramsey_Health,NA
+Red Lake Nation,27-007-2304,NA,47.878159,-95.029172,Red_Lake,BJI,KINL,Red Lake,Red_Lake,NA
+Shakopee,27-139-0505,NA,44.791437,-93.512534,TC_South,FCM,KMPX,South Twin Cities Metro,Shakopee,NA
+St Louis Park,27-053-2006,NA,44.94805,-93.34315,TC_Center,MIC,KMPX,Minneapolis-St. Paul,St_Louis_Park,NA
+St Michael,27-171-3201,NA,45.20916,-93.66921,TC_West,STC,KMPX,North Twin Cities Metro,St_Michael,NA
+Stanton,27-049-5302,NA,44.473754,-93.012611,TC_South,LVN,KMPX,South Twin Cities Metro,Stanton,NA
+Talahi Sch,27-145-3052,NA,45.549839,-94.13345,St. Cloud,STC,KMPX,St. Cloud,St_Cloud,NA
+Virginia,27-137-7001,NA,47.523355,-92.536305,Virginia,EVM,KINL,Virginia,Virginia,NA
+Voyageurs,27-137-9000,27-137-0034,48.4128,-92.8292,Voyageurs,ORB,KINL,Voyageurs National Park,Voyageurs,NA
+WDSE,27-137-7550,NA,46.81826,-92.08936,Duluth,DLH,KINL,Duluth,Duluth_WDSE,NA
+Bad River Tribal School,55-003-0010,NA,46.6144,-90.6986,Bad River Tribal School,NA,NA,WI,Bad River Tribal School,NA
+Trout Lake,55-125-0001,NA,46.0481,-89.6536,Trout Lake,NA,NA,WI,Trout Lake,NA
+Perkinstown,55-119-9991,NA,45.2066,-90.5969,Perkinstown,NA,NA,WI,Perkinstown,472.1
+Eau Clair DOT sign shop,55-035-0014,NA,44.761398,-91.413002,Eau Clair DOT sign shop,NA,NA,WI,Eau Clair DOT sign shop,NA
+Devils Lake Park,55-111-0007,NA,43.4356,-89.6803,Devils Lake Park,NA,NA,WI,Devils Lake Park,NA
+Potosi (PM2.5),55-043-0009,NA,42.692131,-90.696373,Potosi,NA,NA,WI,Potosi,NA
+Waverly Airport (O3),19-017-0011,NA,42.743099,-92.5131,Waverly Airport,NA,NA,IA,Waverly Airport,NA
+"Emmetsburg, Iowa",19-147-1002,NA,43.123299,-94.693298,"Emmetsburg, Iowa",NA,NA,IA,"Emmetsburg, Iowa",NA
+Union County,46-127-0001,NA,42.751518,-96.707208,Union County,NA,NA,SD,Union County,NA
+Research Farm,46-011-0003,NA,44.348604,-96.807299,Research Farm,NA,NA,SD,Research Farm,NA
+Bismarck residential,38-015-0003,NA,46.8253,-100.7681,Bismarck residential,NA,NA,ND,Bismarck residential,580.1
+Water Tower (PM2.5),19-013-0009,NA,42.5014,-92.315804,Water Tower,NA,NA,IA,Water Tower,NA
+Carpenter,19-153-0030,NA,41.6031,-93.643303,Carpenter,NA,NA,IA,Carpenter,282.1
+Thunder Bay,thunder-bay,NA,48.3794,-89.29,Thunder Bay,NA,NA,CA,Thunder Bay,NA
+Winnipeg Ellens,00-007-0119,NA,49.9489,-97.3964,Winnipeg Ellens,NA,NA,CA,Winnipeg Ellens,NA
+Brandon,00-007-0203,NA,49.8422,-99.9189,Brandon,NA,NA,CA,Brandon,NA
+Experimental Lakes,00-006-4001,NA,49.6639,-93.7211,Experimental Lakes,NA,NA,CA,Experimental Lakes,NA
+Pierre,46-065-0003,NA,44.37379,-100.2873,Pierre,NA,NA,SD,Pierre,NA
+Sioux Falls,46-099-0008,NA,43.54792,-96.70077,Sioux Falls,NA,NA,SD,Sioux Falls,NA
