@@ -8,40 +8,40 @@ aqi_update:
 FormatTime, TimeToMeet,,HHmm
 
 
-if (TimeToMeet = 0735)
+if (TimeToMeet = 0755)
 {
 
-        Run, "C:\Users\dkvale\Desktop\hysplit\BATCH_R_forecast_Update.bat"
+        Run, "C:\Users\dkvale\Desktop\aircast\_batch\batch_R_aqi_forecast_update.bat"
 	sleep, 60000
 
 }
 
 
 
-if (TimeToMeet = 1112)
+if (TimeToMeet = 1113)
 {
 
-        Run, "C:\Users\dkvale\Desktop\hysplit\BATCH_R_forecast_Update.bat"
+        Run, "C:\Users\dkvale\Desktop\aircast\_batch\batch_R_aqi_forecast_update.bat"
 	sleep, 60000
 
 }
 
 
 
-if (TimeToMeet = 1225)
+if (TimeToMeet = 1229)
 {
 
-        Run, "C:\Users\dkvale\Desktop\hysplit\BATCH_R_forecast_Update.bat"
+        Run, "C:\Users\dkvale\Desktop\aircast\_batch\batch_R_aqi_forecast_update.bat"
 	sleep, 60000
 
 }
 
 
 
-if (TimeToMeet = 1337)
+if (TimeToMeet = 1340)
 {
 
-        Run, "C:\Users\dkvale\Desktop\hysplit\BATCH_R_forecast_Update.bat"
+        Run, "C:\Users\dkvale\Desktop\aircast\_batch\batch_R_aqi_forecast_update.bat"
 	sleep, 60000
 
 }
@@ -51,7 +51,7 @@ if (TimeToMeet = 1337)
 if (TimeToMeet = 1534)
 {
 
-        Run, "C:\Users\dkvale\Desktop\hysplit\BATCH_R_forecast_Update.bat"
+        Run, "C:\Users\dkvale\Desktop\aircast\_batch\batch_R_aqi_forecast_update.bat"
 	sleep, 60000
 
 }

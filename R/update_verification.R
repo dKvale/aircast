@@ -4,7 +4,7 @@ library(tidyverse)
 
 
 #AirNow credentials
-creds <- read_csv("C:\\Users\\dkvale\\Desktop\\credentials.csv")
+creds <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
 
 
 # AQI conversion functions
@@ -234,7 +234,7 @@ names(verify) <- gsub("Pm25Avg ", "mod_pm25avg_", names(verify))
 
 names(verify) <- gsub("AQI_PM_", "mod_aqi_pm_", names(verify))
 
-names(verify)[c(1,12)] <- c("forecast_day", "site_catid")
+verify <- rename(verify, forecast_day = DayIndex, site_catid = ID)
 
 names(verify) <- gsub("AQI_O3", "fcst_ozone_aqi", names(verify))
 
@@ -252,7 +252,7 @@ verify$date <- NULL
 
 
 # Rearrange columns with dates first
-verify <- verify[ , c(ncol(verify), 1, 11, 10, 2:9, 12:(ncol(verify) - 1))]
+verify <- verify[ , c(ncol(verify), 1, 2:(ncol(verify) - 1))]
 
 
 
@@ -282,6 +282,9 @@ class(verify$forecast_day)
 
 
 #-- Join all
+verify$site_catid
+
+all_inputs$site_catid
 verify   <- left_join(verify, select(all_inputs, -short_name))
 
    
@@ -367,7 +370,7 @@ setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fol
 
 print("Loading previous day verifications...")
 
-all_verify <- try(readRDS(paste0("Archive/", Sys.Date() - 1, "_verification_table.Rdata")))
+all_verify <- try(readRDS(paste0("Archive/", Sys.Date() - 2, "_verification_table.Rdata")))
 
 if ("try-error" %in% class(all_verify)) {
   

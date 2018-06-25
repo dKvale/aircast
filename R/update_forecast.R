@@ -1,6 +1,8 @@
 #! /usr/bin/env Rscript
 
 
+aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/R/"
+
 current_time <- as.numeric(format(Sys.time(), "%H"))
 
 
@@ -8,42 +10,32 @@ if(current_time <= 10) {
   
   # Grab yesterdays actuals
   print("Downloading yesterday actuals")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("get_aqi_results.R"))
+  try(source(paste0(aircast_path, "get_aqi_results.R")))
   
   # Update verification table
   print("Updating verification table")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("update_verification.R"))
+  try(source(paste0(aircast_path, "update_verification.R")))
   
   # Email yesterday's monitoring results
   print("E-mailing yesterday's verification")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("email_verification.R"))
+  try(source(paste0(aircast_path, "email_verification.R")))
   
   # Update MET archive from DarkSky
   print("Updating MET archive from DarkSky")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("update_MET_archive.R"))
+  try(source(paste0(aircast_path, "update_MET_archive.R")))
   
   # Update AQI history file
-  print("Updating site history")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/R")
-  try(source("update_aqi_history.R"))
-  
-  # Update forecast maps
-  print("Updating forecast maps")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/R")
-  try(source("update_forecast_maps.R"))
-  
+  #print("Updating site history")
+  #setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/R")
+  #try(source("update_aqi_history.R"))
+
 }
 
 if(current_time >= 10 & current_time < 12) {
   
   # Update background NAMS data
   print("Downloading NAMS data...")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("update_nams_forecast.R"))
+  try(source(paste0(aircast_path, "update_nams_forecast.R")))
   
 }
 
@@ -51,22 +43,19 @@ if(current_time >= 10 & current_time < 12) {
 if(current_time == 12) {
   
   # Update background NAMS data (backup in case NOAA files did not download)
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("check_nams_forecast.R"))
+  print("Check background download...")
+  try(source(paste0(aircast_path, "check_nams_forecast.R")))
   
   # Send e-mail alert if today's background NAM data is missing
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("background_alert_msg.R"))
+  try(source(paste0(aircast_path, "background_alert_msg.R")))
   
   # Run HYSPLIT model
-  print("Running HYSPLIT")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("run_current_hysplit.R"))
+  print("Running HYSPLIT...")
+  try(source(paste0(aircast_path, "run_current_hysplit.R")))
   
   # Attach background monitoring results for 16z
-  print("Attaching monitoring results")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("update_background_aqi.R"))
+  print("Attaching monitoring results...")
+  try(source(paste0(aircast_path, "update_background_aqi.R")))
   
 }
 
@@ -75,33 +64,30 @@ if(current_time > 12 & current_time < 15) {
   
   # Grab CMAQ forecast
   print("Downloading CMAQ")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("update_cmaq_forecast.R"))
+  try(source(paste0(aircast_path, "update_cmaq_forecast.R")))
   
   # Attach background monitoring results for 17z
   print("Attaching monitoring results")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("update_background_aqi.R"))
+  try(source(paste0(aircast_path, "update_background_aqi.R")))
   
   # E-mail background results
   print("E-mailing background results")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("email_background.R"))
+  try(source(paste0(aircast_path, "email_background.R")))
   
   # Empty airvision FTP folder
   print("Deleting FTP airvision files...")
-  setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-  try(source("clear_airvision_ftp.R"))
+  try(source(paste0(aircast_path, "clear_airvision_ftp.R")))
   
 }
 
 
 if(current_time >= 15) {
   
+
 # Update forecast maps
-print("Updating forecast maps")
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/R")
-try(source("update_forecast_maps.R"))
+#print("Updating forecast maps")
+#setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/R")
+#try(source("update_forecast_maps.R"))
 
 }
 

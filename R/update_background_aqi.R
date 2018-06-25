@@ -8,6 +8,13 @@ library(tidyr)
 library(stringr)
 
 
+# Check file size function
+min_exists <- function(file_name, min_size = 7.2E+8) { 
+  
+  file.exists(file_name) & file.size(file_name) > min_size
+  
+}
+
 # Load site locations
 sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
 
@@ -26,6 +33,7 @@ setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fol
 
 hys  <- read_csv(paste0(Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
 
+
 # Download current AQI monitor readings for Noon
 today       <- Sys.Date() - days_past
 
@@ -36,6 +44,10 @@ year        <- format(Sys.Date(), "%Y")
 gmt_time    <- (as.numeric(format(Sys.time() - 2100, tz = "GMT", "%H")) - 1) %% 24 
 
 if (gmt_time > 17 | gmt_time < 14) gmt_time <- 17
+
+
+# Check if background AQI update has already run
+if (!min_exists(paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), min_size = 100)) {
 
 airnow_base <- paste0('https://s3-us-west-1.amazonaws.com/files.airnowtech.org/airnow/', year, '/', day, '/')
 
@@ -351,8 +363,9 @@ names(hys_wide)[1:2] <- c("site_catid", "hour_gmt")
 # SAVE results
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 
+
 write.csv(hys_wide[ , c(1:11)], 
           paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
 
-
+}
 ##

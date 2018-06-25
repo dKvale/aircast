@@ -16,7 +16,7 @@ sh[new_line] <- paste0("for i in `curl -s -l ftp://\"$ftp_username\":\"$ftp_pass
 writeLines(sh, "X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff Folders\\Dorian\\AQI\\aircast\\_sh scripts\\clear_ftp.sh")
   
 # Run .sh file in command line to delete files from yesterday
-shell(paste0('C: & "C:\\Program Files\\Git\\bin\\sh" ',
+shell(paste0('C: & "C:\\Users\\dkvale\\Documents\\Git\\bin\\sh" ',
              '"X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\_Air_Risk_Evaluation\\Staff Folders\\Dorian\\AQI\\aircast\\_sh scripts\\clear_ftp.sh"'))
 
 

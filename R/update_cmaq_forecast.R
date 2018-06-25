@@ -8,16 +8,31 @@ library(tidyr)
 library(methods)
 
 
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R")
-source("get_cmaq_forecast.R")
+aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 
-sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
+
+# Check file size function
+min_exists <- function(file_name, min_size = 7.2E+8) { 
+  
+  file.exists(file_name) & file.size(file_name) > min_size
+  
+}
+
+source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
+
+sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
 # Filter to one site per forecast city
 sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 
+
+# Check if CMAQ has already run
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
+
+if (!min_exists(paste0(Sys.Date(), "_CMAQ_forecast", ".csv"), min_size = 100)) {
+  
 # Loop through all sites
 cmaq_all <- data_frame()
 
@@ -40,5 +55,7 @@ for(i in 1:nrow(sites)) {
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
   
 write.csv(cmaq_all, paste0(Sys.Date(), "_CMAQ_forecast", ".csv"), row.names = F)
+
+}
 
 ##

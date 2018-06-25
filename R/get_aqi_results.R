@@ -270,7 +270,9 @@ keep_columns <- c("date",
                   "obs_max_ozone_8hr_ppb", 
                   "obs_pm25_24hr_ugm3")
 
+file_name <- paste0(Sys.Date() - 1, "_AQI_observed", ".csv")
 
-write.csv(air_all[ , keep_columns], paste0(Sys.Date() - 1, "_AQI_observed", ".csv"), row.names = F)
+# Write file only if it isn't already there
+if(!file_name %in% list.files()) write.csv(air_all[ , keep_columns], paste0(Sys.Date() - 1, "_AQI_observed", ".csv"), row.names = F)
 
 
