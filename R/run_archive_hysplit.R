@@ -10,11 +10,14 @@ library(readxl)
 library(tidyr)
 library(stringr)
 
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/R/")
-source("hysplit_traj.R")
+
+aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+
+source(paste0(aircast_path, "R/hysplit_traj.R"))
+
 
 # Load site locations
-sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
+sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 

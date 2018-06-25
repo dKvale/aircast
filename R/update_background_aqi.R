@@ -7,6 +7,9 @@ library(measurements)
 library(tidyr)
 library(stringr)
 
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+
 
 # Check file size function
 min_exists <- function(file_name, min_size = 7.2E+8) { 
@@ -16,7 +19,7 @@ min_exists <- function(file_name, min_size = 7.2E+8) {
 }
 
 # Load site locations
-sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
+sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
@@ -362,7 +365,6 @@ names(hys_wide)[1:2] <- c("site_catid", "hour_gmt")
 
 # SAVE results
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
-
 
 write.csv(hys_wide[ , c(1:11)], 
           paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)

@@ -9,29 +9,27 @@
 # Packages
 library(tidyverse)
 
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+
 
 # AQI conversion functions
-source("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-watch/R/aqi_convert.R")
+source(paste0(aqiwatch_path, "R/aqi_convert.R"))
 
 dates <- seq(as.Date("2017-05-20"), as.Date("2018-05-31"), 1)
 
 
 # Load sites
-sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
+sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
 
 # Load recent results
-events <- read_csv("../Verification/event_table.csv")
+events <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/event_table.csv")
 
-events2 <- read_csv("../Verification/event_table.csv")
+events_all <- filter(events, forecast_date %in% dates)
 
-events_all <- bind_rows(events, events2)
-
-events_all <- filter(events_all, forecast_date %in% dates)
-
-rm(events2)
 
 min(events_all$forecast_date)
 
@@ -54,12 +52,12 @@ events <- events_all %>%
 
 
 # Load verification table
-verify  <- read_csv("../Verification/verification_table.csv")
+verify  <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/verification_table.csv")
 
 verify <- verify %>% mutate(mod_max_avg8hr = as.numeric(mod_max_avg8hr),
                             mod_pm25avg    = as.numeric(mod_pm25avg))
 
-verify2 <- read_csv("../Verification/Archive/2017_verification_table.csv")
+verify2 <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/Archive/2017_verification_table.csv")
 
 verify2 <- verify2 %>% mutate(mod_aqi_o3 = as.character(mod_aqi_o3),
                               mod_aqi_pm = as.character(mod_aqi_pm ))
@@ -128,7 +126,7 @@ results <- results %>%
 
 
 # Historical results
-weeks_median <- read_csv("../Forecast data/rolling_11-day_averages.csv")
+weeks_median <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Forecast data/rolling_11-day_averages.csv")
 
 names(weeks_median)[2:6] <-  c("hist_date", 
                                "hist_week_ozone_ppb", 
@@ -246,7 +244,7 @@ stats_pm_overall <- stats_pm %>%
 
 
 ## Save
-write_csv(results, "Day1_history/Day1_forecast_history.csv")
+write_csv(results, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/Day1_history/Day1_forecast_history.csv")
 
 
 ##
