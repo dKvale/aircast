@@ -277,6 +277,9 @@ keep_columns <- c("date",
 file_name <- paste0(Sys.Date() - 1, "_AQI_observed", ".csv")
 
 # Write file only if it isn't already there
-if(!file_name %in% list.files()) write.csv(air_all[ , keep_columns], paste0(Sys.Date() - 1, "_AQI_observed", ".csv"), row.names = F)
+if(!file_name %in% list.files()) {
+  
+  write.csv(air_all[ , keep_columns], paste0(Sys.Date() - 1, "_AQI_observed", ".csv"), row.names = F)
+}
 
 
