@@ -6,11 +6,11 @@ library(readr)
 library(tidyr)
 library(here)
 
-aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/R/"
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 
-source(paste0(aircast_path, "hysplit_traj.R"))
+source(paste0(aircast_path, "R/hysplit_traj.R"))
 
-source(paste0(aircast_path, "get_cmaq_forecast.R"))
+source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
 
 # Check file size function
 min_exists <- function(file_name, min_size = 7.2E+8) { 

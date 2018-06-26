@@ -3,7 +3,7 @@ library(lubridate)
 
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 
 source(paste0(aircast_path, "R/hysplit_support_functions.R"))
 
