@@ -3,7 +3,7 @@
 library(downloader)
 library(magrittr)
 
-
+# if (computer == "desktop) {  }
 
 aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/R/"
 
@@ -51,7 +51,7 @@ if(!min_exists("hysplit.t12z.nama", min_size = 7.3E+8)) {
 }
 
 # NAMsa
-if(!min_exists("hysplit.t12z.namsa", min_size = 1E+9)) {
+if(!min_exists("hysplit.t12z.namsa", min_size = 1.1E+9)) {
   
   nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "a", time_step = 1), error = function(err) NA, silent = T)
   
@@ -62,7 +62,7 @@ if(!min_exists("hysplit.t12z.namsa", min_size = 1E+9)) {
 }
 
 # NAMsa
-if(!min_exists("hysplit.t12z.namsf", min_size = 2.1E+9)) {
+if(!min_exists("hysplit.t12z.namsf", min_size = 2.2E+9)) {
   
   nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "f", time_step = 1), error = function(err) NA, silent = T)
   

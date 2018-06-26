@@ -6,7 +6,7 @@
 #### - Historical week median 
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 
 
 # Packages

@@ -3,8 +3,7 @@
 library(tidyverse)
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
-
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 
 
 #AirNow credentials
@@ -523,6 +522,7 @@ all_verify <- bind_rows(yesterday_fcst, all_verify)
 # Save master verification table
 #------------------------------------------------#
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification")
+
 print("Saving file...")
 
 all_verify  <- select(all_verify, -short_name) %>% 
