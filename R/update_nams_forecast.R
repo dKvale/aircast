@@ -6,11 +6,6 @@ library(magrittr)
 
 
 
-aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
-
-
 source(paste0(aircast_path, "R/get_nams_forecast.R"))
 
 

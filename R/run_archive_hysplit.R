@@ -11,13 +11,12 @@ library(tidyr)
 library(stringr)
 
 
-aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 
 source(paste0(aircast_path, "R/hysplit_traj.R"))
 
 
 # Load site locations
-sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
+sites <- aqi_sites
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 

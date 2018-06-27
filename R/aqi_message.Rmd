@@ -12,7 +12,7 @@ output:
 <div style="margin-top: -19px;"> <i>Preliminary results for `r format(Sys.Date() - 1, "%A %b %d, %Y")`</i></div>  
   
 ```{r echo=FALSE, message = FALSE, warning = FALSE}
-# C: & "C:\Users\dkvale\Documents\R\R-3.4.0\bin\i386\Rscript.exe" --no-save --no-restore "~\..\Desktop\aircast\aircast\R\email_background.R"
+# C: & "C:\Users\dkvale\Documents\R\R-3.5.0\bin\i386\Rscript.exe" --no-save --no-restore "~\..\Desktop\aircast\aircast\R\email_background.R"
 
 # C: & "C:\Users\dkvale\Documents\R\R-3.4.2\bin\i386\Rscript.exe" --no-save --no-restore "C:\Users\dkvale\Desktop\aircast\R\get_aqi_results.R"
 
@@ -21,12 +21,13 @@ library(tidyverse)
 library(lubridate)
 library(ggrepel)
 library(gridExtra)
+library(magrittr)
 
 days_past <- 0
 
 aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
 
 
 # Test for weekend
@@ -44,7 +45,7 @@ source(paste0(aqiwatch_path, "R/aqi_convert.R"))
 #-- Load yesterdays observations
 
 #verify <- readRDS(paste0("Archive/", Sys.Date() - days_past, "_verification_table.Rdata"))
-verify <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/verification_table.csv")
+verify <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/verification_table2.csv")
 
 
 # Switch Voyageurs AQS ID
@@ -52,11 +53,11 @@ verify[verify$site_catid == "27-137-0034", "site_catid"] <- "27-137-9000"
 
 
 #-- Filter to yesterdays results
-verify <- filter(verify, forecast_date == Sys.Date() - days_past - 1)
+verify %<>% filter(forecast_date == Sys.Date() - days_past - 1)
 
 
 #-- Remove day0 forecast from report
-verify <- filter(verify, forecast_day != 0)
+verify %<>% filter(forecast_day != 0)
 
 
 #-- Filter to most recent forecast
@@ -207,11 +208,16 @@ verify_pm <- verify %>%
              select(-count) %>%
              ungroup()
 
-names(verify_pm)[4:20] <-  c("Ozone obs count", "Ozone ppb", "Ozone AQI", "Ozone forecast", 
-                             "CMAQ forecast",
-                             "persist_ozone_aqi", "roll_ozone_aqi", "roll11_ozone_aqi", "bb3_ozone_aqi",
-                             "PM2.5 obs count", "PM2.5 ug/m3", "PM2.5 AQI", "PM2.5 forecast",
-                             "persist_pm25_aqi", "roll_pm25_aqi", "roll11_pm25_aqi", "bb3_pm25_aqi")
+verify_pm <- rename(verify_pm,
+                    `Ozone obs count` = count_ozone_obs,
+                    `Ozone ppb`       = obs_ozone_ppb, 
+                    `Ozone AQI`       = obs_ozone_aqi,
+                    `Ozone forecast`   = fcst_ozone_aqi,
+                    `CMAQ forecast`   = cmaq_ozone_aqi,
+                    `PM2.5 obs count` = count_pm25_obs, 
+                    `PM2.5 ug/m3`     = obs_pm25_ugm3, 
+                    `PM2.5 AQI`       = obs_pm25_aqi, 
+                    `PM2.5 forecast`  = fcst_pm25_aqi)
 
 
 verify_o3 <- verify %>%
@@ -245,11 +251,17 @@ verify_o3 <- verify %>%
 
 
 
-names(verify_o3)[4:20] <-  c("Ozone obs count", "Ozone ppb", "Ozone AQI", "Ozone forecast", 
-                             "CMAQ forecast",
-                             "persist_ozone_aqi", "roll_ozone_aqi", "roll11_ozone_aqi", "bb3_ozone_aqi",
-                             "PM2.5 obs count", "PM2.5 ug/m3", "PM2.5 AQI", "PM2.5 forecast",
-                             "persist_pm25_aqi", "roll_pm25_aqi", "roll11_pm25_aqi", "bb3_pm25_aqi")
+verify_o3 <- rename(verify_o3,
+                    `Ozone obs count` = count_ozone_obs,
+                    `Ozone ppb`       = obs_ozone_ppb, 
+                    `Ozone AQI`       = obs_ozone_aqi,
+                    `Ozone forecast`   = fcst_ozone_aqi,
+                    `CMAQ forecast`   = cmaq_ozone_aqi,
+                    `PM2.5 obs count` = count_pm25_obs, 
+                    `PM2.5 ug/m3`     = obs_pm25_ugm3, 
+                    `PM2.5 AQI`       = obs_pm25_aqi, 
+                    `PM2.5 forecast`  = fcst_pm25_aqi)
+
 
 # Join together
 verify <- bind_rows(verify_pm, verify_o3)
@@ -629,7 +641,8 @@ names(yest_board) <- c("Model",
                         "PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")
 
 
-yest_board <- yest_board %>% mutate_at(vars(`O3 error ppb`:`O3 yellow accuracy %`, `PM on target %`:`PM yellow accuracy %`), round)
+yest_board <- yest_board %>% 
+              mutate_at(vars(`O3 error ppb`:`O3 yellow accuracy %`, `PM on target %`:`PM yellow accuracy %`), round)
 
 
 yest_board$`PM error ug/m3` <- round(yest_board$`PM error ug/m3`, 1)
@@ -674,13 +687,13 @@ if (ozone_season) {
   
 }
 
-names(yest_board) <- gsub("O3 ", "", names(yest_board))
-names(yest_board) <- gsub("PM ", "", names(yest_board))
-names(yest_board) <- gsub("bull", "Bull", names(yest_board))
-names(yest_board) <- gsub("cat", "CAT", names(yest_board))
-names(yest_board) <- gsub("on", "On", names(yest_board))
-names(yest_board) <- gsub("yell", "Yell", names(yest_board))
-names(yest_board) <- gsub("err", "Err", names(yest_board))
+names(yest_board) <- gsub("O3 ", "", names(yest_board)) %>%
+                     gsub("PM ", "", .) %>%
+                     gsub("bull", "Bull", .) %>%
+                     gsub("cat", "CAT", .) %>%
+                     gsub("on", "On", .) %>%
+                     gsub("yell", "Yell", .) %>%
+                     gsub("err", "Err", .)
 
 
 
@@ -806,13 +819,24 @@ col_mon_format <- function(i, param) {
 }
 
 
-verify_all <- select(verify_all, Site:`MPCA forecast`, mod_aqi_ens:mod_aqi_rf, `CMAQ forecast`, pollutant:background_color, `Obs conc`:`MPCA conc`, `Model output`:mod_conc_gen1, `CMAQ conc`)
+verify_all <- select(verify_all, 
+                     Site:`MPCA forecast`, 
+                     mod_aqi_ens:mod_aqi_gen1, 
+                     mod_aqi_rf, 
+                     `CMAQ forecast`, 
+                     pollutant:background_color, 
+                     `Obs conc`:`MPCA conc`, 
+                     `Model output`:mod_conc_gen1,
+                     `CMAQ conc`)
 
-names(verify_all) <- c("Site", "Group", "Obs count", "Obs AQI", 
-                       "MPCA AQI", "Ensemble AQI", "GradBoost AQI", "Robot AQI", 
-                       "Big RF AQI", "CMAQ AQI", "pollutant", "background_color", 
-                       "Monitored", "MPCA", "Ensemble", "Big RF", 
-                       "GradBoost", "Robot", "CMAQ")
+names(verify_all) <- c("Site", "Group", "Obs count", "Obs AQI", "MPCA AQI", 
+                       "Ensemble AQI", "GradBoost AQI", "Robot AQI", 
+                       "Big RF AQI", 
+                       "CMAQ AQI", 
+                       "pollutant", "background_color", 
+                       "Monitored", "MPCA", 
+                       "Ensemble", "Big RF", "GradBoost", "Robot", 
+                       "CMAQ")
 
 
 # Drop model output value unless different than MPCA forecast

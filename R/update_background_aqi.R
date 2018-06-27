@@ -7,24 +7,9 @@ library(measurements)
 library(tidyr)
 library(stringr)
 
-aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-
-
-# Check file size function
-min_exists <- function(file_name, min_size = 7.2E+8) { 
-  
-  file.exists(file_name) & file.size(file_name) > min_size
-  
-}
-
-# Load site locations
-sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
-
-names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
 # Filter to one site per forecast city
-sites <- filter(sites, !site_catid %in% c('27-017-7416'))
+sites <- filter(aqi_sites, !site_catid %in% c('27-017-7416'))
 
 
 # Set day
@@ -370,4 +355,6 @@ write.csv(hys_wide[ , c(1:11)],
           paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
 
 }
+
+
 ##

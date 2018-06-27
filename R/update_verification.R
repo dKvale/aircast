@@ -2,12 +2,7 @@
 
 library(tidyverse)
 
-aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-
-
-#AirNow credentials
-creds <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
+days_past <- 1
 
 
 # AQI conversion functions
@@ -19,15 +14,11 @@ source(paste0(aqiwatch_path, "R/aqi_convert.R"))
 #--------------------------#
 print("Loading sites...")
 
-sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
-
-names(sites) <- gsub(" ", "_", tolower(names(sites)))
+sites <- aqi_sites
 
 # Drop outstate sites
 sites <- filter(sites, !fcst_region %in% c("CA", "ND", "SD", "WI", "IA"))
 
-# Switch Voyageurs AQS ID
-#sites[sites$site_catid == "27-137-9000", "site_catid"] <- sites[sites$site_catid == "27-137-9000", "alt_siteid"]
 
 
 # Yesterday's official submitted forecast
@@ -289,6 +280,7 @@ class(verify$forecast_day)
 verify$site_catid
 
 all_inputs$site_catid
+
 verify   <- left_join(verify, select(all_inputs, -short_name))
 
    
@@ -298,8 +290,6 @@ setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fol
 print("Loading HYSPLIT...")
 
 load_hys  <- FALSE
-
-days_past <- 1
 
 while (!load_hys) {
   
@@ -374,7 +364,7 @@ setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fol
 
 print("Loading previous day verifications...")
 
-all_verify <- try(readRDS(paste0("Archive/", Sys.Date() - 2, "_verification_table.Rdata")))
+all_verify <- try(readRDS(paste0("Archive/", Sys.Date() - days_past, "_verification_table.Rdata")))
 
 if ("try-error" %in% class(all_verify)) {
   
@@ -529,7 +519,7 @@ all_verify  <- select(all_verify, -short_name) %>%
                  left_join(select(sites, short_name, site_catid)) %>%
                  select(forecast_date, forecast_day, site_catid, short_name, group, everything())
 
-write.csv(all_verify, "verification_table.csv", row.names = F)
+write.csv(all_verify, "verification_table2.csv", row.names = F)
 
 saveRDS(all_verify, paste0("Archive/", Sys.Date(), "_verification_table.Rdata"))
 
@@ -541,21 +531,14 @@ events <- filter(actuals, forecast_date == Sys.Date() - 1) %>%
           left_join(select(sites, short_name, site_catid)) %>%
           select(forecast_date, short_name, site_catid, obs_ozone_aqi, obs_pm25_aqi)
 
-# Add event flags and comments
 
+# Add event flags and comments
 
 # Attach new event days to event archive
 print("Loading previous event flags...")
 
 # Load
 all_events <- read_csv("event_table.csv")
-
-#all_events$ozone_alert_day  <- NA
-#all_events$pm25_alert_day   <- NA
-#all_events$obs_comments     <- NA
-#all_events$maybe_bad_obs    <- NA
-#all_events$verified_bad_obs <- NA
-#all_events <- all_events[ , c(1:5,8:9,6:7,10:11,14,12:13)]
 
 all_events$forecast_date <-  as.Date(all_events$forecast_date, "%m/%d/%Y")
 

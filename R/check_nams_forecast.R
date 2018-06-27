@@ -5,22 +5,12 @@ library(magrittr)
 
 # if (computer == "desktop) {  }
 
-aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/R/"
-
-source(paste0(aircast_path, "get_nams_forecast.R"))
+source(paste0(aircast_path, "R/get_nams_forecast.R"))
 
 
 setwd("~")
 setwd("../Desktop/aircast/hysplit/__today")
 
-
-# Create minimum exists function
-# Checks if file exists and if meets minimum file size
-min_exists <- function(file_name, min_size = 7.2E+8) { 
-  
-  file.exists(file_name) & file.size(file_name) > min_size
-  
-  }
 
 # Set file date as today
 new_date <- Sys.Date()

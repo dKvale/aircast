@@ -1,13 +1,14 @@
-#devtools::install_github("hrbrmstr/darksky")
-#devtools::install_github("tidyverse/purrr")
-library(purrr)
+#! /usr/bin/env Rscript
+
+library(purrr)   #devtools::install_github("tidyverse/purrr")
 library(dplyr)
 library(readr)
-library(darksky)
+library(darksky) #devtools::install_github("hrbrmstr/darksky")
 
-options(digits=12)
+options(digits = 12)
 
-aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+# AQI monitoring sites
+sites <- aqi_sites
 
 # DarkSky key
 d_key <- 'ea8610622c9d63c30ca25dea03ec3d90'
@@ -52,7 +53,6 @@ for (file in files) {
 
 #saveRDS(all_met, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata") 
   
-
 # Load previous archives
 #all_met <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata")
 
@@ -61,23 +61,17 @@ names(all_met)
 all_met$site_date <- paste(all_met$site_catid, all_met$date)
 
 
-
-# Site list
-sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
-
-
-# Remove duplicate sites
-#sites <- filter(sites, !short_name %in% c("Fond_Du_Lac2"))
-
 # Add air toxics sites
-all_sites <- read_csv(paste0(aircast_path, "data/air_toxics_sites.csv"))
+all_sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/AirToxics_sites.csv")
 
 all_sites <- filter(all_sites, Year %in% 2010:2017, !duplicated(AQS_ID)) %>%
              select(Report_Name, AQS_ID, lat, long) %>% 
              rowwise() %>%
-             mutate(AQS_ID = paste(substring(AQS_ID, 1, 2), substring(AQS_ID, 3, 5), substring(AQS_ID, 6, 9), sep = "-"))
-             
-names(all_sites) <- c("Air Monitor", "site_catid", "monitor_lat", "monitor_long")
+             mutate(AQS_ID = paste(substring(AQS_ID, 1, 2), 
+                                   substring(AQS_ID, 3, 5), 
+                                   substring(AQS_ID, 6, 9), sep = "-"))
+
+names(all_sites) <- c("air_monitor", "site_catid", "monitor_lat", "monitor_long")
 
 all_sites$run_order <- 3
 
@@ -165,7 +159,7 @@ if (nrow(all_forecasts) > 0) {
     
       temp <- read_csv(file_loc)[ , names(all_forecasts)]
       
-      temp <- read_csv(format_csv(temp), col_types = "cccddcdddddddiddcdddddddd")
+      temp <- read_csv(format_csv(temp), col_types = "cccdddddddddiddccdddddddd")
       
       site_met <- bind_rows(filter(all_forecasts, site_catid == i), temp)
       
@@ -184,6 +178,8 @@ if (nrow(all_forecasts) > 0) {
     }
     
   }
+  
+  
   
   # Save for WAIR database
   if (FALSE) {
