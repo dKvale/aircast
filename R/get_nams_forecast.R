@@ -1,4 +1,5 @@
 #
+
 library(downloader)
 
 get_nams_forecast <- function(date        = Sys.Date(), 
@@ -52,7 +53,7 @@ get_nams_forecast <- function(date        = Sys.Date(),
     
     #writeLines(data, paste0(folder, "/", file))
     
-    if(T) {
+    if (T) {
       download(url      = url,
                destfile = file_loc,
                method   = "internal",
