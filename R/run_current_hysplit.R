@@ -6,18 +6,11 @@ library(readr)
 library(tidyr)
 library(here)
 
-aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 
 source(paste0(aircast_path, "R/hysplit_traj.R"))
 
 source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
 
-# Check file size function
-min_exists <- function(file_name, min_size = 7.2E+8) { 
-  
-  file.exists(file_name) & file.size(file_name) > min_size
-  
-}
 
 
 # Check if HYSPLIT has already run
@@ -26,9 +19,7 @@ setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fol
 if (!min_exists(paste0(Sys.Date(), "_AQI_raw_HYSPLIT.csv"), min_size = 100)) {
 
 # Load site locations
-sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/Monitors and Rep Wx Stations.csv")
-
-names(sites) <- gsub(" ", "_", tolower(names(sites)))
+sites <- aqi_sites
 
 # Filter to one site per forecast city
 sites <- filter(sites, !site_catid %in% c('27-017-7416'))

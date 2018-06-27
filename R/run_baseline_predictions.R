@@ -1,16 +1,13 @@
 # Yesterday's baseline AQI forecasting metrics
 
+# Packages
+library(tidyverse)
+
+
 # Include results for these models:
 #### - Persistance
 #### - Rolling 7 day median
 #### - Historical week median 
-
-aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-
-
-# Packages
-library(tidyverse)
 
 
 # AQI conversion functions
@@ -95,7 +92,9 @@ leech_lake <- mutate(det_lakes, site_catid = "27-021-3410")
 week_med <- bind_rows(week_med, leech_lake)
 
 # Use nearest ozone monitor for sites missing ozone
-#
+# ...
+# ...
+
 
 # SAVE
 write_csv(week_med, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Forecast data/rolling_11-day_averages.csv")

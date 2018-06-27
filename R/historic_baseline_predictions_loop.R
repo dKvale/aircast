@@ -6,11 +6,8 @@
 #### - Historical week median 
 
 
-# Packages
 library(tidyverse)
 
-aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
 
 # AQI conversion functions
 source(paste0(aqiwatch_path, "R/aqi_convert.R"))
@@ -19,9 +16,7 @@ dates <- seq(as.Date("2017-05-20"), as.Date("2018-05-31"), 1)
 
 
 # Load sites
-sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
-
-names(sites) <- gsub(" ", "_", tolower(names(sites)))
+sites <- aqi_sites
 
 
 # Load recent results

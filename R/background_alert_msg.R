@@ -17,14 +17,6 @@ bg_alert_subscribers <- c("dorian.kvale@state.mn.us",
 setwd("~")
 setwd("../Desktop/aircast/hysplit")
 
-# Create minimum exists function
-# Checks if file exists and if meets minimum file size
-min_exists <- function(file_name, min_size = 7.3E+8) { 
-  
-  file.exists(file_name) & file.size(file_name) > min_size
-  
-}
-
 days_past <- 0
 
 met_list  <- c("__today/hysplit.t12z.namsf", "__today/hysplit.t12z.namsa", 

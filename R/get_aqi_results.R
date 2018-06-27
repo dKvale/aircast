@@ -4,21 +4,12 @@ library(stringr)
 library(RCurl)
 library(tidyverse)
 
-aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/R/"
-
-
-#-- Load FTP credentials
-creds <- read.csv("C:/Users/dkvale/Desktop/credentials.csv", stringsAsFactors = F)
 
 # Get yesterday's actuals  #
 #--------------------------#
-sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
-
-names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
 # Drop outstate sites
-sites <- filter(sites, !fcst_region %in% c("CA", "ND", "SD", "WI", "IA"))
+sites <- filter(aqi_sites, !fcst_region %in% c("CA", "ND", "SD", "WI", "IA"))
 
 # Drop dashes in IDs to match AQS
 sites$aqsid <- gsub("-", "", sites$site_catid)
@@ -100,7 +91,7 @@ names(aqi)[c(4:5)] <-  c("max_ozone_8hr", "pm25_24hr")
 # QC MPCA sites using AirVision data
 
 # Connect to aqi-watch FTP site
-airvis_link <- paste0("ftp://", creds$airvis_ftp_usr_pwd, "@34.216.174.58/airvision/")
+airvis_link <- paste0("ftp://", creds$airvis_ftp_usr_pwd, "@34.216.61.109/airvision/")
 
 # Find last file of the day
 file_list   <- getURL(airvis_link, verbose = T, dirlistonly = T) %>%
@@ -283,3 +274,6 @@ if(!file_name %in% list.files()) {
 }
 
 
+
+
+#

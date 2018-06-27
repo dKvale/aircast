@@ -8,21 +8,11 @@ library(tidyr)
 library(methods)
 
 
-aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-
-
-# Check file size function
-min_exists <- function(file_name, min_size = 7.2E+8) { 
-  
-  file.exists(file_name) & file.size(file_name) > min_size
-  
-}
 
 source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
 
-sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
-names(sites) <- gsub(" ", "_", tolower(names(sites)))
+sites <- aqi_sites
 
 # Filter to one site per forecast city
 sites <- filter(sites, !site_catid %in% c('27-017-7416'))

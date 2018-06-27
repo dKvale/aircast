@@ -3,16 +3,13 @@
 library(R.utils)
 library(dplyr)
 library(readr)
-library(mailR)
+library(mailR)  # mailR reference - https://github.com/rpremraj/mailR
 
-# mailR reference - https://github.com/rpremraj/mailR
+
 
 aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us")
 
 #aqi_team <- "dorian.kvale@state.mn.us"
-
-#-- Load credentials
-creds <- read.csv("C:/Users/dkvale/Desktop/credentials.csv", stringsAsFactors = F)
 
 
 #-- Load today's AQI background file

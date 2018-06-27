@@ -26,24 +26,17 @@ aqi_team <- paste0(c("dorian.kvale",
 # Set Pandoc location
 Sys.setenv(RSTUDIO_PANDOC="C:/Program Files/RStudio/bin/pandoc")
 
-#-- Load e-mail credentials
-creds <- read.csv("C:/Users/dkvale/Desktop/credentials.csv", stringsAsFactors = F)
-
 
 #-- Knit Rmarkdown document
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification")
+md_file <- readLines(paste0(aircast_path, "R/aqi_message.Rmd"))
 
-
-file_name <- "email_sent.csv"
-
-# Update daily report if it hasn't been
-if(as.Date(file.info(file_name)$mtime) != Sys.Date()) {
+writeLines(md_file, paste0(results_path, "Verification/daily_results.Rmd"))
   
-rmarkdown::render("aqi_message.Rmd")
+rmarkdown::render(input = paste0(results_path, "Verification/daily_results.Rmd"))
 
 
 #-- Create e-mail message
-msg_body <- readLines("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/aqi_message.html")
+msg_body <- readLines(paste0(results_path, "Verification/daily_results.html"))
 
 #-- Collapse to single line
 msg_body <- paste0(msg_body, collapse = "")
@@ -102,7 +95,6 @@ for(i in aqi_team) {
   }
 }
  
+#write.csv(data.frame(x = 5), "email_sent.csv")      
 
-write.csv(data.frame(x = 5), "email_sent.csv")      
-}
 ##
