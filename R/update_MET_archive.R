@@ -26,6 +26,16 @@ day <- 5
 days[day, ]
 
 
+
+forecast_col_names <- c("site_catid", "time", "summary", "icon", 
+                        "precipIntensity", "precipProbability", "temperature", "apparentTemperature", "dewPoint", "humidity", "pressure", "windSpeed", "windGust", 
+                        "windBearing", 
+                        "cloudCover", "visibility", "precipAccumulation", 
+                        "precipType")
+
+forecast_col_types <- 'ccccdddddddddidddc'
+
+
 # Generate table of downloaded dates
 all_met <- data_frame() 
   
@@ -79,6 +89,7 @@ sites$run_order <- 2
 
 sites <- bind_rows(sites, filter(all_sites, !site_catid %in% sites$site_catid))
 
+
 # Join sites to calendar
 sites$join <- 1
 
@@ -87,6 +98,7 @@ sites <- left_join(sites, days)
 sites$join <- NULL
 
 sites$site_date <- paste(sites$site_catid, sites$date)
+
 
 
 # Put 909 first
@@ -100,6 +112,7 @@ all_forecasts <- data_frame()
 
 requests <- 0
 
+# Drop dates already downloaded 
 sites <- filter(sites, !site_date %in% all_met$site_date)
 
 for (i in 1:nrow(sites)) {
@@ -140,7 +153,8 @@ if (nrow(all_forecasts) > 0) {
   
   all_forecasts$time <- as.character(all_forecasts$time)
   
-  all_forecasts$precipIntensity <- as.numeric(all_forecasts$precipIntensity)
+  all_forecasts <- read_csv(format_csv(all_forecasts[ , forecast_col_names]), 
+                            col_types = forecast_col_types)
   
   # Check date coverage
   length(unique(all_forecasts$time))
@@ -156,29 +170,47 @@ if (nrow(all_forecasts) > 0) {
     file_loc <- paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/sites/", i, ".csv")
     
     if (file.exists(file_loc)) {
-    
-      temp <- read_csv(file_loc)[ , names(all_forecasts)]
       
-      temp <- read_csv(format_csv(temp), col_types = "cccdddddddddiddccdddddddd")
+      # Load previously downloaded data
+      temp <- read_csv(file_loc) %>% filter(!is.na(temperature))
       
-      site_met <- bind_rows(filter(all_forecasts, site_catid == i), temp)
+      if (nrow(temp) > 0) {
+        
+        # Check for missing columns
+        column_chk <- forecast_col_names %in% names(temp)
+        
+        # Arrange columns
+        temp <- temp[ , forecast_col_names[column_chk]]
+        
+        # Align column types
+        temp$time <- as.character(temp$time)
+        
+        temp <- read_csv(format_csv(temp),
+                         col_types = str_split(forecast_col_types, "")[[1]][column_chk] %>% 
+                                               paste(collapse = ""))
+        
+        # Join tables
+        site_met <- bind_rows(filter(all_forecasts, site_catid == i), temp)
+        
+        site_met <- group_by(site_met, time, site_catid) %>% slice(1)
+        
+        write_csv(site_met, file_loc)
       
-      write_csv(site_met, file_loc)
+      } else {
       
-    } else {
-      
-      site_met <- filter(all_forecasts, site_catid == i)
-      
-      site_met$precipAccumulation <- as.numeric(site_met$precipAccumulation)
-      
-      site_met$time <- as.character(site_met$time)
-      
-      write_csv(site_met, file_loc)
+        site_met <- filter(all_forecasts, site_catid == i)
+        
+        site_met$precipAccumulation <- as.numeric(site_met$precipAccumulation)
+        
+        site_met$time <- as.character(site_met$time)
+        
+        write_csv(site_met, file_loc)
       
     }
     
+    }
+    
   }
-  
   
   
   # Save for WAIR database
@@ -254,5 +286,9 @@ bigger_list$Seattle
 
 }
 
-
+if (FALSE) {
+  
+  
+  
+}
 ##
