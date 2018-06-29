@@ -5,6 +5,10 @@ library(RCurl)
 library(tidyverse)
 
 
+# Load get_airnow() function
+source(paste0(aircast_path, "R/get_airnow.R"))
+
+       
 # Get yesterday's actuals  #
 #--------------------------#
 
@@ -17,41 +21,23 @@ sites$aqsid <- gsub("-", "", sites$site_catid)
 # Filter to one site per forecast city
 sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 
-# Get date
+
+# Get dates
 today     <- gsub("-", "", Sys.Date())
 
-yesterday <- gsub("-", "", Sys.Date() - 1)
+yesterday <- Sys.Date() - 1
 
 year      <- format(Sys.Date() - 1, "%Y")
 
+# Site list
+site_list <- c(sites$aqsid, gsub("-", "", sites$alt_siteid))
 
-# Connect to AirNow data site
-#https://files.airnowtech.org/
+# Pollutant list
+pollutant_list <- c("OZONE-8HR", "PM2.5-24hr")
 
-airnow_link <- paste0("https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/",
-                      year, "/",
-                      yesterday,
-                      "/daily_data.dat")
-  
-aqi   <- try(read_delim(airnow_link, "|", 
-                        col_names = F, 
-                        col_types = c('cccccdic')), 
-             silent = T)
-  
-closeAllConnections()
-
-
-if (class(aqi) == "try-error") aqi <- data_frame("date" = as.character(NA),
-                                                 "aqsid" = as.character(NA),3,4,5,6,7,8)[0, ]
-
-# Clean
-names(aqi) <- c("date", "aqsid", "City", "Parameter", "Units", "Concentration", "Hours", "Agency")
-
-
-# Filter sites
-aqi <- filter(aqi[ , -c(5,7:8)], 
-              aqsid %in% c(sites$aqsid, gsub("-", "", sites$alt_siteid)),
-              Parameter %in% c("OZONE-8HR", "PM2.5-24hr"))
+# Download results from AirNow
+aqi <- get_airnow(yesterday, site_list[!is.na(site_list)], pollutant_list) %>% 
+       select(-Units, -Hours, -Agency)
 
 
 # Add missing sites from AirNow's "yesterday.dat" file

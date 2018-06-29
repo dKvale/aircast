@@ -19,7 +19,6 @@ aqi_team <- paste0(c("dorian.kvale",
 #aqi_team <- aqi_team[1]
 
 
-
 # Set Pandoc location
 Sys.setenv(RSTUDIO_PANDOC = "C:/Program Files/RStudio/bin/pandoc")
 

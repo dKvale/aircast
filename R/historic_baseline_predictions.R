@@ -46,7 +46,7 @@ events <- events_all %>%
 
 
 # Load verification table
-verify  <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/verification_table.csv")
+verify  <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/verification_table2.csv")
 
 verify <- verify %>% mutate(mod_max_avg8hr = as.numeric(mod_max_avg8hr),
                             mod_pm25avg    = as.numeric(mod_pm25avg))
@@ -54,7 +54,9 @@ verify <- verify %>% mutate(mod_max_avg8hr = as.numeric(mod_max_avg8hr),
 verify2 <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/Archive/2017_verification_table.csv")
 
 verify2 <- verify2 %>% mutate(mod_aqi_o3 = as.character(mod_aqi_o3),
-                              mod_aqi_pm = as.character(mod_aqi_pm ))
+                              mod_aqi_pm = as.character(mod_aqi_pm ),
+                              fcst_ozone_aqi = as.character(fcst_ozone_aqi))
+
 
 # Join together
 verify <- bind_rows(verify, verify2)
@@ -104,36 +106,37 @@ a <-  filter(results, is.na(obs_pm25_aqi), !is.na(obs_pm25_aqi_e))
 
 a <-  filter(results, is.na(obs_ozone_aqi), !is.na(obs_ozone_aqi_e))
 
-results <- results %>% mutate(obs_pm25_aqi  = ifelse(is.na(obs_pm25_aqi) & !is.na(obs_pm25_aqi_e), obs_pm25_aqi_e, obs_pm25_aqi),
-                              obs_pm25_ugm3 = ifelse(is.na(obs_pm25_ugm3) & !is.na(obs_pm25_aqi_e), aqi2conc(obs_pm25_aqi_e, "pm25"), obs_pm25_ugm3),
-                              obs_ozone_aqi = ifelse(is.na(obs_ozone_aqi) & !is.na(obs_ozone_aqi_e), obs_ozone_aqi_e, obs_ozone_aqi),
-                              obs_ozone_ppb = ifelse(is.na(obs_ozone_ppb) & !is.na(obs_ozone_aqi_e), aqi2conc(obs_ozone_aqi_e, "ozone"), obs_ozone_ppb))
+# Replace missing observations with converted AQI
+results <- results %>% 
+           mutate(obs_pm25_aqi  = ifelse(is.na(obs_pm25_aqi) & !is.na(obs_pm25_aqi_e), obs_pm25_aqi_e, obs_pm25_aqi),
+                  obs_pm25_ugm3 = ifelse(is.na(obs_pm25_ugm3) & !is.na(obs_pm25_aqi_e), aqi2conc(obs_pm25_aqi_e, "pm25"), obs_pm25_ugm3),
+                  obs_ozone_aqi = ifelse(is.na(obs_ozone_aqi) & !is.na(obs_ozone_aqi_e), obs_ozone_aqi_e, obs_ozone_aqi),
+                  obs_ozone_ppb = ifelse(is.na(obs_ozone_ppb) & !is.na(obs_ozone_aqi_e), aqi2conc(obs_ozone_aqi_e, "ozone"), obs_ozone_ppb))
 
 
 # Drop wildfire events
-event_dates <- paste(filter(events_all, verified_bad_obs == "Y")$forecast_date, filter(events_all, verified_bad_obs == "Y")$site_catid)
-
-results <- results %>% 
-            select(-obs_pm25_aqi_e, -obs_ozone_aqi_e, -n) %>%
-            mutate(obs_pm25_aqi = ifelse(paste(forecast_date, site_catid) %in% event_dates, NA, obs_pm25_aqi),
-                   obs_pm25_ugm3 = ifelse(paste(forecast_date, site_catid) %in% event_dates, NA, obs_pm25_ugm3))
+if (FALSE) {
+  
+  event_dates <- paste(filter(events_all, verified_bad_obs == "Y")$forecast_date, 
+                       filter(events_all, verified_bad_obs == "Y")$site_catid)
+  
+  results <- results %>% 
+              select(-obs_pm25_aqi_e, -obs_ozone_aqi_e, -n) %>%
+              mutate(obs_pm25_aqi = ifelse(paste(forecast_date, site_catid) %in% event_dates, NA, obs_pm25_aqi),
+                     obs_pm25_ugm3 = ifelse(paste(forecast_date, site_catid) %in% event_dates, NA, obs_pm25_ugm3))
+  
+}
 
 
 # Historical results
 weeks_median <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Forecast data/rolling_11-day_averages.csv")
-
-names(weeks_median)[2:6] <-  c("hist_date", 
-                               "hist_week_ozone_ppb", 
-                               "hist_week_pm25_ugm3",
-                               "hist_week_ozone_aqi", 
-                               "hist_week_pm25_aqi")
 
 
 # Drop non-forecast sites 
 results <- filter(results, !site_catid %in% c("27-137-9000", "27-137-0034"))
 
 
-# Super mutate
+# Add predictions
 results <- results %>% 
              ungroup() %>% 
              arrange(site_catid, forecast_date) %>% 
@@ -146,6 +149,7 @@ results <- results %>%
                     roll_ozone_ppb      = ifelse((n < 10) || sum(is.na(results$obs_ozone_ppb[(n - 9):(n - 2)])) > 3, NA, median(results$obs_ozone_ppb[(n - 9):(n - 2)], na.rm = T)),
                     roll_pm25_ugm3      = ifelse((n < 10) || sum(is.na(results$obs_pm25_ugm3[(n - 9):(n - 2)])) > 3, NA, median(results$obs_pm25_ugm3[(n - 9):(n - 2)], na.rm = T))
              )
+
 
 # Join historical medians
 results <- left_join(results, weeks_median[ , 1:4])
