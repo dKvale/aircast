@@ -100,11 +100,14 @@ sites$join <- NULL
 sites$site_date <- paste(sites$site_catid, sites$date)
 
 
-
 # Put 909 first
 sites$run_order <- ifelse(sites$site_catid == "27-053-0909", 1, sites$run_order)
 
 sites <- arrange(sites, run_order, desc(date), site_catid)
+
+
+# Drop dates already downloaded 
+sites <- filter(sites, !site_date %in% all_met$site_date)
 
 
 # Loop through site table and send DarkSky request
@@ -112,8 +115,6 @@ all_forecasts <- data_frame()
 
 requests <- 0
 
-# Drop dates already downloaded 
-sites <- filter(sites, !site_date %in% all_met$site_date)
 
 for (i in 1:nrow(sites)) {
   
@@ -286,9 +287,5 @@ bigger_list$Seattle
 
 }
 
-if (FALSE) {
-  
-  
-  
-}
+
 ##

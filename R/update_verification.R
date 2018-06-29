@@ -519,9 +519,9 @@ all_verify  <- select(all_verify, -short_name) %>%
                  left_join(select(sites, short_name, site_catid)) %>%
                  select(forecast_date, forecast_day, site_catid, short_name, group, everything())
 
-write.csv(all_verify, "verification_table2.csv", row.names = F)
-
 saveRDS(all_verify, paste0("Archive/", Sys.Date(), "_verification_table.Rdata"))
+
+write.csv(all_verify, "verification_table2.csv", row.names = F)
 
 
 #------------------------------------------------#
