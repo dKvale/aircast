@@ -70,7 +70,7 @@ verify_recent <- verify %>%
 #-- Filter to most recent modeled values
 verify <- verify %>% 
              group_by(site_catid) %>% 
-             filter(!is.na(mod_aqi_pm_ens)) %>%
+             filter(!is.na(mod_aqi_pm_ens) | !is.na(mod_aqi_o3_ens)) %>%
              filter(forecast_day == min(forecast_day, na.rm = T)) %>%
              ungroup()
 
