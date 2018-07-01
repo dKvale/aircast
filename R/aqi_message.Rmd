@@ -532,19 +532,59 @@ pm_performance <- tall_pm %>%
 
 
 ## New performance table
-yest_board <- data_frame(Model                    = c("Staniel Dirwin", "Dr Robot", "GradBooster", "Big RF", "Ensemble",  "CMAQ", "Farmer Weeks", "Persistant Assistant","J.K. Rollings", "BB3 (aka 'Blender')"),
-                        `new O3 accuracy`         = o3_performance$accuracy[c(5,7,8,6,9:10,1,3,2,11)],
-                        `new O3 yellow accuracy`  = o3_performance$elev_accuracy[c(5,7,8,6,9:10,1,3,2,11)],
-                        `new O3 error ppb`        = o3_performance$mean_conc_diff[c(5,7,8,6,9:10,1,3,2,11)],
-                        `new O3 bullseyes`        = o3_performance$bulls_eyes[c(5,7,8,6,9:10,1,3,2,11)],
-                        `new O3 on target`        = o3_performance$near_misses[c(5,7,8,6,9:10,1,3,2,11)],
-                        `new PM accuracy`         = pm_performance$accuracy[c(5,7,8,6,9,NaN,1,3,2,10)],
-                        `new PM yellow accuracy`  = pm_performance$elev_accuracy[c(5,7,8,6,9,NaN,1,3,2,10)],
-                        `new PM error ug/m3`      = pm_performance$mean_conc_diff[c(5,7,8,6,9,NaN,1,3,2,10)],
-                        `new PM bullseyes`        = pm_performance$bulls_eyes[c(5,7,8,6,9,NaN,1,3,2,10)],
-                        `new PM on target`        = pm_performance$near_misses[c(5,7,8,6,9,NaN,1,3,2,10)],
-                         new_obs                  = 1)
+model_names <- data_frame(Model = c( 
+                            "Staniel Dirwin", 
+                            "Dr Robot", 
+                            "GradBooster", 
+                            "Big RF", 
+                            "Ensemble",  
+                            "CMAQ", 
+                            "Farmer Weeks", 
+                            "Persistant Assistant",
+                            "J.K. Rollings",
+                            "BB3 (aka 'Blender')"),
+                          model_o3 = c(
+                            "MPCA forecast",
+                            "mod_aqi_gen1",
+                            "mod_aqi_gb",
+                            "mod_aqi_rf",
+                            "mod_aqi_ens",
+                            "CMAQ forecast",
+                            "roll11_ozone_aqi",
+                            "persist_ozone_aqi",
+                            "roll_ozone_aqi", 
+                            "bb3_ozone_aqi"),
+                          model_pm = c(
+                            "MPCA forecast",
+                            "mod_aqi_gen1",
+                            "mod_aqi_gb",
+                            "mod_aqi_rf",
+                            "mod_aqi_ens",
+                            "CMAQ forecast",
+                            "roll11_pm25_aqi",
+                            "persist_pm25_aqi",
+                            "roll_pm25_aqi", 
+                            "bb3_pm25_aqi"))
+                          
 
+yest_board <- left_join(model_names, o3_performance, by = c("model_o3" = "model")) %>%
+              select(-model_o3, -model_pm, -n_obs, -n_preds, -elev_preds) %>%
+              left_join(left_join(model_names, pm_performance, by = c("model_pm" = "model")), by = "Model") %>%
+              select(-model_o3, -model_pm, -n_obs, -n_preds, -elev_preds)
+
+yest_board <- rename(yest_board,
+                     `new O3 accuracy`        = accuracy.x,
+                     `new O3 yellow accuracy` = elev_accuracy.x,
+                     `new O3 error ppb`       = mean_conc_diff.x,
+                     `new O3 bullseyes`       = bulls_eyes.x,
+                     `new O3 on target`       = near_misses.x,
+                     
+                     `new PM accuracy`        = accuracy.y,
+                     `new PM yellow accuracy` = elev_accuracy.y,
+                     `new PM error ug/m3`     = mean_conc_diff.y,
+                     `new PM bullseyes`       = bulls_eyes.y,
+                     `new PM on target`       = near_misses.y) %>% 
+                  mutate(new_obs              = 1)
 
 # 
 
