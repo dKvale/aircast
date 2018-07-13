@@ -12,6 +12,11 @@ aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
+# Load site locations
+aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
+names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
+
+
 # AQI conversion functions
 source(paste0(aqiwatch_path, "R/aqi_convert.R"))
 
@@ -319,17 +324,17 @@ stats_o3 <-  stats %>%
                          mae   = mean(abs(obs_ozone_ppb - forecast), na.rm = T),
                          category_correct = sum(correct, na.rm = T) / n,
                          green_correct    = sum(correct[obs_ozone_ppb < 55], na.rm = T) / sum(obs_ozone_ppb < 55 & !is.na(forecast), na.rm = T),
-                         green_false      = sum(!correct[obs_ozone_ppb > 55], na.rm = T) / sum(obs_ozone_ppb > 55 & !is.na(forecast), na.rm = T),
-                         yellow_correct   = sum(correct[obs_ozone_ppb > 55], na.rm = T) / sum(obs_ozone_ppb > 55 & !is.na(forecast), na.rm = T),
-                         yellow_false     = sum(!correct[obs_ozone_ppb < 55], na.rm = T) / sum(obs_ozone_ppb < 55 & !is.na(forecast), na.rm = T)) %>%
-               mutate_at(vars(bias:yellow_false), round , 2)
+                         yellow_correct   = sum(correct[obs_ozone_ppb >= 55], na.rm = T) / sum(obs_ozone_ppb >= 55 & !is.na(forecast), na.rm = T),
+                         green_wrong      = sum(!correct[obs_ozone_ppb < 55], na.rm = T) / sum(obs_ozone_ppb < 55 & !is.na(forecast), na.rm = T),
+                         yellow_wrong     = sum(!correct[obs_ozone_ppb >= 55], na.rm = T) / sum(obs_ozone_ppb >= 55 & !is.na(forecast), na.rm = T)) %>%
+               mutate_at(vars(bias:yellow_wrong), round , 2)
 
 
 stats_o3_overall <- stats_o3 %>% 
                       filter(n > 70) %>%
                       group_by(model) %>%
-                      summarize_at(vars(bias:yellow_false), median, na.rm = T) %>%
-                      mutate_at(vars(bias:yellow_false), round , 2)
+                      summarize_at(vars(bias:yellow_wrong), median, na.rm = T) %>%
+                      mutate_at(vars(bias:yellow_wrong), round , 2)
 
 
 stats_pm <- stats %>% 
@@ -343,18 +348,18 @@ stats_pm <- stats %>%
                       rmse  = (mean((obs_pm25_ugm3 - forecast)**2, na.rm = T)) %>% sqrt(),
                       mae   = mean(abs(obs_pm25_ugm3 - forecast), na.rm = T),
                       category_correct = sum(correct, na.rm = T) / n,
-                      green_correct    = sum(correct[obs_pm25_ugm3 < 12], na.rm = T) / sum(obs_pm25_ugm3 < 12 & !is.na(forecast), na.rm = T),
-                      green_false      = sum(!correct[obs_pm25_ugm3 > 12], na.rm = T) / sum(obs_pm25_ugm3 > 12 & !is.na(forecast), na.rm = T),
+                      green_correct    = sum(correct[obs_pm25_ugm3 <= 12], na.rm = T) / sum(obs_pm25_ugm3 <= 12 & !is.na(forecast), na.rm = T),
                       yellow_correct   = sum(correct[obs_pm25_ugm3 > 12], na.rm = T) / sum(obs_pm25_ugm3 > 12 & !is.na(forecast), na.rm = T),
-                      yellow_false     = sum(!correct[obs_pm25_ugm3 < 12], na.rm = T) / sum(obs_pm25_ugm3 < 12 & !is.na(forecast), na.rm = T)) %>%
-            mutate_at(vars(bias:yellow_false), round , 2)
+                      green_wrong     = sum(!correct[obs_pm25_ugm3 <= 12], na.rm = T) / sum(obs_pm25_ugm3 <= 12 & !is.na(forecast), na.rm = T),
+                      yellow_wrong      = sum(!correct[obs_pm25_ugm3 > 12], na.rm = T) / sum(obs_pm25_ugm3 > 12 & !is.na(forecast), na.rm = T)) %>%
+            mutate_at(vars(bias:yellow_wrong), round , 2)
 
             
 stats_pm_overall <- stats_pm %>% 
                     filter(n > 70) %>%
                     group_by(model) %>%
-                    summarize_at(vars(bias:yellow_false), median, na.rm = T) %>%
-                    mutate_at(vars(bias:yellow_false), round , 2)
+                    summarize_at(vars(bias:yellow_wrong), median, na.rm = T) %>%
+                    mutate_at(vars(bias:yellow_wrong), round , 2)
 
 
 ## Save

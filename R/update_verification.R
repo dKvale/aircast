@@ -115,7 +115,7 @@ aqi_forc <- unique(aqi_forc_all)
 
 
 # Select most recent forecast
-aqi_forc <- aqi_forc %>% group_by(Date, Group) %>% arrange(DayIndex) %>% slice(1)
+aqi_forc <- aqi_forc %>% arrange(DayIndex) %>% group_by(Date, Group) %>% slice(1)
 
 
 # Load internal forecasts for missing sites
