@@ -12,10 +12,11 @@ aqi_team <- paste0(c("dorian.kvale",
                      "steve.irwin",
                      "daniel.dix",
                      "monika.vadali",
-                     "ruth.roberson",
+                     "helen.waquiu",
                      "david.l.brown",
-                     "rick.strassman"), "@state.mn.us") #aqi_team <- "frank.kohlasch@state.mn.us"
+                     "luke.charpentier"), "@state.mn.us") 
 
+#aqi_team <- "frank.kohlasch@state.mn.us"
 #aqi_team <- aqi_team[1]
 
 
