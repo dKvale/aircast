@@ -170,6 +170,8 @@ if (nrow(all_forecasts) > 0) {
   # Update individual site files
   for (i in unique(all_forecasts$site_catid)) {
     
+    print(i)
+    
     file_loc <- paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/sites/", i, ".csv")
     
     if (file.exists(file_loc)) {
@@ -189,7 +191,7 @@ if (nrow(all_forecasts) > 0) {
         temp$time <- as.character(temp$time)
         
         temp <- read_csv(format_csv(temp),
-                         col_types = str_split(forecast_col_types, "")[[1]][column_chk] %>% 
+                         col_types = strsplit(forecast_col_types, "")[[1]][column_chk] %>% 
                                                paste(collapse = ""))
         
         # Join tables
@@ -199,7 +201,9 @@ if (nrow(all_forecasts) > 0) {
         
         write_csv(site_met, file_loc)
       
-      } else {
+      }
+      
+    } else {
       
         site_met <- filter(all_forecasts, site_catid == i)
         
@@ -208,8 +212,6 @@ if (nrow(all_forecasts) > 0) {
         site_met$time <- as.character(site_met$time)
         
         write_csv(site_met, file_loc)
-      
-    }
     
     }
     
