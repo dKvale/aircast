@@ -5,7 +5,6 @@ library(reports)
 library(magrittr)
 
 
-
 source(paste0(aircast_path, "R/get_nams_forecast.R"))
 
 

@@ -1,7 +1,7 @@
 # Generate baseline AQI forecasting metrics
 
 # Include results for these models:
-#### - Persistance
+#### - Persistence
 #### - Rolling 7 day median
 #### - Historical week median 
 
@@ -68,6 +68,7 @@ blank_results <- data_frame(forecast_date = rep(dates, each = length(unique(site
                             aqsid         = rep(unique(sites$aqsid), length(dates)),
                             join = 1)
 
+
 # Expand results table to all parameters
 if (FALSE) {
 blank_results <- left_join(blank_results, 
@@ -75,6 +76,7 @@ blank_results <- left_join(blank_results,
                                       join       = 1)) %>% 
                  select(-join)
 }
+
 
 # Load recent results
 events <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/event_table.csv")
@@ -156,8 +158,10 @@ results <- left_join(blank_results, filter(verify, forecast_day == 1))
 results <- left_join(results, events)
 
 
+
 # Switch to AirNow results
 results <- left_join(blank_results, air_obs)  %>% select(-join) 
+
 
 
 # Drop site-parameter combos that don't exist
@@ -184,6 +188,7 @@ results <- results %>%
 
 }
 
+
 # Drop wildfire events
 if (FALSE) {
   
@@ -209,10 +214,34 @@ weeks_median <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_E
 results <- filter(results, !site_catid %in% c("27-137-9000", "27-137-0034"))
 
 
+
 # Spread wide format
 results <- tidyr::spread(results, Parameter, Concentration) %>% 
            rename(obs_ozone_ppb = `OZONE-8HR`,   #aqi2conc(`OZONE-8HR`, "ozone"), 
                   obs_pm25_ugm3 = `PM2.5-24hr`)  #aqi2conc(`PM2.5-24hr`, "pm2.5"))
+
+
+# Add results for forecast regions
+results <- left_join(results, select(sites, site_catid, fcst_region))
+
+group_results <- results %>%
+                   group_by(forecast_date, fcst_region) %>%
+                   summarize(site_catid    = fcst_region[1],
+                             aqsid         = fcst_region[1],
+                             City          = fcst_region[1], 
+                             obs_ozone_ppb = max(obs_ozone_ppb, na.rm =T),
+                             obs_pm25_ugm3 = max(obs_pm25_ugm3, na.rm =T)) %>%
+                   filter(site_catid %in% c("North Twin Cities Metro", "South Twin Cities Metro", "Minneapolis-St. Paul"))
+
+
+results <- results %>%
+             mutate_at(vars(site_catid, aqsid), as.character)  %>%
+             bind_rows(group_results) %>%
+             select(-fcst_region)
+
+
+# Replace infinity
+results[results == -Inf] <- NA
 
 
 # Add predictions
@@ -236,8 +265,32 @@ results <- results %>%
 
 
 
+
 # Join historical medians
-results <- left_join(results, weeks_median[ , c(1,2,5,6)]) %>% select(-hist_date)
+# Add median results for forecast regions
+weeks_median <- left_join(weeks_median, select(sites, site_catid, fcst_region))
+
+group_median <- weeks_median %>%
+                  group_by(hist_date, fcst_region) %>%
+                  summarize(site_catid          = fcst_region[1],
+                            hist_week_ozone_ppb = max(hist_week_ozone_ppb, na.rm =T),
+                            hist_week_pm25_ugm3 = max(hist_week_pm25_ugm3, na.rm =T)) %>%
+                  filter(site_catid %in% c("North Twin Cities Metro", "South Twin Cities Metro", "Minneapolis-St. Paul"))
+
+
+weeks_median <-  weeks_median %>%
+                  mutate_at(vars(site_catid), as.character)  %>%
+                  bind_rows(group_median) %>%
+                  select(-fcst_region)
+
+# Replace infinity
+weeks_median[weeks_median == -Inf] <- NA
+
+
+# Join medians
+results <- left_join(results, 
+                     select(weeks_median, site_catid, hist_date, hist_week_ozone_ppb, hist_week_pm25_ugm3)) %>% 
+           select(-hist_date)
 
 
 
@@ -291,6 +344,7 @@ results <- left_join(select(results, -c(n,
 
 }
 
+
 ## Drop non-ozone season obs
 results <- results %>%
              mutate(ozone_season  = as.numeric(format(forecast_date, "%m")) %in% 4:10,
@@ -306,9 +360,12 @@ results <- left_join(results, select(sites, air_monitor, site_catid))
 ## Forecasters don't submit day 1 forecasts on these days
 results <- results %>% mutate(weekend = weekdays(forecast_date) %in% c("Sunday", "Monday"))
 
+
 ## Calc performance stats
 names(results)
 
+
+# OZONE ####
 stats <- gather(results, model, forecast, persist_ozone_ppb:bb3_pm25_ugm3) %>% 
          filter(forecast_date > "2017-05-31", !weekend)
 
@@ -331,12 +388,14 @@ stats_o3 <-  stats %>%
 
 
 stats_o3_overall <- stats_o3 %>% 
-                      filter(n > 70) %>%
+                      filter(n > 70, 
+                             !site_catid %in% c("North Twin Cities Metro", "South Twin Cities Metro", "Minneapolis-St. Paul")) %>%
                       group_by(model) %>%
                       summarize_at(vars(bias:yellow_wrong), median, na.rm = T) %>%
                       mutate_at(vars(bias:yellow_wrong), round , 2)
 
 
+# PM2.5 ####
 stats_pm <- stats %>% 
             filter(grepl("ugm3", model), !is.na(obs_pm25_ugm3)) %>%
             rowwise() %>%
@@ -356,7 +415,8 @@ stats_pm <- stats %>%
 
             
 stats_pm_overall <- stats_pm %>% 
-                    filter(n > 70) %>%
+                    filter(n > 70, 
+                           !site_catid %in% c("North Twin Cities Metro", "South Twin Cities Metro", "Minneapolis-St. Paul")) %>%
                     group_by(model) %>%
                     summarize_at(vars(bias:yellow_wrong), median, na.rm = T) %>%
                     mutate_at(vars(bias:yellow_wrong), round , 2)
@@ -365,6 +425,7 @@ stats_pm_overall <- stats_pm %>%
 ## Save
 write_csv(results, 
           paste0(results_path, "/Verification/Day1_history/", format(min(results$forecast_date), "%Y"), "_Day1_forecast_history_airnow_results.csv"))
+
 
 # Save performance stats
 write_csv(stats_pm, 
