@@ -105,7 +105,7 @@ sites$site_date <- paste(sites$site_catid, sites$date)
 # Put 909 first
 sites$run_order <- ifelse(sites$site_catid == "27-053-0909", 1, sites$run_order)
 
-sites <- arrange(sites, run_order, desc(date), site_catid)
+sites <- arrange(sites, run_order, site_catid, desc(date))
 
 
 # Drop dates already downloaded 
