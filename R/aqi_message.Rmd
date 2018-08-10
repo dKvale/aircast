@@ -386,10 +386,11 @@ o3_line_plot <- filter(verify_all, !is.na(`Obs conc`), pollutant == "Ozone") %>%
                   geom_abline(intercept = 0, size = 0.25, color = "grey50") +
                   geom_abline(intercept = 5, size = 0.25, color = "grey50", linetype = 3) +
                   geom_abline(intercept = -5, size = 0.25, color = "grey50", linetype = 3) +
-                  geom_point(colour = "grey50", size = 1.75) +
-                  geom_point(aes(color = factor(background_color)), size = 1.6) + 
+                  geom_point(color = "grey50", size = 1.75) +
+                  geom_point(aes(color = background_color), size = 1.6) + 
                   geom_text_repel(aes(label = Site), size = 1.75) + 
-                  scale_color_manual(values = levels(factor(tall_o3$background_color)), guide = F) +
+                   scale_color_manual(breaks = c("#53BF33", "#FFEE00", "#DB6B1A"), 
+                                      values = c("#53BF33", "#FFEE00", "#DB6B1A"), guide = F) +
                   ylim(ozone_range) +
                   xlim(ozone_range) +
                   theme_bw() + 
@@ -413,10 +414,11 @@ pm_line_plot <- filter(verify_all, !is.na(`Obs conc`), pollutant == "PM2.5") %>%
                   geom_abline(intercept = 0, size = 0.25, color = "grey50") +
                   geom_abline(intercept = 3, size = 0.25, color = "grey50", linetype = 3) +
                   geom_abline(intercept = -3, size = 0.25, color = "grey50", linetype = 3) +
-                  geom_point(colour = "grey50", size = 1.75) +
-                  geom_point(aes(color = factor(background_color)), size = 1.6) + 
+                  geom_point(color = "grey50", size = 1.75) +
+                  geom_point(aes(color = background_color), size = 1.6) + 
                   geom_text_repel(aes(label = Site), size = 1.75) + 
-                  scale_color_manual(values = levels(factor(tall_pm$background_color)), guide = F) +
+                  scale_color_manual(breaks = c("#53BF33", "#FFEE00", "#DB6B1A"), 
+                                     values = c("#53BF33", "#FFEE00", "#DB6B1A"), guide = F) +
                   ylim(pm_range) +
                   xlim(pm_range) +
                   theme_bw() + 
