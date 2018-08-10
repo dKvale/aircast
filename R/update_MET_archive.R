@@ -38,6 +38,7 @@ forecast_col_names <- c("site_catid", "time", "summary", "icon",
 forecast_col_types <- 'ccccdddddddddidddc'
 
 
+
 # Generate table of downloaded dates
 all_met <- data_frame() 
   
@@ -49,7 +50,7 @@ for (file in files) {
     
     print(file)
     
-    tmp <- read_csv(paste0(folder, "/", file))
+    tmp <- read_csv(paste0(folder, "/", file)) %>% filter(!is.na(site_catid), site_catid == gsub("[.csv]", "", file))
     
     if (nrow(tmp) > 0) {
     
@@ -60,7 +61,6 @@ for (file in files) {
       all_met <- bind_rows(tmp, all_met)
     
 }
-    
 }
 
 #saveRDS(all_met, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata") 
@@ -100,6 +100,7 @@ sites <- left_join(sites, days)
 sites$join <- NULL
 
 sites$site_date <- paste(sites$site_catid, sites$date)
+
 
 
 # Put 909 first
@@ -177,7 +178,7 @@ if (nrow(all_forecasts) > 0) {
     if (file.exists(file_loc)) {
       
       # Load previously downloaded data
-      temp <- read_csv(file_loc) %>% filter(!is.na(temperature))
+      temp <- read_csv(file_loc) %>% filter(!is.na(temperature), !is.na(site_catid))
       
       if (nrow(temp) > 0) {
         

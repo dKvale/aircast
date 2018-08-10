@@ -7,9 +7,8 @@ library(gmailr)
 #creds  <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
 
 bg_alert_subscribers <- c("dorian.kvale@state.mn.us",
-                         "steve.irwin@state.mn.us",
-                         "daniel.dix@state.mn.us",
-                         "david.l.brown@state.mn.us")
+                          "daniel.dix@state.mn.us",
+                          "david.l.brown@state.mn.us")
 
 #bg_alert_subscribers <- bg_alert_subscribers[1]
 
