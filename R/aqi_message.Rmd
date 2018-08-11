@@ -42,6 +42,10 @@ ozone_season <- as.numeric(format(Sys.Date() - 1, "%m")) %in% 4:10
 source(paste0(aqiwatch_path, "R/aqi_convert.R"))
 
 
+# Set AQI color scheme
+aqi_colors <- c("#53BF33" = "#53BF33", "#FFEE00" = "#FFEE00", "#DB6B1A" = "#DB6B1A")
+
+
 #-- Load yesterdays observations
 
 #verify <- readRDS(paste0("Archive/", Sys.Date() - days_past, "_verification_table.Rdata"))
@@ -389,8 +393,7 @@ o3_line_plot <- filter(verify_all, !is.na(`Obs conc`), pollutant == "Ozone") %>%
                   geom_point(color = "grey50", size = 1.75) +
                   geom_point(aes(color = background_color), size = 1.6) + 
                   geom_text_repel(aes(label = Site), size = 1.75) + 
-                   scale_color_manual(breaks = c("#53BF33", "#FFEE00", "#DB6B1A"), 
-                                      values = c("#53BF33", "#FFEE00", "#DB6B1A"), guide = F) +
+                   scale_color_manual(values = aqi_colors, guide = F) +
                   ylim(ozone_range) +
                   xlim(ozone_range) +
                   theme_bw() + 
@@ -417,8 +420,7 @@ pm_line_plot <- filter(verify_all, !is.na(`Obs conc`), pollutant == "PM2.5") %>%
                   geom_point(color = "grey50", size = 1.75) +
                   geom_point(aes(color = background_color), size = 1.6) + 
                   geom_text_repel(aes(label = Site), size = 1.75) + 
-                  scale_color_manual(breaks = c("#53BF33", "#FFEE00", "#DB6B1A"), 
-                                     values = c("#53BF33", "#FFEE00", "#DB6B1A"), guide = F) +
+                  scale_color_manual(values = aqi_colors, guide = F) +
                   ylim(pm_range) +
                   xlim(pm_range) +
                   theme_bw() + 
@@ -441,12 +443,12 @@ if (ozone_season) {
   # Save to PNG image
   png("C:/Users/dkvale/Desktop/fcst_regression.png", width = 1300, height = 700, res = 300)
   # Set 2 plots per row
-  grid.arrange(o3_line_plot, pm_line_plot, ncol = 2) #print(line_plot + theme_gray(base_size = 4.5))
+  grid.arrange(pm_line_plot, o3_line_plot, ncol = 2) #print(line_plot + theme_gray(base_size = 4.5))
   dev.off()
   
   png("fcst_regression.png", width = 1300, height = 700, res = 300)
   # Set 2 plots per row
-  grid.arrange(o3_line_plot, pm_line_plot, ncol = 2) #print(line_plot + theme_gray(base_size = 4.5))
+  grid.arrange(pm_line_plot, o3_line_plot, ncol = 2) #print(line_plot + theme_gray(base_size = 4.5))
   dev.off()
 
 } else {
