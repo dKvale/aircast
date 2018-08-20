@@ -39,8 +39,13 @@ forecast_col_types <- 'ccccdddddddddidddc'
 
 
 
-# Generate table of downloaded dates
-all_met <- data_frame() 
+# Generate table of downloaded site-dates
+all_met <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/DarkSky MET data - daily summary - 2003-2017.csv") %>% 
+             select(site_catid, date) %>% 
+             group_by(site_catid, date) %>% 
+             slice(1) %>%
+             ungroup() %>%
+             mutate(date = as.character(date))
   
 folder <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/sites" 
     
@@ -50,13 +55,16 @@ for (file in files) {
     
     print(file)
     
-    tmp <- read_csv(paste0(folder, "/", file)) %>% filter(!is.na(site_catid), site_catid == gsub("[.csv]", "", file))
+    tmp <- read_csv(paste0(folder, "/", file)) %>% 
+             filter(!is.na(site_catid), site_catid == gsub("[.csv]", "", file))
     
     if (nrow(tmp) > 0) {
     
       tmp$date <- format(tmp$time, "%Y-%m-%d") 
       
-      tmp <- select(tmp, site_catid, date) %>% group_by(date) %>% slice(1)
+      tmp <- select(tmp, site_catid, date) %>% 
+             group_by(site_catid, date) %>% 
+             slice(1)
       
       all_met <- bind_rows(tmp, all_met)
     
@@ -105,6 +113,11 @@ sites$site_date <- paste(sites$site_catid, sites$date)
 
 # Put 909 first
 sites$run_order <- ifelse(sites$site_catid == "27-053-0909", 1, sites$run_order)
+
+sites <- arrange(sites, run_order, site_catid, desc(date))
+
+# Put AQI sites first
+sites$run_order <- ifelse(sites$site_catid %in% aqi_sites$site_catid, 1.1, sites$run_order)
 
 sites <- arrange(sites, run_order, site_catid, desc(date))
 

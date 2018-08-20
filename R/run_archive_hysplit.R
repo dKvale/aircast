@@ -24,7 +24,13 @@ names(sites) <- gsub(" ", "_", tolower(names(sites)))
 sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 
 
+# Set output location
+## Create folder on Desktop
 setwd("C:/Users/dkvale/Desktop/archive_hysplit")
+
+
+# Set folder for NARR MET data
+met_folder <- "C:/Users/dkvale/Desktop/archive_hysplit/NARR"
 
 # Trajectory function to read all sites
 aqi_traj <- function(date            = NULL, 
@@ -48,7 +54,7 @@ aqi_traj <- function(date            = NULL,
                              daily_hours  = 17,
                              direction    = "backward",
                              met_type     = "NARR",
-                             met_dir      = "C:/Users/dkvale/Desktop/archive_hysplit/NARR",
+                             met_dir      = met_folder,
                              extended_met = F,
                              vert_motion  = 0,
                              model_height = 20000,
@@ -93,15 +99,20 @@ for(i in 1:nrow(days)) {
   
   hys_day_10m  <- aqi_traj(date = day, receptor_height = 10, traj_hours = 24)
   
+  hys_day_200m <- aqi_traj(date = day, receptor_height = 200, traj_hours = 24)
+  
   hys_day_500m <- aqi_traj(date = day, receptor_height = 500, traj_hours = 24)
 
-  hys_archive  <- bind_rows(hys_day_500m, hys_day_10m, hys_archive)
+  hys_archive  <- bind_rows(hys_day_500m, hys_day_200m, hys_archive)
+  
+  hys_archive  <- bind_rows(hys_archive, hys_day_10m, hys_archive)
+  
   
   closeAllConnections()
   
 }
 
-# Loop through days2
+# Loop through days for second year
 hys_archive2 <- data_frame()
 
 for(i in 1:nrow(days2)) {
@@ -114,9 +125,14 @@ for(i in 1:nrow(days2)) {
   
   hys_day_10m  <- aqi_traj(date = day, receptor_height = 10, traj_hours = 24)
   
+  hys_day_200m <- aqi_traj(date = day, receptor_height = 200, traj_hours = 24)
+  
   hys_day_500m <- aqi_traj(date = day, receptor_height = 500, traj_hours = 24)
   
-  hys_archive2  <- bind_rows(hys_day_500m, hys_day_10m, hys_archive2)
+  hys_archive2  <- bind_rows(hys_day_500m, hys_day_200m, hys_archive)
+  
+  hys_archive2  <- bind_rows(hys_archive2, hys_day_10m, hys_archive)
+  )
   
   closeAllConnections()
   
@@ -125,7 +141,7 @@ for(i in 1:nrow(days2)) {
 
 saveRDS(hys_archive, paste0("HYSPLIT archive using NARR data - ", min(years), ".rdata"))
 
-saveRDS(hys_archive2, paste0("HYSPLIT archive using NARR data - ", min(years)+1, ".rdata"))
+saveRDS(hys_archive2, paste0("HYSPLIT archive using NARR data - ", min(years) + 1, ".rdata"))
 
 
 # Join multiple years
