@@ -126,6 +126,11 @@ sites <- arrange(sites, run_order, site_catid, desc(date))
 sites <- filter(sites, !site_date %in% all_met$site_date)
 
 
+# Count site-days left to download for AQI
+sites %>% filter(site_catid %in% aqi_sites$site_catid) %>% nrow() %>% print()
+
+
+
 # Loop through site table and send DarkSky request
 all_forecasts <- data_frame()
 

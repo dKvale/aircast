@@ -291,6 +291,7 @@ for (i in 1:nrow(missing)) {
   
   
   if (nrow(near_sites_all) > 0) {
+    
   # Add coords
   near_sites_all  <- left_join(near_sites_all, sites[ , c("site_catid", "monitor_lat", "monitor_long")])
   
