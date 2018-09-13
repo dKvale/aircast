@@ -174,7 +174,8 @@ names(verify)[1:3] <- c("Site", "Group", "AQS ID")
 #-- Clip long site names
 verify$Site <- ifelse(verify$Site == "Duluth_WDSE", "Duluth WD", verify$Site)
 verify$Site <- ifelse(verify$Site == "St_Paul_Ramsey_Health", "St Paul Ramsey", verify$Site)
-verify$Site <- ifelse(verify$Site == "MSP_HC_Anderson", "HC Anderson", verify$Site)
+verify$Site <- ifelse(verify$Site == "MSP_HC_Anderson", "HC Andersen", verify$Site)
+verify$Site <- ifelse(verify$Site == "HC_Anderson", "HC Andersen", verify$Site)
 verify$Site <- ifelse(verify$Site == "MSP_St_Louis_Park", "St Louis Park", verify$Site)
 
 
