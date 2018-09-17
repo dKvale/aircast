@@ -472,7 +472,7 @@ verify_pm$background_color <- NULL
   
 ```{r echo=FALSE, message =FALSE, warning =FALSE, results='hide'}
 # Leader board
-#lead_board <- data_frame(Model            = c("MPCA MET Team", "Dr Robot", "CMAQ"),
+#lead_board <- data_frame(Model            = c("MPCA Team", "Dr Robot", "CMAQ"),
 #                         `O3 accuracy %`  = c(100,100,100),
 #                         `PM accuracy %`  = c(100,100,100),
 #                         `O3 error ppb`    = c(5,5,5),
@@ -538,7 +538,7 @@ pm_performance <- tall_pm %>%
 
 ## New performance table
 model_names <- data_frame(Model = c( 
-                            "MPCA MET Team", 
+                            "MPCA Team", 
                             "Dr Robot", 
                             "GradBooster", 
                             "Big RF", 
@@ -1031,7 +1031,7 @@ pm_df
 <div style="margin-top: 8px; margin-left: 24px;">
 ```{r, echo = F, warning = F, message = F}
 yest_board <- readRDS('yesterday_board.rdata')
-yest_board[1, 1] <- "MPCA MET Team"
+yest_board[1, 1] <- "MPCA Team"
 yest_board[ifelse(ozone_season, 10, 9), 1] <- "BB3 (the Blender)"
 
 ```
@@ -1099,7 +1099,7 @@ if (weekend) { cat('<br> _Note: Some of MPCA&#39;s forecasts only predicted AQI 
 ```{r, echo = F, warning = F, message = F}
 #Dr-Robot is getting smarter everyday.
 lead_board <- readRDS('leader_board.rdata') 
-lead_board[1, 1] <- "MPCA MET Team" 
+lead_board[1, 1] <- "MPCA Team" 
 lead_board[ifelse(ozone_season, 10, 9), 1] <- "BB3 (the Blender)"
 
 # Round values
