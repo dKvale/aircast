@@ -40,11 +40,6 @@ aqi <- get_airnow(yesterday, site_list[!is.na(site_list)], pollutant_list) %>%
        select(-Units, -Hours, -Agency)
 
 
-# Add missing sites from AirNow's "yesterday.dat" file
-#...
-#...
-
-
 # Flip to wide format
 
 # Create empty rows if table is blank
@@ -109,7 +104,7 @@ if (class(airvis_df) == "try-error") {
 # Create empty table if fail
 if (class(airvis_df) == "try-error") {
   
-  airvis_df <- data_frame(aqsid     = NA, x2 = NA,x3 = NA,
+  airvis_df <- data_frame(aqsid     = NA, x2 = NA, x3 = NA,
                           date      = as.character(NA), 
                           Parameter = NA, x6 = NA, x7 = NA,
                           Concentration = NA, x9 = NA, 
@@ -127,9 +122,10 @@ closeAllConnections()
 airvis_df$Concentration <- ifelse(airvis_df$qc_flag > 5, NA, airvis_df$Concentration)
 
 
-# Filter to PM2.5 and ozone
+# Clean AQS ID
 airvis_df$aqsid <- gsub("840", "", airvis_df$aqsid)
 
+# Filter to PM2.5 and ozone
 airvis_ozone    <- filter(airvis_df, 
                           Parameter == 44201, 
                           aqsid %in% gsub("-", "", c(sites$site_catid, sites$alt_siteid)))

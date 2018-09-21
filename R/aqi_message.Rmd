@@ -547,7 +547,7 @@ model_names <- data_frame(Model = c(
                             "Farmer Weeks", 
                             "Persistant Assistant",
                             "J.K. Rollings",
-                            "BB3 (aka 'Blender')"),
+                            "BB3 Blender"),
                           model_o3 = c(
                             "MPCA forecast",
                             "mod_aqi_gen1",
@@ -687,8 +687,9 @@ names(yest_board) <- c("Model",
 
 
 yest_board <- yest_board %>% 
-              mutate_at(vars(`O3 error ppb`:`O3 yellow accuracy %`, `PM on target %`:`PM yellow accuracy %`), round)
+              mutate_at(vars(`O3 on target %`:`O3 yellow accuracy %`, `PM on target %`:`PM yellow accuracy %`), round)
 
+yest_board$`O3 error ppb` <- round(yest_board$`O3 error ppb`, 1)
 
 yest_board$`PM error ug/m3` <- round(yest_board$`PM error ug/m3`, 1)
 
@@ -745,8 +746,12 @@ names(yest_board) <- gsub("O3 ", "", names(yest_board)) %>%
 # Total running performance
 lead_board[lead_board$Model == "CMAQ", "Forecasts n"] <- 0
 
-lead_board <- select(lead_board, c(Model, `O3 error ppb`, `O3 on target %`, `O3 bullseyes %`, `O3 cat accuracy %`, `O3 yellow accuracy %`,
-                                   `PM error ug/m3`), `PM on target %`, `PM bullseyes %`, `PM cat accuracy %`, `PM yellow accuracy %`, `Forecasts n`, `O3 Forecasts n`)
+lead_board <- select(lead_board, Model, 
+                     `O3 error ppb`, `O3 on target %`, `O3 bullseyes %`, 
+                     `O3 cat accuracy %`, `O3 yellow accuracy %`,
+                     `PM error ug/m3`, `PM on target %`, `PM bullseyes %`, 
+                     `PM cat accuracy %`, `PM yellow accuracy %`, 
+                     `Forecasts n`, `O3 Forecasts n`)
 
 
 # Archive updated performance
@@ -757,10 +762,8 @@ write_csv(lead_board, paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Ri
 
 
 # Round decimals places
-lead_board$`O3 yellow accuracy %` <- as.numeric(lead_board$`O3 yellow accuracy %`)
-
 lead_board <- lead_board %>% 
-                mutate(`O3 error ppb`         = `O3 error ppb` %>% as.numeric() %>% round(), 
+                mutate(`O3 error ppb`         = `O3 error ppb` %>% as.numeric() %>% round(1), 
                        `O3 on target %`       = `O3 on target %` %>% as.numeric() %>% round(),
                        `O3 bullseyes %`       = `O3 bullseyes %` %>% as.numeric() %>% round(), 
                        `O3 cat accuracy %`    = `O3 cat accuracy %` %>% as.numeric() %>% round(),
@@ -773,41 +776,54 @@ lead_board <- lead_board %>%
                        `PM yellow accuracy %` = `PM yellow accuracy %` %>% as.numeric() %>% round())
 
 
-# Blank CMAQ for PM2.5 forecasts
-lead_board[lead_board$Model == "CMAQ", c("PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")] <- " "
+# Flip to tall table
+names(lead_board)[c(1:6,13)] <- c("Model", "Mean error ugm3|ppb", "On target %", 
+                                  "Bullseyes", "Cat accuracy", "Yellow accuracy", 
+                                  "Forecasts") 
+  
+lead_board_o3 <- lead_board[ , c(1:6,13)] %>% mutate(Pollutant = "ozone")
+
+lead_board_pm <- lead_board[ , c(1,7:12)] %>% mutate(Pollutant = "PM25")
+
+names(lead_board_pm) <- c("Model", "Mean error ugm3|ppb", "On target %", 
+                          "Bullseyes", "Cat accuracy", "Yellow accuracy", "Forecasts", 
+                          "Pollutant") 
+
+
+lead_board <- bind_rows(lead_board_pm, lead_board_o3) %>%
+               select(Model, Pollutant, everything())
 
 
 # Blank NAs for days without yellow/orange
-lead_board[is.na(lead_board$`O3 yellow accuracy %`), "O3 yellow accuracy %"] <- " "
+lead_board[is.na(lead_board$`Yellow accuracy`), "Yellow accuracy"] <- " "
 
+
+# Drop CMAQ from PM2.5 forecasts
+lead_board <- filter(lead_board, !(Model == "CMAQ" & Pollutant == "PM25"))
 
 
 if (ozone_season) {
   
   lead_board <- formattable(lead_board,
                             list(Model                   = margin_right(24),
-                                 `O3 error ppb`          = margin_right(84),
-                                 `O3 on target %`        = margin_right(110),
-                                 `O3 bullseyes %`        = margin_right(114),
-                                 `O3 cat accuracy %`     = margin_right(104),
-                                 `O3 yellow accuracy %`  = margin_right(124),
-                                 
-                                 `PM error ug/m3`        = margin_right(100),
-                                 `PM on target %`        = margin_right(110),
-                                 `PM bullseyes %`        = margin_right(114),
-                                 `PM cat accuracy %`     = margin_right(110),
-                                 `PM yellow accuracy %`  = margin_right(124)),
-                            align = c("l"), digits = 1, format = "html")
+                                 Pollutant               = margin_right(50),
+                                 `Mean error ugm3|ppb`   = margin_right(70),
+                                 `On target %`           = margin_right(99),
+                                 `Bullseyes`             = margin_right(90),
+                                 `Cat accuracy`          = margin_right(99),
+                                 `Yellow accuracy`       = margin_right(120)),
+                            align = c("l"), digits = 2, format = "html")
 
 } else{
   
-  lead_board <- formattable(select(lead_board[-6, ], -c(`O3 error ppb`:`O3 yellow accuracy %`)),
+  lead_board <- formattable(filter(lead_board, Pollutant == "PM25"),
                             list(Model                   = margin_right(24),
-                                 `PM on target %`        = margin_right(110),
-                                 `PM cat accuracy %`     = margin_right(110),
-                                 `PM yellow accuracy %`  = margin_right(124),
-                                 `PM bullseyes %`        = margin_right(114),
-                                 `PM error ug/m3`         = margin_right(100)),
+                                 Pollutant               = margin_right(50),
+                                 `Mean error ug/m3`      = margin_right(70),
+                                 `On target %`           = margin_right(99),
+                                 `Bullseyes`             = margin_right(90),
+                                 `Cat accuracy`          = margin_right(99),
+                                 `Yellow accuracy`       = margin_right(120)),
                             align = c("l"), digits = 2, format = "html")
                             
 } 
@@ -1031,8 +1047,8 @@ pm_df
 <div style="margin-top: 8px; margin-left: 24px;">
 ```{r, echo = F, warning = F, message = F}
 yest_board <- readRDS('yesterday_board.rdata')
-yest_board[1, 1] <- "MPCA Team"
-yest_board[ifelse(ozone_season, 10, 9), 1] <- "BB3 (the Blender)"
+#yest_board[1, 1] <- "MPCA Team"
+#yest_board[ifelse(ozone_season, 10, 9), 1] <- "BB3 Blender"
 
 ```
 
@@ -1090,7 +1106,7 @@ if (weekend) { cat('<br> _Note: Some of MPCA&#39;s forecasts only predicted AQI 
   
 ### Overall model performance for next-day forecasts
 
-<div style="margin-top: -14px;">
+<div style="margin-top: -11px;">
 
 </div>
 
@@ -1099,13 +1115,24 @@ if (weekend) { cat('<br> _Note: Some of MPCA&#39;s forecasts only predicted AQI 
 ```{r, echo = F, warning = F, message = F}
 #Dr-Robot is getting smarter everyday.
 lead_board <- readRDS('leader_board.rdata') 
-lead_board[1, 1] <- "MPCA Team" 
-lead_board[ifelse(ozone_season, 10, 9), 1] <- "BB3 (the Blender)"
 
-# Round values
-#lead_board$`PM yellow accuracy %` <- round(lead_board$`PM yellow accuracy %`)
-#if (grepl("O3", names(lead_board))) lead_board$`O3 yellow accuracy %` <- round(lead_board$`O3 yellow accuracy %`)
-lead_board
+#lead_board[1, 1] <- "MPCA Team" 
+pm_board <- subset(lead_board, Pollutant == "PM25") %>%
+            rename(`Mean error ugm3` = `Mean error ugm3|ppb`)
+
+pm_board
+```
+
+<br>
+
+```{r, echo = F, warning = F, message = F}
+if (ozone_season) {
+  
+  o3_board <- subset(lead_board, Pollutant == "ozone") %>%
+              rename(`Mean error ppb` = `Mean error ugm3|ppb`)
+
+o3_board
+}
 ```
 </div>
   
