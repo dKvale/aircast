@@ -777,15 +777,15 @@ lead_board <- lead_board %>%
 
 
 # Flip to tall table
-names(lead_board)[c(1:6,13)] <- c("Model", "Mean error ugm3|ppb", "On target %", 
+names(lead_board)[c(1:6,13)] <- c("Model", "Error ugm3|ppb", "On target %", 
                                   "Bullseyes", "Cat accuracy", "Yellow accuracy", 
                                   "Forecasts") 
   
-lead_board_o3 <- lead_board[ , c(1:6,13)] %>% mutate(Pollutant = "ozone")
+lead_board_o3 <- lead_board[ , c(1:6,13)] %>% mutate(Pollutant = "Ozone")
 
 lead_board_pm <- lead_board[ , c(1,7:12)] %>% mutate(Pollutant = "PM25")
 
-names(lead_board_pm) <- c("Model", "Mean error ugm3|ppb", "On target %", 
+names(lead_board_pm) <- c("Model", "Error ugm3|ppb", "On target %", 
                           "Bullseyes", "Cat accuracy", "Yellow accuracy", "Forecasts", 
                           "Pollutant") 
 
@@ -807,7 +807,7 @@ if (ozone_season) {
   lead_board <- formattable(lead_board,
                             list(Model                   = margin_right(24),
                                  Pollutant               = margin_right(50),
-                                 `Mean error ugm3|ppb`   = margin_right(70),
+                                 `Error ugm3|ppb`        = margin_right(70),
                                  `On target %`           = margin_right(99),
                                  `Bullseyes`             = margin_right(90),
                                  `Cat accuracy`          = margin_right(99),
@@ -819,7 +819,7 @@ if (ozone_season) {
   lead_board <- formattable(filter(lead_board, Pollutant == "PM25"),
                             list(Model                   = margin_right(24),
                                  Pollutant               = margin_right(50),
-                                 `Mean error ug/m3`      = margin_right(70),
+                                 `Error ug/m3`           = margin_right(70),
                                  `On target %`           = margin_right(99),
                                  `Bullseyes`             = margin_right(90),
                                  `Cat accuracy`          = margin_right(99),
@@ -1128,7 +1128,7 @@ pm_board
 ```{r, echo = F, warning = F, message = F}
 if (ozone_season) {
   
-  o3_board <- subset(lead_board, Pollutant == "ozone") %>%
+  o3_board <- subset(lead_board, Pollutant == "Ozone") %>%
               rename(`Mean error ppb` = `Mean error ugm3|ppb`)
 
 o3_board
