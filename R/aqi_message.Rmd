@@ -1118,7 +1118,7 @@ lead_board <- readRDS('leader_board.rdata')
 
 #lead_board[1, 1] <- "MPCA Team" 
 pm_board <- subset(lead_board, Pollutant == "PM25") %>%
-            rename(`Mean error ugm3` = `Mean error ugm3|ppb`)
+            rename(`Error ugm3` = `Error ugm3|ppb`)
 
 pm_board
 ```
@@ -1129,7 +1129,7 @@ pm_board
 if (ozone_season) {
   
   o3_board <- subset(lead_board, Pollutant == "Ozone") %>%
-              rename(`Mean error ppb` = `Mean error ugm3|ppb`)
+              rename(`Error ppb` = `Error ugm3|ppb`)
 
 o3_board
 }
