@@ -9,12 +9,12 @@ library(mailR)
 
 # E-mail subscribers
 aqi_team <- c(paste0(c("dorian.kvale",
-                     "steve.irwin",
-                     "daniel.dix",
-                     "monika.vadali",
-                     "helen.waquiu",
-                     "david.l.brown",
-                     "luke.charpentier"), "@state.mn.us"), "kvaled@gmail.com") 
+                       "daniel.dix",
+                       "monika.vadali",
+                       "helen.waquiu",
+                       "david.l.brown",
+                       "luke.charpentier"), "@state.mn.us"), 
+              "kvaled@gmail.com") 
 
 #aqi_team <- "frank.kohlasch@state.mn.us"
 #aqi_team <- aqi_team[1]

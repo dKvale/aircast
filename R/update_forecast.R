@@ -96,20 +96,19 @@ if(current_time > 12 & current_time < 15) {
   try(source(paste0(aircast_path, "R/update_cmaq_forecast.R")))
   
   
-  # Empty airvision FTP folder
-  print("Deleting FTP airvision files...")
-  try(source(paste0(aircast_path, "R/clear_airvision_ftp.R")))
-  
 }
 
 
 if(current_time >= 15) {
   
-
-# Update forecast maps
-#print("Updating forecast maps")
-#setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/")
-#try(source("R/update_forecast_maps.R"))
+  # Empty airvision FTP folder
+  print("Deleting FTP airvision files...")
+  try(source(paste0(aircast_path, "R/clear_airvision_ftp.R")))
+  
+  # Update forecast maps
+  #print("Updating forecast maps")
+  #setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Web/aqi-dashboard/")
+  #try(source("R/update_forecast_maps.R"))
 
 }
 
