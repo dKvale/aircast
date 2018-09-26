@@ -1122,9 +1122,9 @@ pm_board <- subset(lead_board, Pollutant == "PM25") %>%
 
 pm_board
 ```
+</div>
 
-<br>
-
+<div style="margin-top: 12px; margin-left: 24px;">
 ```{r, echo = F, warning = F, message = F}
 if (ozone_season) {
   
