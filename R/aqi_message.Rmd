@@ -1106,12 +1106,9 @@ if (weekend) { cat('<br> _Note: Some of MPCA&#39;s forecasts only predicted AQI 
   
 ### Overall model performance for next-day forecasts
 
-<div style="margin-top: -11px;">
-
-</div>
+<div style="margin-top: -11px; margin-left: 24px;">
 
 
-<div style="margin-top: -2px; margin-left: 24px;">
 ```{r, echo = F, warning = F, message = F}
 #Dr-Robot is getting smarter everyday.
 lead_board <- readRDS('leader_board.rdata') 
@@ -1122,9 +1119,9 @@ pm_board <- subset(lead_board, Pollutant == "PM25") %>%
 
 pm_board
 ```
-</div>
 
-<div style="margin-top: 12px; margin-left: 24px;">
+
+<p style="margin-top: 12px;"></p>
 ```{r, echo = F, warning = F, message = F}
 if (ozone_season) {
   
@@ -1134,6 +1131,7 @@ if (ozone_season) {
 o3_board
 }
 ```
+
 </div>
   
 
