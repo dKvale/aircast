@@ -70,11 +70,14 @@ closeAllConnections()
 # Clean data
 site_coords <- site_coords[ , c(1:2,4:5,7,9:10,12:13,16:21)]
 
-names(site_coords) <- c("AqsID","Parameter","Site Name","Active","Agency","Lat","Long","Local_Time","Country","City_Code","City","State_FIPS","State","FIPS","County")
+names(site_coords) <- c("AqsID","Parameter","Site Name","Active",
+                        "Agency","Lat","Long","Local_Time","Country",
+                        "City_Code","City","State_FIPS","State","FIPS","County")
 
 site_coords <- site_coords[!duplicated(site_coords$AqsID), ]
 
-names(aqi) <- c("Date", "Time", "AqsID", "Site Name", "Local_Time" , "Parameter", "Units", "Concentration","Agency")
+names(aqi) <- c("Date", "Time", "AqsID", "Site Name", "Local_Time" , 
+                "Parameter", "Units", "Concentration","Agency")
 
 aqi$Parameter <- gsub("[.]", "", aqi$Parameter)
 
@@ -85,9 +88,8 @@ aqi$Units     <- NULL
 # Filter to Ozone & PM25
 unique(aqi$Parameter)
 
-aqi <- filter(aqi, Parameter %in% c("OZONE", "PM25")) #, "PM10"))
-
-#aqi <- mutate(aqi, units = ifelse(Parameter == "OZONE", "PPB", "UG/M3"))
+aqi <- unique(aqi) %>%
+       filter(Parameter %in% c("OZONE", "PM25")) #, "PM10"))
 
 
 # Split Ozone and PM25 columns
@@ -142,11 +144,13 @@ hys$month <- format(as.Date(hys$date), "%m")
 hys$day   <- format(as.Date(hys$date), "%d")
 
 hysplit_columns <- c("date", "year", "month", "day", "hour", "receptor", 
-                     "hour.inc", "height", "receptor_height", "date2", "lat", "lon", "forecast_day")
+                     "hour.inc", "height", "receptor_height", "date2", 
+                     "lat", "lon", "forecast_day")
 
 hys <- as_data_frame(hys[ , hysplit_columns])
 
-names(hys)[c(1,7,8,10:12)] <- c("receptor_date", "traj_hours", "start_height", "parcel_date", "start_lat", "start_lon")
+names(hys)[c(1,7,8,10:12)] <- c("receptor_date", "traj_hours", "start_height", 
+                                "parcel_date", "start_lat", "start_lon")
 
 
 hys$wtd_Ozone_Noon_ppb         <- NA
@@ -352,7 +356,7 @@ names(hys_wide)[1:2] <- c("site_catid", "hour_gmt")
 # SAVE results
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 
-write.csv(hys_wide[ , c(1:11)], 
+write.csv(hys_wide[ , ], 
           paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
 
 }

@@ -23,7 +23,6 @@ aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
 
 
-
 current_time <- as.numeric(format(Sys.time(), "%H"))
 
 

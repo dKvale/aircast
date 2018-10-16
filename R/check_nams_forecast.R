@@ -21,7 +21,9 @@ new_date <- Sys.Date()
 # NAMf
 if(!min_exists("hysplit.t12z.namf", min_size = 1.2E+9)) {
   
-  nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "f", time_step = 3), error = function(err) NA, silent = T)
+  nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "f", time_step = 3), 
+                  error = function(err) NA, 
+                  silent = T)
   
 # If fail, download 6z       
   if(!is.null(nam)) { 
@@ -32,7 +34,9 @@ if(!min_exists("hysplit.t12z.namf", min_size = 1.2E+9)) {
 # NAMa
 if(!min_exists("hysplit.t12z.nama", min_size = 7.3E+8)) {
   
-  nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "a", time_step = 3), error = function(err) NA, silent = T)
+  nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "a", time_step = 3), 
+                  error = function(err) NA, 
+                  silent = T)
   
   # If fail, download 6z       
   if(is.na(nam)) { 
@@ -43,7 +47,9 @@ if(!min_exists("hysplit.t12z.nama", min_size = 7.3E+8)) {
 # NAMsa
 if(!min_exists("hysplit.t12z.namsa", min_size = 1.1E+9)) {
   
-  nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "a", time_step = 1), error = function(err) NA, silent = T)
+  nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "a", time_step = 1), 
+                  error = function(err) NA, 
+                  silent = T)
   
   # If fail, download 6z       
   if(is.na(nam)) { 
@@ -51,10 +57,12 @@ if(!min_exists("hysplit.t12z.namsa", min_size = 1.1E+9)) {
   }
 }
 
-# NAMsa
+# NAMsf
 if(!min_exists("hysplit.t12z.namsf", min_size = 2.2E+9)) {
   
-  nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "f", time_step = 1), error = function(err) NA, silent = T)
+  nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "f", time_step = 1), 
+                  error = function(err) NA, 
+                  silent = T)
   
   # If fail, download 6z       
   if(is.na(nam)) { 

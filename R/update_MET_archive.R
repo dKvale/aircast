@@ -99,6 +99,9 @@ sites$run_order <- 2
 
 sites <- bind_rows(sites, filter(all_sites, !site_catid %in% sites$site_catid))
 
+# Drop duplicate sites
+sites <- filter(sites,  !site_catid %in% "27-017-7417")
+
 
 # Join sites to calendar
 sites$join <- 1
@@ -112,9 +115,7 @@ sites$site_date <- paste(sites$site_catid, sites$date)
 
 
 # Put 909 first
-sites$run_order <- ifelse(sites$site_catid == "27-053-0909", 1, sites$run_order)
-
-sites <- arrange(sites, run_order, site_catid, desc(date))
+sites$run_order <- ifelse(sites$site_catid %in% c("27-053-0909"), 1, sites$run_order) #"27-053-0910" Pacific street
 
 # Put AQI sites first
 sites$run_order <- ifelse(sites$site_catid %in% aqi_sites$site_catid, 1.1, sites$run_order)
@@ -128,7 +129,6 @@ sites <- filter(sites, !site_date %in% all_met$site_date)
 
 # Count site-days left to download for AQI
 sites %>% filter(site_catid %in% aqi_sites$site_catid) %>% nrow() %>% print()
-
 
 
 # Loop through site table and send DarkSky request
