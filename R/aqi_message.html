@@ -1,0 +1,975 @@
+
+
+
+<div id="minnesota-aqi-report" class="section level2">
+<h2>Minnesota AQI report</h2>
+<div style="margin-top: -19px;">
+<i>Preliminary results for Friday Nov 02, 2018</i>
+</div>
+<div style="margin-top: 12px;">
+<p>The category accuracy of the next-day forecast was <strong>100%</strong> (17/17) for PM2.5.</p>
+</div>
+<div style="margin-top: 16px;">
+
+<div id="mpca-forecast-vs-monitoring-results" class="section level3">
+<h3>MPCA forecast vs Monitoring results</h3>
+<div style="margin-top: -16px; margin-left: 8px;">
+<p><img src="fcst_regression.png" width="550" height="564" style="margin-bottom: 15px; margin-left: 8px;"></p>
+</div>
+</div>
+<div id="pm2.5-results-in-ugm3" class="section level3">
+<h3>PM2.5 results in <em>ug/m3</em></h3>
+<div style="margin-top: -18px; margin-left: 18px;">
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+Site
+</th>
+<th style="text-align:left;">
+Obs count
+</th>
+<th style="text-align:left;">
+Monitored
+</th>
+<th style="text-align:left;">
+MPCA
+</th>
+<th style="text-align:left;">
+Ensemble
+</th>
+<th style="text-align:left;">
+Big RF
+</th>
+<th style="text-align:left;">
+GradBoost
+</th>
+<th style="text-align:left;">
+Robot
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Rochester </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 9.10">9.1</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.70">6.7</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 9.21">9.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 7.57">7.6</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 9.30">9.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.83">6.8</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Lakeville </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 8.80">8.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.70">6.7</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 7.19">7.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.40">6.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.60">6.6</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.78">6.8</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Winona </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">NA</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 8.50">8.5</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 8.20">8.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.57">5.6</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.15">5.1</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.77">5.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.02">5.0</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Fargo </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">NA</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 8.40">8.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 8.40">8.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #FFEE00; color: black; 13.17">13.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #FFEE00; color: black; 12.78">12.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 11.95">12.0</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 11.31">11.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">HC Andersen </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 7.60">7.6</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 7.20">7.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 10.62">10.6</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 9.54">9.5</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 10.03">10.0</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 9.80">9.8</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Marshall </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.80">6.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.20">6.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.30">6.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.38">6.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.89">4.9</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 8.88">8.9</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Leech Lake </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">23</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.00">6.0</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.30">5.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.40">5.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.10">6.1</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.10">6.1</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.40">5.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Red Lake </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">23</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.00">6.0</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.70">6.7</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.34">5.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.36">6.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.01">6.0</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.39">5.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Anoka </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.80">5.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.20">6.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.26">6.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.21">6.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.17">6.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.74">6.7</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Virginia </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">23</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.30">5.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.30">5.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.93">6.9</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.92">5.9</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.52">5.5</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.42">5.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Detroit Lakes </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.90">4.9</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.30">4.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.48">4.5</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 6.13">6.1</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.25">5.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.86">4.9</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Duluth WD </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.70">4.7</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.80">4.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.01">5.0</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.07">5.1</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.68">3.7</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.21">4.2</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Brainerd </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">23</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.40">4.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.80">5.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.21">4.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.94">3.9</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.61">3.6</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.26">4.3</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">St Cloud </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.70">3.7</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.80">5.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.43">4.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.43">4.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.19">4.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.45">4.4</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Fond Du Lac </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">23</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.40">3.4</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.80">4.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.60">5.6</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.57">4.6</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.09">4.1</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.68">4.7</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Grand Portage </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 2.50">2.5</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 4.30">4.3</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.20">3.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.89">3.9</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.23">3.2</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.80">3.8</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 23px">Ely </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 65px">24</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 0.50">0.5</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 2.90">2.9</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 5.66">5.7</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.75">3.8</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.67">3.7</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-left: 36px; padding-right: 36px; margin-right: 15px; font-weight: 600; background-color: #53BF33; color: black; 3.34">3.3</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div style="margin-top: 32px;">
+<h3 id="yesterdays-model-performance">Yesterday's model performance</h3>
+</div>
+<div style="margin-top: 8px; margin-left: 24px;">
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:left;">
+Error ug/m3
+</th>
+<th style="text-align:left;">
+On target %
+</th>
+<th style="text-align:left;">
+Bullseyes %
+</th>
+<th style="text-align:left;">
+CAT accuracy %
+</th>
+<th style="text-align:left;">
+Yellow accuracy %
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">MPCA Team </span>
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Dr Robot </span>
+</td>
+<td style="text-align:left;">
+1.4
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+82
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">GradBooster </span>
+</td>
+<td style="text-align:left;">
+1.2
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+82
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Big RF </span>
+</td>
+<td style="text-align:left;">
+1.4
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+82
+</td>
+<td style="text-align:left;">
+94
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Ensemble </span>
+</td>
+<td style="text-align:left;">
+1.5
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+76
+</td>
+<td style="text-align:left;">
+94
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Farmer Weeks </span>
+</td>
+<td style="text-align:left;">
+1.5
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+71
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Persistant Assistant</span>
+</td>
+<td style="text-align:left;">
+1.9
+</td>
+<td style="text-align:left;">
+94
+</td>
+<td style="text-align:left;">
+65
+</td>
+<td style="text-align:left;">
+94
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">J.K. Rollings </span>
+</td>
+<td style="text-align:left;">
+1.1
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+94
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">BB3 Blender </span>
+</td>
+<td style="text-align:left;">
+1.2
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+94
+</td>
+<td style="text-align:left;">
+100
+</td>
+<td style="text-align:left;">
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><br></p>
+</div>
+<div id="overall-model-performance-for-next-day-forecasts" class="section level3">
+<h3>Overall model performance for next-day forecasts</h3>
+<div style="margin-top: -11px; margin-left: 24px;">
+<table class="table table-condensed">
+<thead>
+<tr>
+<th style="text-align:left;">
+Model
+</th>
+<th style="text-align:left;">
+Pollutant
+</th>
+<th style="text-align:left;">
+Error ugm3
+</th>
+<th style="text-align:left;">
+On target %
+</th>
+<th style="text-align:left;">
+Bullseyes
+</th>
+<th style="text-align:left;">
+Cat accuracy
+</th>
+<th style="text-align:left;">
+Yellow accuracy
+</th>
+<th style="text-align:left;">
+Forecasts
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">MPCA Team </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 50px">PM25</span>
+</td>
+<td style="text-align:left;">
+2.3
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">91</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 90px">68</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">93</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 120px">49</span>
+</td>
+<td style="text-align:left;">
+175
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Dr Robot </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 50px">PM25</span>
+</td>
+<td style="text-align:left;">
+2.5
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">88</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 90px">64</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">91</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 120px">46</span>
+</td>
+<td style="text-align:left;">
+176
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">GradBooster </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 50px">PM25</span>
+</td>
+<td style="text-align:left;">
+2.4
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">90</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 90px">65</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">94</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 120px">14</span>
+</td>
+<td style="text-align:left;">
+135
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Big RF </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 50px">PM25</span>
+</td>
+<td style="text-align:left;">
+2.4
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">89</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 90px">65</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">93</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 120px">13</span>
+</td>
+<td style="text-align:left;">
+135
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Ensemble </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 50px">PM25</span>
+</td>
+<td style="text-align:left;">
+2.5
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">89</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 90px">65</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">93</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 120px">9 </span>
+</td>
+<td style="text-align:left;">
+135
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Farmer Weeks </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 50px">PM25</span>
+</td>
+<td style="text-align:left;">
+2.8
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">85</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 90px">57</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">88</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 120px">3 </span>
+</td>
+<td style="text-align:left;">
+176
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">Persistant Assistant</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 50px">PM25</span>
+</td>
+<td style="text-align:left;">
+3.2
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">78</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 90px">53</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">84</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 120px">17</span>
+</td>
+<td style="text-align:left;">
+176
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">J.K. Rollings </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 50px">PM25</span>
+</td>
+<td style="text-align:left;">
+2.8
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">86</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 90px">61</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">90</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 120px">23</span>
+</td>
+<td style="text-align:left;">
+176
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+<span style="padding-right: 24px">BB3 Blender </span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 50px">PM25</span>
+</td>
+<td style="text-align:left;">
+2.7
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">88</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 90px">63</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 99px">90</span>
+</td>
+<td style="text-align:left;">
+<span style="padding-right: 120px">10</span>
+</td>
+<td style="text-align:left;">
+176
+</td>
+</tr>
+</tbody>
+</table>
+<p style="margin-top: 12px;">
+</p>
+</div>
+</div>
+</div>

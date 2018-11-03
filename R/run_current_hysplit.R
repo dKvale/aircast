@@ -8,9 +8,7 @@ library(here)
 
 
 source(paste0(aircast_path, "R/hysplit_traj.R"))
-
 source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
-
 
 
 # Check if HYSPLIT has already run
