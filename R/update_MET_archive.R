@@ -18,7 +18,7 @@ Sys.setenv(DARKSKY_API_KEY = d_key)
 
 
 # Create date table
-days <- data_frame(date = seq(as.Date("2008-12-31"), as.Date("2017-12-31"), 1),
+days <- data_frame(date = seq(as.Date("2009-12-31"), as.Date("2017-12-31"), 1),
                    join = 1)
 
 days[1:5, ]
@@ -70,11 +70,7 @@ for (file in files) {
 }
 }
 
-#saveRDS(all_met, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata") 
-  
-# Load previous archives
-#all_met <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive.rdata")
-
+# Create site/date identifier
 names(all_met)
 
 all_met$site_date <- paste(all_met$site_catid, all_met$date)
