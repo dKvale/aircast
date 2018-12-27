@@ -25,7 +25,7 @@ library(magrittr)
 
 days_past <- 0
 
-aircast_path <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 
 
@@ -105,9 +105,13 @@ verify$obs_pm25_aqi <- conc2aqi(verify$obs_pm25_ugm3, "pm25")
 
 
 # Check for color only forecasts, if found set "weekend" to TRUE
-if ("green" %in% c(verify$fcst_ozone_aqi, verify$fcst_pm25_aqi) | 
-    "yellow" %in% c(verify$fcst_ozone_aqi, verify$fcst_pm25_aqi) | 
-    "orange" %in% c(verify$fcst_ozone_aqi, verify$fcst_pm25_aqi)) weekend <- TRUE
+if (ozone_season) { forecasts <- c(verify$fcst_ozone_aqi, verify$fcst_pm25_aqi)
+} else forecasts <- verify$fcst_pm25_aqi
+
+
+if ("green" %in%  forecasts |
+    "yellow" %in% forecasts | 
+    "orange" %in% forecasts) weekend <- TRUE
 
 
 # If weekend convert forecast color to AQI
@@ -273,7 +277,7 @@ verify_o3 <- rename(verify_o3,
 # Join together
 verify <- bind_rows(verify_pm, verify_o3)
 
-verify[verify == -Inf] <- NA
+verify[verify == -Inf]       <- NA
 verify_o3[verify_o3 == -Inf] <- NA
 verify_pm[verify_pm == -Inf] <- NA
 
@@ -361,16 +365,25 @@ tall_pm$Site <- factor(tall_pm$Site, levels = rev(arrange(filter(tall_pm, model 
 # Add AQI colors
 verify_o3 <-  verify_o3 %>%
               rowwise() %>%
-              mutate(pollutant = "Ozone",
+              mutate(pollutant        = "Ozone",
                      background_color = aqi2color(`Obs AQI`))
+
 
 verify_pm <-  verify_pm %>%
               rowwise() %>%
               mutate(pollutant = "PM2.5",
                      background_color = aqi2color(`Obs AQI`))
-
-# Combine tables
-verify_all <- bind_rows(verify_o3, verify_pm)
+                     
+if(nrow(verify_o3) < 1) {
+  
+  verify_o3[1, ] <- NA
+ 
+  verify_o3$background_color <- NA
+  
+  verify_all <- bind_rows(verify_o3[0, ], verify_pm)
+  
+} else {verify_all <- bind_rows(verify_o3, verify_pm)}
+  
 
 verify_all <- verify_all %>%
               rowwise() %>%
@@ -485,7 +498,8 @@ verify_pm$background_color <- NULL
 # Load past results
 #lead_board <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification/lead_board.csv")
 
-lead_board <- try(read_csv(paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification/Archive leaders/", Sys.Date() - 1, "-lead_board.csv")))
+lead_board <- try(read_csv(paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification/Archive leaders/", Sys.Date() - 1, "-lead_board.csv")),
+                  silent = TRUE)
 
 
 if (class(lead_board) == "try-error") {
@@ -500,25 +514,6 @@ if (class(lead_board) == "try-error") {
 
 
 # New performance metrics
-o3_performance <- tall_o3 %>%
-                     group_by(Site) %>%
-                     mutate(n            = 1:n(),
-                            obs_col      = background_color[model == "Obs AQI"],
-                            obs_conc     = conc[model == "Obs AQI"],
-                            fcst_correct = obs_col == background_color[n],
-                            conc_diff    = abs(obs_conc - conc[n])) %>%
-                     group_by(model) %>%
-                     summarize(n_obs          = sum(!is.na(tall_o3$aqi[tall_o3$model == "Obs AQI"])),
-                               n_preds        = sum(!is.na(fcst_correct)),
-                               elev_preds     = sum(!is.na(fcst_correct) & obs_col != "#53BF33"), 
-                               accuracy       = 100 * sum(fcst_correct, na.rm = T) / n_preds,
-                               elev_accuracy  = 100 * sum(fcst_correct & obs_col != "#53BF33", na.rm = T) / elev_preds, 
-                               mean_conc_diff = mean(conc_diff, na.rm = T),
-                               bulls_eyes     = 100 * sum(conc_diff <= 5, na.rm = T) / n_preds,
-                               near_misses    = 100 * sum(conc_diff <= 10, na.rm = T) / n_preds) %>%
-                     arrange(desc(model))
-
-
 pm_performance <- tall_pm %>%
                      group_by(Site) %>%
                      mutate(n            = 1:n(),
@@ -573,13 +568,33 @@ model_names <- data_frame(Model = c(
                             "roll_pm25_aqi", 
                             "bb3_pm25_aqi"))
                           
+if(nrow(tall_o3) < 1) {
+  
+o3_performance <- tall_o3 %>%
+                     group_by(Site) %>%
+                     mutate(n            = 1:n(),
+                            obs_col      = background_color[model == "Obs AQI"],
+                            obs_conc     = conc[model == "Obs AQI"],
+                            fcst_correct = obs_col == background_color[n],
+                            conc_diff    = abs(obs_conc - conc[n])) %>%
+                     group_by(model) %>%
+                     summarize(n_obs          = sum(!is.na(tall_o3$aqi[tall_o3$model == "Obs AQI"])),
+                               n_preds        = sum(!is.na(fcst_correct)),
+                               elev_preds     = sum(!is.na(fcst_correct) & obs_col != "#53BF33"), 
+                               accuracy       = 100 * sum(fcst_correct, na.rm = T) / n_preds,
+                               elev_accuracy  = 100 * sum(fcst_correct & obs_col != "#53BF33", na.rm = T) / elev_preds, 
+                               mean_conc_diff = mean(conc_diff, na.rm = T),
+                               bulls_eyes     = 100 * sum(conc_diff <= 5, na.rm = T) / n_preds,
+                               near_misses    = 100 * sum(conc_diff <= 10, na.rm = T) / n_preds) %>%
+                     arrange(desc(model))
 
-yest_board <- left_join(model_names, o3_performance, by = c("model_o3" = "model")) %>%
-              select(-model_o3, -model_pm, -n_obs, -n_preds, -elev_preds) %>%
-              left_join(left_join(model_names, pm_performance, by = c("model_pm" = "model")), by = "Model") %>%
-              select(-model_o3, -model_pm, -n_obs, -n_preds, -elev_preds)
 
-yest_board <- rename(yest_board,
+  yest_board <- left_join(model_names, o3_performance, by = c("model_o3" = "model")) %>%
+                 select(-model_o3, -model_pm, -n_obs, -n_preds, -elev_preds) %>%
+                 left_join(left_join(model_names, pm_performance, by = c("model_pm" = "model")), by = "Model") %>%
+                 select(-model_o3, -model_pm, -n_obs, -n_preds, -elev_preds)
+  
+  yest_board <- rename(yest_board,
                      `new O3 accuracy`        = accuracy.x,
                      `new O3 yellow accuracy` = elev_accuracy.x,
                      `new O3 error ppb`       = mean_conc_diff.x,
@@ -593,7 +608,29 @@ yest_board <- rename(yest_board,
                      `new PM on target`       = near_misses.y) %>% 
                   mutate(new_obs              = 1)
 
+
+  names(yest_board) <- gsub("new ", "", names(yest_board))
+ 
+
+} else {
+  
+  yest_board <- left_join(model_names, pm_performance, by = c("model_pm" = "model")) %>%
+                select(-model_o3, -model_pm, -n_obs, -n_preds, -elev_preds)
+
+   yest_board <- rename(yest_board,
+                        `new PM accuracy`        = accuracy,
+                        `new PM yellow accuracy` = elev_accuracy,
+                        `new PM error ug/m3`     = mean_conc_diff,
+                        `new PM bullseyes`       = bulls_eyes,
+                        `new PM on target`       = near_misses) %>% 
+                 mutate(new_obs       
+                        = 1)
+   
+  names(yest_board) <- gsub("new ", "", names(yest_board))
+ 
 # 
+}
+
 
 # Don't update annual stats on Sunday and Monday
 if (!weekend) {
@@ -619,13 +656,13 @@ if (!weekend) {
                           `PM on target %` = sum(`PM on target %` * (`Forecasts n` - new_obs), `new PM on target` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T),
 
                           `PM error ug/m3`  = sum(`PM error ug/m3` * (`Forecasts n` - new_obs), `new PM error ug/m3` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T))
+    
                           
   } else {
     
     
      if (is.na(yest_board[lead_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board$new_obs[6] <- 0
     
-     
      lead_board <- lead_board %>% 
                      rowwise() %>%
                      mutate(`O3 error ppb`         = `O3 error ppb` %>% as.numeric(), 
@@ -661,8 +698,24 @@ if (!weekend) {
 
 } else {
   
-  yest_board[1, c(4:6,9:11)] <- NA 
-  
+  if (ncol(yest_board) > 8) {
+    
+    yest_board[1, c(4:6,9:11)] <- NA 
+    
+     # Yesterday's performance
+     yest_board <- select(yest_board, Model, 
+                          `new O3 error ppb`, `new O3 on target`, `new O3 bullseyes`, `new O3 accuracy`, `new O3 yellow accuracy`,   
+                          `new PM error ug/m3`, `new PM on target`, `new PM bullseyes`, `new PM accuracy`, `new PM yellow accuracy` )
+        
+  } else {
+    
+    yest_board[1, c(2:6)] <- NA 
+    
+     # Yesterday's performance
+     yest_board <- select(yest_board, Model, 
+                          `new PM error ug/m3`, `new PM on target`, `new PM bullseyes`, `new PM accuracy`, `new PM yellow accuracy` )
+     
+  }
 }
 
 options(digits = 2)
@@ -674,33 +727,35 @@ margin_right <- function(i) {
 }
 
 
-# Yesterday's performance
-yest_board <- select(yest_board, Model, 
-                     `new O3 error ppb`, `new O3 on target`, `new O3 bullseyes`, `new O3 accuracy`, `new O3 yellow accuracy`,   
-                     `new PM error ug/m3`, `new PM on target`, `new PM bullseyes`, `new PM accuracy`, `new PM yellow accuracy` )
+# Clean table names
+if (ncol(yest_board) > 8) {
   
-
-# Clean table
-names(yest_board) <- gsub("new ", "", names(yest_board))
+  names(yest_board) <- c("Model",
+                          "O3 error ppb", "O3 on target %", "O3 bullseyes %", "O3 cat accuracy %",  "O3 yellow accuracy %", 
+                          "PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")
   
-names(yest_board) <- c("Model",
-                        "O3 error ppb", "O3 on target %", "O3 bullseyes %", "O3 cat accuracy %",  "O3 yellow accuracy %", 
-                        "PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")
+  yest_board <- yest_board %>% 
+                mutate_at(vars(`O3 on target %`:`O3 yellow accuracy %`, `PM on target %`:`PM yellow accuracy %`), round)
+  
+  yest_board$`O3 error ppb` <- round(yest_board$`O3 error ppb`, 1)
+  
+  yest_board[is.na(yest_board$`O3 yellow accuracy %`), "O3 yellow accuracy %"] <- " "
+  
+} else {
+  
+    names(yest_board) <- c("Model",
+                           "PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")
+  
+  yest_board <- yest_board %>% 
+                mutate_at(vars(`PM on target %`:`PM yellow accuracy %`), round)
+  
+}
 
+  yest_board$`PM error ug/m3` <- round(yest_board$`PM error ug/m3`, 1)
 
-yest_board <- yest_board %>% 
-              mutate_at(vars(`O3 on target %`:`O3 yellow accuracy %`, `PM on target %`:`PM yellow accuracy %`), round)
-
-yest_board$`O3 error ppb` <- round(yest_board$`O3 error ppb`, 1)
-
-yest_board$`PM error ug/m3` <- round(yest_board$`PM error ug/m3`, 1)
-
-yest_board[is.na(yest_board$`PM yellow accuracy %`), "PM yellow accuracy %"] <- " "
-
-yest_board[is.na(yest_board$`O3 yellow accuracy %`), "O3 yellow accuracy %"] <- " "
-
-
-yest_board[yest_board$Model == "CMAQ", c("PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")] <- " "
+  yest_board[is.na(yest_board$`PM yellow accuracy %`), "PM yellow accuracy %"] <- " "
+  
+  yest_board[yest_board$Model == "CMAQ", c("PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")] <- " "
 
 
 # Add date of forecast  
@@ -724,7 +779,7 @@ if (ozone_season) {
                             align = c("l"), digits = 2, format = "html")
 } else{
 
-  yest_board <- formattable(select(yest_board[-6, ], -c(`O3 error ppb`:`O3 yellow accuracy %`)),
+  yest_board <- formattable(select(yest_board[-6, ], Model, `PM error ug/m3`:`PM yellow accuracy %`),
                             list(Model                   = margin_right(24),
                                  `PM error ug/m3`        = margin_right(100),
                                  `PM on target %`        = margin_right(110),
