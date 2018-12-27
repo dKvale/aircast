@@ -18,7 +18,7 @@ Sys.setenv(DARKSKY_API_KEY = d_key)
 
 
 # Create date table
-days <- data_frame(date = seq(as.Date("2009-12-31"), as.Date("2017-12-31"), 1),
+days <- data_frame(date = seq(as.Date("2008-12-31"), as.Date("2017-12-31"), 1),
                    join = 1)
 
 days[1:5, ]
@@ -26,7 +26,6 @@ days[1:5, ]
 day <- 5
 
 days[day, ]
-
 
 
 forecast_col_names <- c("site_catid", "time", "summary", "icon", 
@@ -97,7 +96,8 @@ all_sites$run_order <- 3
 
 sites$run_order <- 2
 
-sites <- bind_rows(sites, filter(all_sites, !site_catid %in% sites$site_catid))
+sites <- bind_rows(sites, 
+                   filter(all_sites, !site_catid %in% sites$site_catid))
 
 # Drop duplicate sites
 sites <- filter(sites,  !site_catid %in% "27-017-7417")
@@ -111,7 +111,6 @@ sites <- left_join(sites, days)
 sites$join <- NULL
 
 sites$site_date <- paste(sites$site_catid, sites$date)
-
 
 
 # Put 909 first
@@ -291,7 +290,7 @@ met_sum <- group_by(all_met2, as.Date(time)) %>%
 
 if (FALSE) {
 #------------------------------#
-# Using purr for multiple sites
+# Use purr for multiple sites
 #-------------------------------#
 more_than_one <- data.frame(loc  = c("Maine", "Seattle"),
                             lon  = c(43.2672, 47.6097),
