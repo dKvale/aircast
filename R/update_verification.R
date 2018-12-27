@@ -119,8 +119,6 @@ aqi_forc <- aqi_forc %>% arrange(DayIndex) %>% group_by(Date, Group) %>% slice(1
 
 
 # Load internal forecasts for missing sites
-#aqi_forc_int2 <- read_csv("All_Values.csv") 
-
 aqi_forc_int <- read_csv("All_Values_gen2.csv") 
 
 
@@ -364,11 +362,12 @@ setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fol
 
 print("Loading previous day verifications...")
 
-all_verify <- try(readRDS(paste0("Archive/", Sys.Date() - days_past, "_verification_table.Rdata")))
+all_verify <- try(readRDS(paste0("Archive/", Sys.Date() - days_past, "_verification_table.Rdata")), 
+                  silent = TRUE)
 
 if ("try-error" %in% class(all_verify)) {
   
-  all_verify <- read_csv("verification_table.csv")
+  all_verify <- read_csv("verification_table2.csv")
 
 }
   
@@ -443,8 +442,6 @@ yesterday_fcst <- filter(all_verify, forecast_date == Sys.Date() - 1) %>%
 yesterday_fcst <- left_join(yesterday_fcst, select(actuals, -air_monitor, -aqsid))
 
 
-
-
 # Yesterday's CMAQ forecast
 #--------------------------------#
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
@@ -454,7 +451,8 @@ cmaq_all <- data_frame()
 
 # Load CMAQ forecast from past 2 days
 for (i in 1:2) {
-  cmaq_forc <- try(read_csv(paste0(Sys.Date() - i, "_CMAQ_forecast.csv")))
+  
+  cmaq_forc <- try(read_csv(paste0(Sys.Date() - i, "_CMAQ_forecast.csv")), silent = TRUE)
   
   if (!"try-error" %in% class(cmaq_forc)) {
     
@@ -479,7 +477,6 @@ for (i in 1:2) {
   
   # Combine
   cmaq_all <- bind_rows(cmaq_forc, cmaq_all)
-  
   }
 }
 

@@ -26,3 +26,5 @@ vignettes/*.pdf
 aircast.Rproj
 fcst_regression.png
 Thumbs.db
+R/*.rdata
+.rdata
