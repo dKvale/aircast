@@ -568,7 +568,7 @@ model_names <- data_frame(Model = c(
                             "roll_pm25_aqi", 
                             "bb3_pm25_aqi"))
                           
-if(nrow(tall_o3) < 1) {
+if(nrow(tall_o3) > 0) {
   
 o3_performance <- tall_o3 %>%
                      group_by(Site) %>%
@@ -661,7 +661,7 @@ if (!weekend) {
   } else {
     
     
-     if (is.na(yest_board[lead_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board$new_obs[6] <- 0
+     if ("new O3 error ppb" %in% names(yest_board) &&  is.na(yest_board[lead_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board$new_obs[6] <- 0
     
      lead_board <- lead_board %>% 
                      rowwise() %>%
@@ -704,8 +704,8 @@ if (!weekend) {
     
      # Yesterday's performance
      yest_board <- select(yest_board, Model, 
-                          `new O3 error ppb`, `new O3 on target`, `new O3 bullseyes`, `new O3 accuracy`, `new O3 yellow accuracy`,   
-                          `new PM error ug/m3`, `new PM on target`, `new PM bullseyes`, `new PM accuracy`, `new PM yellow accuracy` )
+                          `O3 error ppb`, `O3 on target`, `O3 bullseyes`, `O3 accuracy`, `O3 yellow accuracy`,   
+                          `PM error ug/m3`, `PM on target`, `PM bullseyes`, `PM accuracy`, `PM yellow accuracy`)
         
   } else {
     
@@ -713,7 +713,7 @@ if (!weekend) {
     
      # Yesterday's performance
      yest_board <- select(yest_board, Model, 
-                          `new PM error ug/m3`, `new PM on target`, `new PM bullseyes`, `new PM accuracy`, `new PM yellow accuracy` )
+                          `PM error ug/m3`, `PM on target`, `PM bullseyes`, `PM accuracy`, `PM yellow accuracy`)
      
   }
 }
@@ -755,7 +755,8 @@ if (ncol(yest_board) > 8) {
 
   yest_board[is.na(yest_board$`PM yellow accuracy %`), "PM yellow accuracy %"] <- " "
   
-  yest_board[yest_board$Model == "CMAQ", c("PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")] <- " "
+  yest_board[yest_board$Model == "CMAQ", 
+             c("PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")] <- " "
 
 
 # Add date of forecast  
