@@ -46,6 +46,8 @@ all_met <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evalua
              ungroup() %>%
              mutate(date = as.character(date))
   
+all_met <- all_met[0, ]
+
 folder <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/sites" 
     
 files <- list.files(folder)
@@ -154,7 +156,8 @@ for (i in 1:nrow(sites)) {
   
     day_forc$site_catid <- site$site_catid
   
-    all_forecasts       <- bind_rows(day_forc, all_forecasts)
+    all_forecasts       <- bind_rows(day_forc, all_forecasts) %>%
+                           select(site_catid, everything())
     
   } else {
     
@@ -170,8 +173,18 @@ if (nrow(all_forecasts) > 0) {
   
   all_forecasts$time <- as.character(all_forecasts$time)
   
-  all_forecasts <- read_csv(format_csv(all_forecasts[ , forecast_col_names]), 
-                            col_types = forecast_col_types)
+  keep_names <- forecast_col_names %in% names(all_forecasts) 
+  
+  keep_types <- strsplit(forecast_col_types, "") %>% 
+                unlist() %>% 
+                .[keep_names] %>%
+                paste0(collapse = "")
+  
+  keep_names <- forecast_col_names[keep_names]
+  
+  all_forecasts <- all_forecasts[ , keep_names] %>%
+                   format_csv() %>%
+                   read_csv(col_types = keep_types)
   
   # Check date coverage
   length(unique(all_forecasts$time))
