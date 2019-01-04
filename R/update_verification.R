@@ -389,6 +389,7 @@ verify$background_origin_500m <- as.character(verify$background_origin_500m)
 # Make forecast character string for color only forecasts
 all_verify$fcst_ozone_aqi <- as.character(all_verify$fcst_ozone_aqi)
 all_verify$fcst_pm25_aqi  <- as.character(all_verify$fcst_pm25_aqi)
+
 verify$fcst_ozone_aqi     <- as.character(verify$fcst_ozone_aqi)
 verify$fcst_pm25_aqi      <- as.character(verify$fcst_pm25_aqi)
 verify$background_24hr_pm25_17z <- as.numeric(verify$background_24hr_pm25_17z)
