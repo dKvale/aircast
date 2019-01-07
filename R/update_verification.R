@@ -239,13 +239,11 @@ names(verify) <- gsub("Pm25Avg", "fcst_pm25_ugm3", names(verify))
 
 names(verify) <- tolower(names(verify))
 
-verify$forecast_date  <- verify$date
-
-verify$date <- NULL
+verify <- rename(forecast_date = date)
 
 
 # Rearrange columns with dates first
-verify <- verify[ , c(ncol(verify), 1, 2:(ncol(verify) - 1))]
+verify <-  select(verify, forecast_date, everything())
 
 
 
@@ -305,6 +303,9 @@ while (!load_hys) {
   if (days_past > 10) load_hys <- TRUE
 }
   
+
+if (!is.na(hys)) {
+  
 # Convert day index column
 hys$forecast_day <- as.numeric(gsub("day", "", hys$forecast_day))
 
@@ -349,6 +350,7 @@ names(hys_origin)[1:2] <- c("site_catid", "forecast_date")
 
 verify <- left_join(verify, hys_origin)
 
+}
 
 # Clean table
 #--------------------------------#
@@ -381,10 +383,15 @@ all_verify <- filter(all_verify,
                      !is.na(forecast_date))
 
 
-#-- Add new data to table
-verify$background_10m_500m_avg_24hr_ozone_noon_ppb <- as.numeric(verify$background_10m_500m_avg_24hr_ozone_noon_ppb)
-verify$background_origin_10m  <- as.character(verify$background_origin_10m)
-verify$background_origin_500m <- as.character(verify$background_origin_500m)
+#-- Set background types for joining
+if (!is.na(hys)) {
+  verify$background_10m_500m_avg_24hr_ozone_noon_ppb <- as.numeric(verify$background_10m_500m_avg_24hr_ozone_noon_ppb)
+  verify$background_origin_10m  <- as.character(verify$background_origin_10m)
+  verify$background_origin_500m <- as.character(verify$background_origin_500m)
+  verify$background_24hr_pm25_17z <- as.numeric(verify$background_24hr_pm25_17z)
+  verify$background_10m_500m_avg_24hr_ozone_noon_ppb <- as.numeric(verify$background_10m_500m_avg_24hr_ozone_noon_ppb)
+  
+  }
 
 # Make forecast character string for color only forecasts
 all_verify$fcst_ozone_aqi <- as.character(all_verify$fcst_ozone_aqi)
@@ -392,11 +399,8 @@ all_verify$fcst_pm25_aqi  <- as.character(all_verify$fcst_pm25_aqi)
 
 verify$fcst_ozone_aqi     <- as.character(verify$fcst_ozone_aqi)
 verify$fcst_pm25_aqi      <- as.character(verify$fcst_pm25_aqi)
-verify$background_24hr_pm25_17z <- as.numeric(verify$background_24hr_pm25_17z)
-verify$background_10m_500m_avg_24hr_ozone_noon_ppb <- as.numeric(verify$background_10m_500m_avg_24hr_ozone_noon_ppb)
 
 all_verify <- bind_rows(verify, all_verify)
-
 
 
 # Yesterday's actuals
@@ -409,7 +413,7 @@ actuals <- read_csv(paste0(Sys.Date() - 1, "_AQI_observed", ".csv"))
 
 #-- Header names
 names(actuals)[c(1, 5:8)] <- c("forecast_date","count_ozone_obs",
-                              "count_pm25_obs","obs_ozone_ppb","obs_pm25_ugm3")
+                               "count_pm25_obs","obs_ozone_ppb","obs_pm25_ugm3")
 
 
 #-- Add AQI category
