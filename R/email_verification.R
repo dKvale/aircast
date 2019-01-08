@@ -14,7 +14,8 @@ aqi_team <- c(paste0(c("dorian.kvale",
                        "helen.waquiu",
                        "david.l.brown",
                        "luke.charpentier"), "@state.mn.us"), 
-              "kvaled@gmail.com") 
+              "kvaled@gmail.com",
+              "sirwin.mobile@gmail.com") 
 
 #aqi_team <- "frank.kohlasch@state.mn.us"
 #aqi_team <- aqi_team[1]
@@ -43,7 +44,7 @@ msg_body <- paste0(msg_body, collapse = "")
 msg_body <- paste0('<style type="text/css"> th, td {border-bottom: 1px solid #ddd;} </style>', msg_body)
 
 msg_body <- gsub("<table", 
-                 '<table style = "padding-right: 10px; padding-bottom: 2px;', msg_body)
+                 '<table style = "padding-right: 10px; padding-bottom: 2px;"', msg_body)
 
 
 #-- Send message function

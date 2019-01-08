@@ -5,7 +5,7 @@ library(dplyr)
 library(readr)
 library(mailR)  # mailR reference - https://github.com/rpremraj/mailR
 
-aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us")
+aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us", "sirwin.mobile@gmail.com")
 
 #aqi_team <- "dorian.kvale@state.mn.us"
 
