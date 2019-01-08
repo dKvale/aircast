@@ -239,7 +239,7 @@ names(verify) <- gsub("Pm25Avg", "fcst_pm25_ugm3", names(verify))
 
 names(verify) <- tolower(names(verify))
 
-verify <- rename(forecast_date = date)
+verify <- rename(verify, forecast_date = date)
 
 
 # Rearrange columns with dates first
