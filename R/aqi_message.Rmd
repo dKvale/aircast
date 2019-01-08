@@ -29,7 +29,6 @@ aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 
 
-
 # Test for weekend
 weekend <- weekdays(Sys.Date() - 1 - days_past) %in% c("Sunday","Monday")
 
