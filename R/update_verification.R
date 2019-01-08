@@ -488,7 +488,8 @@ for (i in 1:2) {
 
 # Attach CMAQ to yesterday forecasts
 if (nrow(cmaq_all) > 0) {
-  yesterday_fcst <- left_join(select(yesterday_fcst, -cmaq_ozone_ppb, -cmaq_ozone_aqi), cmaq_all)
+  yesterday_fcst <- left_join(select(yesterday_fcst, -cmaq_ozone_ppb, -cmaq_ozone_aqi), 
+                              cmaq_all)
 }
 
 
