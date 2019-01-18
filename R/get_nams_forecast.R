@@ -1,4 +1,4 @@
-#
+#! /usr/bin/env Rscript
 
 library(downloader)
 
@@ -38,16 +38,13 @@ get_nams_forecast <- function(date        = Sys.Date(),
     
     file_loc <- paste0(folder, "/", file)
     
-    #htmlRaw <- getURLContent(url, followlocation = TRUE, binary = TRUE)
-    
     ## Working
     #data  <- httr::content(GET(paste0("ftp://arlftp.arlhq.noaa.gov/forecast/", date, "/", file)))
     
     #save_data <- file(file_loc, "wb")
     
     #writeBin(a, save_data)
-    
-    ##
+
     #data  <- getURLContent(paste0("ftp://arlftp.arlhq.noaa.gov/forecast/", date, "/", file))
 
     

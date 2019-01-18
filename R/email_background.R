@@ -5,6 +5,16 @@ library(dplyr)
 library(readr)
 library(mailR)  # mailR reference - https://github.com/rpremraj/mailR
 
+
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
+results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
+
+
+#Java path
+Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+
+
 aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us", "sirwin.mobile@gmail.com")
 
 #aqi_team <- "dorian.kvale@state.mn.us"
