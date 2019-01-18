@@ -1,6 +1,6 @@
 #! /usr/bin/env Rscript
 
-library(purrr)   #devtools::install_github("tidyverse/purrr")
+library(purrr)   
 library(dplyr)
 library(readr)
 library(darksky) #devtools::install_github("hrbrmstr/darksky")
