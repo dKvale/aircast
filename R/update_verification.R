@@ -30,7 +30,7 @@ print("Loading official forecasts...")
 # Load forecasts from AirNow for all days past yesterday
 #aqi_forc <- readLines(paste0("ftp://", creds$user, ":", creds$pwd, "@ftp.airnowapi.org/ReportingArea/reportingarea.dat"))
 
-aqi_forc_all <- data_frame()
+aqi_forc_all <- tibble()
 
 for (i in 0:4) {
   
@@ -287,20 +287,22 @@ print("Loading HYSPLIT...")
 
 load_hys  <- FALSE
 
+days_past_hys <- days_past
+
 while (!load_hys) {
   
-  hys <- tryCatch(read_csv(paste0(Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv")), error = function(e) NA)
+  hys <- tryCatch(read_csv(paste0(Sys.Date() - days_past_hys, "_AQI_raw_HYSPLIT.csv")), error = function(e) NA)
   
   if (is.na(hys)) {
     
-    days_past <- days_past + 1
+    days_past_hys <- days_past_hys + 1
     
   } else {
     
     load_hys <- TRUE
   }
   
-  if (days_past > 10) load_hys <- TRUE
+  if (days_past_hys > 7) load_hys <- TRUE
 }
   
 
@@ -356,7 +358,9 @@ verify <- left_join(verify, hys_origin)
 #--------------------------------#
 names(verify) <- gsub(" ", "_", tolower(names(verify)))
 
-verify <- filter(verify, !is.na(forecast_day), !is.na(site_catid))
+verify <- filter(verify, 
+                 !is.na(forecast_day), 
+                 !is.na(site_catid))
 
 
 # Load and join to previous days
@@ -497,7 +501,8 @@ if (nrow(cmaq_all) > 0) {
 #------------------------------------------------#
 
 # Drop yesterday from master table
-all_verify <- filter(all_verify, forecast_date != (Sys.Date() - 1))
+all_verify <- filter(all_verify, 
+                     forecast_date != (Sys.Date() - 1))
 
 # Align column types
 all_verify$cmaq_ozone_aqi <- as.numeric(all_verify$cmaq_ozone_aqi)

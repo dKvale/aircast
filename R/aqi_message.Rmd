@@ -94,9 +94,8 @@ sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(sites) <- gsub(" ", "_", tolower(names(sites)))
 
-verify <- left_join(select(verify, -short_name), 
+verify <- left_join(select(verify, -contains("short_name")), 
                     select(sites, short_name, site_catid), by = "site_catid")
-
 
 
 #-- Recalculate AQI
@@ -608,7 +607,7 @@ o3_performance <- tall_o3 %>%
                   mutate(new_obs              = 1)
 
 
-  names(yest_board) <- gsub("new ", "", names(yest_board))
+  #names(yest_board) <- gsub("new ", "", names(yest_board))
  
 
 } else {
@@ -625,13 +624,12 @@ o3_performance <- tall_o3 %>%
                  mutate(new_obs       
                         = 1)
    
-  names(yest_board) <- gsub("new ", "", names(yest_board))
- 
+
 # 
 }
 
 
-# Don't update annual stats on Sunday and Monday
+# Don't update annual stats for Sunday and Monday forecasts (Day 3)
 if (!weekend) {
   
   # Update performance
@@ -658,7 +656,6 @@ if (!weekend) {
     
                           
   } else {
-    
     
      if ("new O3 error ppb" %in% names(yest_board) &&  is.na(yest_board[lead_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board$new_obs[6] <- 0
     
@@ -729,9 +726,17 @@ margin_right <- function(i) {
 # Clean table names
 if (ncol(yest_board) > 8) {
   
-  names(yest_board) <- c("Model",
-                          "O3 error ppb", "O3 on target %", "O3 bullseyes %", "O3 cat accuracy %",  "O3 yellow accuracy %", 
-                          "PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")
+   names(yest_board) <- gsub("new ", "", names(yest_board))
+
+   yest_board <- rename(yest_board, 
+                        "O3 on target %"       = "O3 on target", 
+                        "O3 bullseyes %"       = "O3 bullseyes", 
+                        "O3 cat accuracy %"    = "O3 accuracy",  
+                        "O3 yellow accuracy %" = "O3 yellow accuracy", 
+                        "PM on target %"       = "PM on target", 
+                        "PM bullseyes %"       = "PM bullseyes", 
+                        "PM cat accuracy %"    = "PM accuracy", 
+                        "PM yellow accuracy %" = "PM yellow accuracy")
   
   yest_board <- yest_board %>% 
                 mutate_at(vars(`O3 on target %`:`O3 yellow accuracy %`, `PM on target %`:`PM yellow accuracy %`), round)
@@ -742,24 +747,29 @@ if (ncol(yest_board) > 8) {
   
 } else {
   
-    names(yest_board) <- c("Model",
-                           "PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")
+   names(yest_board) <- gsub("new ", "", names(yest_board))
+
+   yest_board <- rename(yest_board,
+                        "PM on target %"       = "PM on target", 
+                        "PM bullseyes %"       = "PM bullseyes", 
+                        "PM cat accuracy %"    = "PM accuracy", 
+                        "PM yellow accuracy %" = "PM yellow accuracy")
   
   yest_board <- yest_board %>% 
                 mutate_at(vars(`PM on target %`:`PM yellow accuracy %`), round)
   
 }
 
-  yest_board$`PM error ug/m3` <- round(yest_board$`PM error ug/m3`, 1)
+yest_board$`PM error ug/m3` <- round(yest_board$`PM error ug/m3`, 1)
 
-  yest_board[is.na(yest_board$`PM yellow accuracy %`), "PM yellow accuracy %"] <- " "
+yest_board[is.na(yest_board$`PM yellow accuracy %`), "PM yellow accuracy %"] <- " "
   
-  yest_board[yest_board$Model == "CMAQ", 
+yest_board[yest_board$Model == "CMAQ", 
              c("PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")] <- " "
 
 
 # Add date of forecast  
-#yest_board <- cbind(yest_board, data_frame("Date of forecast" = c(fcast_date, fcast_date, cmaq_date, rep(NA, 4))))
+# yest_board <- cbind(yest_board, data_frame("Date of forecast" = c(fcast_date, fcast_date, cmaq_date, rep(NA, 4))))
   
 if (ozone_season) {
   
