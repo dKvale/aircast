@@ -132,7 +132,9 @@ verify <- mutate(verify,
 #-- Add baseline predictions
 source(paste0(aircast_path, "R/run_baseline_predictions.R"))
 
-verify <- left_join(verify, select(blend3, -short_name)) %>% ungroup()
+verify <- left_join(select(verify, -matches("roll_ozone_aqi|roll_pm25_aqi|roll11_ozone_aqi|roll11_pm25_aqi|persist_ozone_aqi|persist_pm25_aqi|bb3_ozone_aqi|bb3_pm25_aqi")),
+                    select(blend3, -short_name)) %>% 
+          ungroup()
 
 
 #-- Dates
@@ -606,10 +608,6 @@ o3_performance <- tall_o3 %>%
                      `new PM on target`       = near_misses.y) %>% 
                   mutate(new_obs              = 1)
 
-
-  #names(yest_board) <- gsub("new ", "", names(yest_board))
- 
-
 } else {
   
   yest_board <- left_join(model_names, pm_performance, by = c("model_pm" = "model")) %>%
@@ -705,16 +703,16 @@ if (!weekend) {
         
   } else {
     
-    yest_board[1, c(2:6)] <- NA 
+     yest_board[1, c(2:6)] <- NA 
     
      # Yesterday's performance
-     yest_board <- select(yest_board, Model, 
-                          `PM error ug/m3`, `PM on target`, `PM bullseyes`, `PM accuracy`, `PM yellow accuracy`)
+     yest_board <- select(yest_board, Model, `PM error ug/m3`, `PM on target`, `PM bullseyes`, `PM accuracy`, `PM yellow accuracy`)
      
   }
 }
 
 options(digits = 2)
+
 
 # Create web table
 margin_right <- function(i) {
@@ -738,11 +736,7 @@ if (ncol(yest_board) > 8) {
                         "PM cat accuracy %"    = "PM accuracy", 
                         "PM yellow accuracy %" = "PM yellow accuracy")
   
-  yest_board <- yest_board %>% 
-                mutate_at(vars(`O3 on target %`:`O3 yellow accuracy %`, `PM on target %`:`PM yellow accuracy %`), round)
-  
-  yest_board$`O3 error ppb` <- round(yest_board$`O3 error ppb`, 1)
-  
+
   yest_board[is.na(yest_board$`O3 yellow accuracy %`), "O3 yellow accuracy %"] <- " "
   
 } else {
@@ -755,17 +749,17 @@ if (ncol(yest_board) > 8) {
                         "PM cat accuracy %"    = "PM accuracy", 
                         "PM yellow accuracy %" = "PM yellow accuracy")
   
-  yest_board <- yest_board %>% 
-                mutate_at(vars(`PM on target %`:`PM yellow accuracy %`), round)
-  
 }
 
-yest_board$`PM error ug/m3` <- round(yest_board$`PM error ug/m3`, 1)
+
+yest_board <- bind_cols(select(yest_board, matches("M error|Model")) %>%
+                           mutate_if(is.numeric, round, digits=1),
+                         select(yest_board, -matches("M error|Model")) %>%
+                              mutate_if(is.numeric, round))
 
 yest_board[is.na(yest_board$`PM yellow accuracy %`), "PM yellow accuracy %"] <- " "
   
-yest_board[yest_board$Model == "CMAQ", 
-             c("PM error ug/m3", "PM on target %", "PM bullseyes %", "PM cat accuracy %", "PM yellow accuracy %")] <- " "
+yest_board[yest_board$Model == "CMAQ", grep("PM", names(yest_board))] <- " "
 
 
 # Add date of forecast  
@@ -787,9 +781,10 @@ if (ozone_season) {
                                  `PM cat accuracy %`     = margin_right(110),
                                  `PM yellow accuracy %`  = margin_right(124)),
                             align = c("l"), digits = 2, format = "html")
-} else{
+  
+} else {
 
-  yest_board <- formattable(select(yest_board[-6, ], Model, `PM error ug/m3`:`PM yellow accuracy %`),
+  yest_board <- formattable(select(filter(yest_board, Model != "CMAQ"), Model, `PM error ug/m3`, `PM on target %`, `PM bullseyes %`, `PM cat accuracy %`, `PM yellow accuracy %`),
                             list(Model                   = margin_right(24),
                                  `PM error ug/m3`        = margin_right(100),
                                  `PM on target %`        = margin_right(110),
