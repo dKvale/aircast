@@ -44,7 +44,7 @@ get_airnow <- function(dates      = c(Sys.Date(), Sys.Date()-1),
   
     
     # Filter sites
-    aqi <- filter(aqi, aqsid %in% site_list, Parameter %in% pollutant_list)
+    aqi <- filter(aqi, aqsid %in% site_list, Parameter %in% pollutants)
     
     # Join all
     all_results <- bind_rows(aqi, all_results)
