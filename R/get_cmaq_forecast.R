@@ -10,7 +10,7 @@ library(methods)
 
 get_cmaq_forecast <- function(lat, long, hour_gmt = NULL) {  
 
-  url       <- paste0('http://airquality.weather.gov/probe_aq_data.php?latitude=', lat, "&longitude=", long, '&Submit=Get+Guidance')
+  url       <- paste0('https://airquality.weather.gov/probe_aq_data.php?latitude=', lat, "&longitude=", long, '&Submit=Get+Guidance')
   
   noaa_web  <- read_html(url)
   
