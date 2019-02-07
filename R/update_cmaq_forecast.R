@@ -8,7 +8,6 @@ library(tidyr)
 library(methods)
 
 
-
 source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
 
 

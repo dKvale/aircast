@@ -122,6 +122,10 @@ closeAllConnections()
 airvis_df$Concentration <- ifelse(airvis_df$qc_flag > 5, NA, airvis_df$Concentration)
 
 
+# Drop concentrations > 300
+airvis_df$Concentration <- ifelse(airvis_df$Concentration > 300, NA, airvis_df$Concentration)
+
+
 # Clean AQS ID
 airvis_df$aqsid <- gsub("840", "", airvis_df$aqsid)
 
@@ -253,7 +257,8 @@ file_name <- paste0(Sys.Date() - 1, "_AQI_observed", ".csv")
 if(!file_name %in% list.files()) {
   
   write.csv(air_all[ , keep_columns], paste0(Sys.Date() - 1, "_AQI_observed", ".csv"), row.names = F)
-}
+
+  }
 
 
 
