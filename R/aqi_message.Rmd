@@ -619,8 +619,7 @@ o3_performance <- tall_o3 %>%
                         `new PM error ug/m3`     = mean_conc_diff,
                         `new PM bullseyes`       = bulls_eyes,
                         `new PM on target`       = near_misses) %>% 
-                 mutate(new_obs       
-                        = 1)
+                 mutate(new_obs                  = 1)
    
 
 # 
@@ -655,7 +654,7 @@ if (!weekend) {
                           
   } else {
     
-     if ("new O3 error ppb" %in% names(yest_board) &&  is.na(yest_board[lead_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board$new_obs[6] <- 0
+     if ("new O3 error ppb" %in% names(yest_board) &&  is.na(yest_board[lead_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board[6, "O3 Forecasts n"] <- 0
     
      lead_board <- lead_board %>% 
                      rowwise() %>%
@@ -692,12 +691,15 @@ if (!weekend) {
 
 } else {
   
+  yest_board <- yest_board %>% rename_all(str_remove, "new ")
+    
   if (ncol(yest_board) > 8) {
     
-    yest_board[1, c(4:6,9:11)] <- NA 
+     yest_board[1, c(4:6,9:11)] <- NA 
     
      # Yesterday's performance
-     yest_board <- select(yest_board, Model, 
+     yest_board <- yest_board %>%
+                   select(Model, 
                           `O3 error ppb`, `O3 on target`, `O3 bullseyes`, `O3 accuracy`, `O3 yellow accuracy`,   
                           `PM error ug/m3`, `PM on target`, `PM bullseyes`, `PM accuracy`, `PM yellow accuracy`)
         
