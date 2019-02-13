@@ -40,7 +40,7 @@ aqi_team <- c(paste0(c("dorian.kvale",
 # Set Pandoc location
 #Sys.setenv(RSTUDIO_PANDOC = "C:/Program Files/RStudio/bin/pandoc")
 
-Sys.setenv(RSTUDIO_PANDOC="C:/Users/dkvale/Documents/RStudio/bin/pandoc")
+Sys.setenv(RSTUDIO_PANDOC = "C:/Users/dkvale/Documents/RStudio/bin/pandoc")
 
 
 #-- Knit Rmarkdown document
