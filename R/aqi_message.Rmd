@@ -23,6 +23,10 @@ library(ggrepel)
 library(gridExtra)
 library(magrittr)
 
+# Save results?
+save_stats <- TRUE
+
+# Set No. of days before yesterday, 0 is default
 days_past <- 0
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
@@ -170,7 +174,9 @@ verify <- select(verify, short_name, group, aqs_id,
                  persist_ozone_aqi, roll_ozone_aqi, roll11_ozone_aqi, bb3_ozone_aqi,
                  count_pm25_obs, obs_pm25_ugm3, obs_pm25_aqi, fcst_pm25_aqi,
                  persist_pm25_aqi, roll_pm25_aqi, roll11_pm25_aqi, bb3_pm25_aqi,
-                 mod_max_avg8hr_ens:mod_aqi_pm_rf)
+                 mod_max_avg8hr_ens:mod_aqi_pm_superens,
+                 cmaq_prod_o3:cmaq_prod_pm_aqi) %>%
+           select(-contains("super"))
 
 
 names(verify)[1:3] <- c("Site", "Group", "AQS ID") 
@@ -192,38 +198,17 @@ verify$Group <- gsub("_", " ", verify$Group)
 
 #-- Select highest forecast per group
 verify_pm <- verify %>%
-              group_by(Group) %>%
+              group_by(Group, forecast_date) %>%
               arrange(-obs_pm25_ugm3) %>%
-              mutate(obs_ozone_ppb    = NA,
-                     obs_ozone_aqi    = NA,
-                     obs_pm25_ugm3    = max(obs_pm25_ugm3, na.rm = T),
-                     obs_pm25_aqi     = max(obs_pm25_aqi, na.rm = T),
-                     fcst_pm25_aqi    = max(fcst_pm25_aqi, na.rm = T),
-                     
-                     mod_aqi_pm_ens   = max(mod_aqi_pm_ens, na.rm = T),
-                     mod_aqi_pm_gb    = max(mod_aqi_pm_gb, na.rm = T),
-                     mod_aqi_pm_gen1  = max(mod_aqi_pm_gen1, na.rm = T),
-                     mod_aqi_pm_rf    = max(mod_aqi_pm_rf, na.rm = T),
-                     
-                     mod_pm25avg_ens   = max(mod_pm25avg_ens, na.rm = T),
-                     mod_pm25avg_gb    = max(mod_pm25avg_gb, na.rm = T),
-                     mod_pm25avg_gen1  = max(mod_pm25avg_gen1, na.rm = T),
-                     mod_pm25avg_rf    = max(mod_pm25avg_rf, na.rm = T),
-                     
-                     persist_pm25_aqi = max(persist_pm25_aqi, na.rm = T),
-                     roll_pm25_aqi    = max(roll_pm25_aqi , na.rm = T),
-                     roll11_pm25_aqi  = max(roll11_pm25_aqi, na.rm = T),
-                     bb3_pm25_aqi     = max(bb3_pm25_aqi, na.rm = T),
-                     count            = 1:n()) %>%
-             filter(count == 1) %>%
-             select(-count) %>%
-             ungroup()
+              mutate_if(is.numeric, max, na.rm = T) %>%
+              slice(1) %>%
+              ungroup()
 
 verify_pm <- rename(verify_pm,
                     `Ozone obs count` = count_ozone_obs,
                     `Ozone ppb`       = obs_ozone_ppb, 
                     `Ozone AQI`       = obs_ozone_aqi,
-                    `Ozone forecast`   = fcst_ozone_aqi,
+                    `Ozone forecast`  = fcst_ozone_aqi,
                     `CMAQ forecast`   = cmaq_ozone_aqi,
                     `PM2.5 obs count` = count_pm25_obs, 
                     `PM2.5 ug/m3`     = obs_pm25_ugm3, 
@@ -232,41 +217,18 @@ verify_pm <- rename(verify_pm,
 
 
 verify_o3 <- verify %>%
-              group_by(Group) %>%
+              group_by(Group, forecast_date) %>%
               arrange(-obs_ozone_ppb) %>%
-              mutate(obs_pm25_ugm3     = NA,
-                     obs_pm25_aqi      = NA,
-                     obs_ozone_ppb     = max(obs_ozone_ppb, na.rm = T),
-                     obs_ozone_aqi     = max(obs_ozone_aqi, na.rm = T),
-                     fcst_ozone_aqi    = max(fcst_ozone_aqi, na.rm = T),
-                     
-                     mod_aqi_o3_ens   = max(mod_aqi_o3_ens, na.rm = T),
-                     mod_aqi_o3_gb    = max(mod_aqi_o3_gb, na.rm = T),
-                     mod_aqi_o3_gen1  = max(mod_aqi_o3_gen1, na.rm = T),
-                     mod_aqi_o3_rf    = max(mod_aqi_o3_rf, na.rm = T),
-                     
-                     mod_max_avg8hr_ens   = max(mod_max_avg8hr_ens, na.rm = T),
-                     mod_max_avg8hr_gb    = max(mod_max_avg8hr_gb, na.rm = T),
-                     mod_max_avg8hr_gen1  = max(mod_max_avg8hr_gen1, na.rm = T),
-                     mod_max_avg8hr_rf    = max(mod_max_avg8hr_rf, na.rm = T),
-                     
-                     cmaq_ozone_aqi    = max(cmaq_ozone_aqi, na.rm = T),
-                     persist_ozone_aqi = max(persist_ozone_aqi, na.rm = T),
-                     roll_ozone_aqi    = max(roll_ozone_aqi, na.rm = T),
-                     roll11_ozone_aqi  = max(roll11_ozone_aqi, na.rm = T),
-                     bb3_ozone_aqi     = max(bb3_ozone_aqi, na.rm = T),
-                     count             = 1:n()) %>%
-             filter(count == 1) %>%
-             select(-count) %>%
-             ungroup()
-
+              mutate_if(is.numeric, max, na.rm = T) %>%
+              slice(1) %>%
+              ungroup()
 
 
 verify_o3 <- rename(verify_o3,
                     `Ozone obs count` = count_ozone_obs,
                     `Ozone ppb`       = obs_ozone_ppb, 
                     `Ozone AQI`       = obs_ozone_aqi,
-                    `Ozone forecast`   = fcst_ozone_aqi,
+                    `Ozone forecast`  = fcst_ozone_aqi,
                     `CMAQ forecast`   = cmaq_ozone_aqi,
                     `PM2.5 obs count` = count_pm25_obs, 
                     `PM2.5 ug/m3`     = obs_pm25_ugm3, 
@@ -283,7 +245,10 @@ verify_pm[verify_pm == -Inf] <- NA
 
 
 # Ozone table
-verify_o3 <- select(verify_o3, -c(`AQS ID`, `PM2.5 obs count`:bb3_pm25_aqi, mod_pm25avg_ens:mod_aqi_pm_rf)) %>% 
+verify_o3 <- select(verify_o3, -c(`AQS ID`, 
+                                  `PM2.5 obs count`:bb3_pm25_aqi, 
+                                  mod_pm25avg_ens:mod_aqi_pm_rf, 
+                                  contains("_pm"))) %>% 
              filter(!is.na(`Ozone forecast`), !is.na(`Ozone AQI`)) %>%
              arrange(-`Ozone AQI`)
 
@@ -296,12 +261,14 @@ names(verify_o3) <- gsub("_o3_", "_", names(verify_o3))
 
 
 # PM2.5 table
-verify_pm <- select(verify_pm, c(Site, Group, `PM2.5 obs count`:bb3_pm25_aqi, mod_pm25avg_ens:mod_aqi_pm_rf)) %>% 
+verify_pm <- select(verify_pm, c(Site, Group, 
+                                 `PM2.5 obs count`:bb3_pm25_aqi, 
+                                 mod_pm25avg_ens:mod_aqi_pm_rf,
+                                 contains("_pm"))) %>% 
              filter(!is.na(`PM2.5 forecast`), !is.na(`PM2.5 AQI`)) %>%
              arrange(-`PM2.5 AQI`)
 
 names(verify_pm)[c(3:6,11)]  <- c("Obs count", "conc", "Obs AQI", "MPCA forecast", "Model output")
-
 
 names(verify_pm) <- gsub("pm25avg", "conc", names(verify_pm))
 
@@ -310,45 +277,46 @@ names(verify_pm) <- gsub("_pm_", "_", names(verify_pm))
 
 # Plot accuracy
 # Flip to tall table
-tall_o3 <- tidyr::gather(data  = select(verify_o3, -c(conc, `Model output`:mod_conc_gen1)),
+tall_pm <- tidyr::gather(select(verify_pm, -c(conc, `Model output`:mod_conc_ab)),
                          key   = model, 
                          value = aqi, 
                          na.rm = FALSE, 
-                         `Obs AQI`:bb3_ozone_aqi, mod_aqi_ens:mod_aqi_rf)
+                         `Obs AQI`:names(verify_pm)[length(names(verify_pm))])
 
 
-tall_pm <- tidyr::gather(data  = select(verify_pm, -c(conc, `Model output`:mod_conc_gen1)),
+tall_o3 <- tidyr::gather(select(verify_o3, -c(conc, `Model output`:mod_conc_ab)),
                          key   = model, 
                          value = aqi, 
                          na.rm = FALSE, 
-                         `Obs AQI`:bb3_pm25_aqi, mod_aqi_ens:mod_aqi_rf)
+                         `Obs AQI`:names(verify_o3)[length(names(verify_o3))])
 
 
 # Set colors
-tall_o3 <- tall_o3 %>% 
-           rowwise() %>%
-           mutate(background_color = aqi2color(aqi))
-
-tall_pm <- tall_pm %>% 
-           rowwise() %>%
-           mutate(background_color = aqi2color(aqi))
-
 # Convert to concentration
-tall_o3 <- tall_o3 %>% 
-           rowwise() %>% 
-           mutate(conc = aqi2conc(aqi, "OZONE")) %>%
-           group_by(Site) %>%
-           mutate(`conc_diff (ppb)` = conc - conc[model == "Obs AQI"],
-                  fcst_correct = identical(background_color[model == "Obs AQI"], background_color[model == "MPCA forecast"]))
-        
-
 tall_pm <- tall_pm %>% 
-           rowwise() %>% 
-           mutate(conc = aqi2conc(aqi, "PM25")) %>%
+            rowwise() %>%
+            mutate(background_color = aqi2color(aqi),
+                   conc             = aqi2conc(aqi, "PM25"))
+
+tall_o3 <- tall_o3 %>% 
+            rowwise() %>%
+            mutate(background_color = aqi2color(aqi),
+                   conc             = aqi2conc(aqi, "OZONE"))
+
+
+# Calculate model-monitor concentration difference
+tall_pm <- tall_pm %>% 
            group_by(Site) %>%
            mutate(`conc_diff (ug/m3)` = conc - conc[model == "Obs AQI"],
-                  fcst_correct = identical(background_color[model == "Obs AQI"], background_color[model == "MPCA forecast"]))
-            
+                  fcst_correct        = identical(background_color[model == "Obs AQI"], 
+                                                  background_color[model == "MPCA forecast"]))
+
+tall_o3 <- tall_o3 %>% 
+           group_by(Site) %>%
+           mutate(`conc_diff (ppb)` = conc - conc[model == "Obs AQI"],
+                  fcst_correct      = identical(background_color[model == "Obs AQI"], 
+                                                background_color[model == "MPCA forecast"]))
+        
 ```
   
   
@@ -366,13 +334,16 @@ tall_pm$Site <- factor(tall_pm$Site, levels = rev(arrange(filter(tall_pm, model 
 verify_o3 <-  verify_o3 %>%
               rowwise() %>%
               mutate(pollutant        = "Ozone",
-                     background_color = aqi2color(`Obs AQI`))
-
+                     background_color = aqi2color(`Obs AQI`)) %>%
+              rename(cmaq_prod_conc   = cmaq_prod_o3,
+                     cmaq_bc_conc     = cmaq_bc_o3)
 
 verify_pm <-  verify_pm %>%
               rowwise() %>%
               mutate(pollutant = "PM2.5",
-                     background_color = aqi2color(`Obs AQI`))
+                     background_color = aqi2color(`Obs AQI`)) %>%
+              rename(cmaq_prod_conc   = cmaq_prod_pm,
+                     cmaq_bc_conc     = cmaq_bc_pm)
                      
 if(nrow(verify_o3) < 1) {
   
@@ -382,7 +353,7 @@ if(nrow(verify_o3) < 1) {
   
   verify_all <- bind_rows(verify_o3[0, ], verify_pm)
   
-} else {verify_all <- bind_rows(verify_o3, verify_pm)}
+} else { verify_all <- bind_rows(verify_o3, verify_pm) }
   
 
 verify_all <- verify_all %>%
@@ -492,7 +463,7 @@ verify_pm$background_color <- NULL
 #                         `PM accuracy %`  = c(100,100,100),
 #                         `O3 error ppb`    = c(5,5,5),
 #                         `PM error ug/m3`  = c(1,1,1),
-#                         `Forecasts n`    = c(0,0,0)) 
+#                         `PM Forecasts`    = c(0,0,0)) 
                              
 
 # Load past results
@@ -512,6 +483,9 @@ if (class(lead_board) == "try-error") {
    
 }
 
+names(lead_board) <- gsub("Forecasts n", "Forecasts", names(lead_board))
+
+names(lead_board)[12] <- "PM Forecasts"
 
 # New performance metrics
 pm_performance <- tall_pm %>%
@@ -544,7 +518,9 @@ model_names <- data_frame(Model = c(
                             "Farmer Weeks", 
                             "Persistant Assistant",
                             "J.K. Rollings",
-                            "BB3 Blender"),
+                            "BB3 Blender",
+                            "CMAQ 6z",
+                            "CMAQ 6z beta+"),
                           model_o3 = c(
                             "MPCA forecast",
                             "mod_aqi_gen1",
@@ -555,7 +531,9 @@ model_names <- data_frame(Model = c(
                             "roll11_ozone_aqi",
                             "persist_ozone_aqi",
                             "roll_ozone_aqi", 
-                            "bb3_ozone_aqi"),
+                            "bb3_ozone_aqi",
+                            "cmaq_prod_o3",
+                            "cmaq_bc_o3"),
                           model_pm = c(
                             "MPCA forecast",
                             "mod_aqi_gen1",
@@ -566,7 +544,9 @@ model_names <- data_frame(Model = c(
                             "roll11_pm25_aqi",
                             "persist_pm25_aqi",
                             "roll_pm25_aqi", 
-                            "bb3_pm25_aqi"))
+                            "bb3_pm25_aqi",
+                            "cmaq_prod_aqi",
+                            "cmaq_bc_aqi"))
                           
 if(nrow(tall_o3) > 0) {
   
@@ -621,7 +601,6 @@ o3_performance <- tall_o3 %>%
                         `new PM on target`       = near_misses) %>% 
                  mutate(new_obs                  = 1)
    
-
 # 
 }
 
@@ -635,26 +614,28 @@ if (!weekend) {
   # Don't update Ozone in winter
   if (!ozone_season) {
     
-     lead_board$new_obs[6] <- 0
+     #lead_board$new_obs[6] <- 0
     
      lead_board <- lead_board %>% 
                    rowwise() %>%
-                   mutate(`Forecasts n`    = sum(`Forecasts n`, new_obs, na.rm = T),
+                   mutate(new_obs           = !is.na(`new PM error ug/m3`),
                           
-                          `PM cat accuracy %`  = sum(`PM cat accuracy %` * (`Forecasts n` - new_obs), `new PM accuracy` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T),
+                          `PM Forecasts`    = sum(`PM Forecasts`, new_obs, na.rm = T),
                           
-                       `PM yellow accuracy %` = ifelse(is.na(`new PM yellow accuracy`), `PM yellow accuracy %`, sum( `PM yellow accuracy %` * (`Forecasts n` - new_obs), `new PM yellow accuracy` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T)),
+                          `PM cat accuracy %`  = sum(`PM cat accuracy %` * (`PM Forecasts` - new_obs), `new PM accuracy` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T),
                           
-                          `PM bullseyes %` = sum(`PM bullseyes %` * (`Forecasts n` - new_obs), `new PM bullseyes` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T),
+                       `PM yellow accuracy %` = ifelse(is.na(`new PM yellow accuracy`), `PM yellow accuracy %`, sum( `PM yellow accuracy %` * (`PM Forecasts` - new_obs), `new PM yellow accuracy` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T)),
                           
-                          `PM on target %` = sum(`PM on target %` * (`Forecasts n` - new_obs), `new PM on target` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T),
+                          `PM bullseyes %` = sum(`PM bullseyes %` * (`PM Forecasts` - new_obs), `new PM bullseyes` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T),
+                          
+                          `PM on target %` = sum(`PM on target %` * (`PM Forecasts` - new_obs), `new PM on target` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T),
 
-                          `PM error ug/m3`  = sum(`PM error ug/m3` * (`Forecasts n` - new_obs), `new PM error ug/m3` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T))
+                          `PM error ug/m3`  = sum(`PM error ug/m3` * (`PM Forecasts` - new_obs), `new PM error ug/m3` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T))
     
                           
   } else {
     
-     if ("new O3 error ppb" %in% names(yest_board) &&  is.na(yest_board[lead_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board[6, "O3 Forecasts n"] <- 0
+     if ("new O3 error ppb" %in% names(yest_board) &&  is.na(yest_board[lead_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board[6, "O3 Forecasts"] <- 0
     
      lead_board <- lead_board %>% 
                      rowwise() %>%
@@ -663,28 +644,33 @@ if (!weekend) {
                             `O3 on target %`       = `O3 on target %` %>% as.numeric(),
                             `O3 cat accuracy %`    = `O3 cat accuracy %` %>% as.numeric(),
                             `O3 yellow accuracy %` = `O3 yellow accuracy %` %>% as.numeric()) %>%
-                     mutate(`Forecasts n`    = sum(`Forecasts n`, new_obs, na.rm = T),
-                            `O3 Forecasts n` = sum(`O3 Forecasts n`, new_obs, na.rm = T),
+                     mutate(new_obs        = !is.na(`new PM error ug/m3`),
+                            
+                            `PM Forecasts` = sum(`PM Forecasts`, new_obs , na.rm = T),
                           
-                            `PM cat accuracy %`  = sum(`PM cat accuracy %` * (`Forecasts n` - new_obs), `new PM accuracy` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T),
+                            `PM cat accuracy %`  = sum(`PM cat accuracy %` * (`PM Forecasts` - new_obs), `new PM accuracy` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T),
                        
-                            `PM yellow accuracy %` = ifelse(is.na(`new PM yellow accuracy`), `PM yellow accuracy %`, sum( `PM yellow accuracy %` * (`Forecasts n` - new_obs), `new PM yellow accuracy` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T)),
+                            `PM yellow accuracy %` = ifelse(is.na(`new PM yellow accuracy`), `PM yellow accuracy %`, sum( `PM yellow accuracy %` * (`PM Forecasts` - new_obs), `new PM yellow accuracy` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T)),
                           
-                            `PM bullseyes %` = sum(`PM bullseyes %` * (`Forecasts n` - new_obs), `new PM bullseyes` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T),
+                            `PM bullseyes %` = sum(`PM bullseyes %` * (`PM Forecasts` - new_obs), `new PM bullseyes` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T),
                           
-                            `PM on target %` = sum(`PM on target %` * (`Forecasts n` - new_obs), `new PM on target` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T),
+                            `PM on target %` = sum(`PM on target %` * (`PM Forecasts` - new_obs), `new PM on target` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T),
 
-                            `PM error ug/m3`  = sum(`PM error ug/m3` * (`Forecasts n` - new_obs), `new PM error ug/m3` * new_obs, na.rm = T) / max(1, `Forecasts n`, na.rm = T),
+                            `PM error ug/m3`  = sum(`PM error ug/m3` * (`PM Forecasts` - new_obs), `new PM error ug/m3` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T),
+                            
+                            new_obs        = !is.na(`new O3 error ug/m3`),
+                            
+                            `O3 Forecasts` = sum(`O3 Forecasts`, new_obs, na.rm = T),
                           
-                            `O3 cat accuracy %`  = sum(`O3 cat accuracy %` * (`O3 Forecasts n` - new_obs), `new O3 accuracy` * new_obs, na.rm = T) / max(1, `O3 Forecasts n`, na.rm = T),
+                            `O3 cat accuracy %`  = sum(`O3 cat accuracy %` * (`O3 Forecasts` - new_obs), `new O3 accuracy` * new_obs, na.rm = T) / max(1, `O3 Forecasts`, na.rm = T),
                        
-                            `O3 yellow accuracy %` = ifelse(is.na(`new O3 yellow accuracy`), `O3 yellow accuracy %`, sum(`O3 yellow accuracy %` * (`O3 Forecasts n` - new_obs), `new O3 yellow accuracy` * new_obs, na.rm = T) / max(1, `O3 Forecasts n`, na.rm = T)),
+                            `O3 yellow accuracy %` = ifelse(is.na(`new O3 yellow accuracy`), `O3 yellow accuracy %`, sum(`O3 yellow accuracy %` * (`O3 Forecasts` - new_obs), `new O3 yellow accuracy` * new_obs, na.rm = T) / max(1, `O3 Forecasts`, na.rm = T)),
                           
-                            `O3 bullseyes %` = sum(`O3 bullseyes %` * (`O3 Forecasts n` - new_obs), `new O3 bullseyes` * new_obs, na.rm = T) / max(1, `O3 Forecasts n`, na.rm = T),
+                            `O3 bullseyes %` = sum(`O3 bullseyes %` * (`O3 Forecasts` - new_obs), `new O3 bullseyes` * new_obs, na.rm = T) / max(1, `O3 Forecasts`, na.rm = T),
                           
-                            `O3 on target %` = sum(`O3 on target %` * (`O3 Forecasts n` - new_obs), `new O3 on target` * new_obs, na.rm = T) / max(1, `O3 Forecasts n`, na.rm = T),
+                            `O3 on target %` = sum(`O3 on target %` * (`O3 Forecasts` - new_obs), `new O3 on target` * new_obs, na.rm = T) / max(1, `O3 Forecasts`, na.rm = T),
 
-                            `O3 error ppb`  = sum(`O3 error ppb` * (`O3 Forecasts n` - new_obs), `new O3 error ppb` * new_obs, na.rm = T) / max(1, `O3 Forecasts n`, na.rm = T))
+                            `O3 error ppb`  = sum(`O3 error ppb` * (`O3 Forecasts` - new_obs), `new O3 error ppb` * new_obs, na.rm = T) / max(1, `O3 Forecasts`, na.rm = T))
      
   }
 
@@ -808,22 +794,25 @@ names(yest_board) <- gsub("O3 ", "", names(yest_board)) %>%
 
 
 # Total running performance
-lead_board[lead_board$Model == "CMAQ", "Forecasts n"] <- 0
+lead_board[lead_board$Model == "CMAQ", "PM Forecasts"] <- 0
 
 lead_board <- select(lead_board, Model, 
                      `O3 error ppb`, `O3 on target %`, `O3 bullseyes %`, 
                      `O3 cat accuracy %`, `O3 yellow accuracy %`,
                      `PM error ug/m3`, `PM on target %`, `PM bullseyes %`, 
                      `PM cat accuracy %`, `PM yellow accuracy %`, 
-                     `Forecasts n`, `O3 Forecasts n`)
+                     `PM Forecasts`, `O3 Forecasts`)
 
 
+if (save_stats) {
+  
 # Archive updated performance
 write_csv(lead_board, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification/lead_board.csv")
 
 # Backup file
 write_csv(lead_board, paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification/Archive leaders/", Sys.Date(), "-lead_board.csv"))
 
+}
 
 # Round decimals places
 lead_board <- lead_board %>% 
@@ -952,7 +941,7 @@ verify_all <- select(verify_all,
                      pollutant:background_color, 
                      `Obs conc`:`MPCA conc`, 
                      `Model output`:mod_conc_gen1,
-                     `CMAQ conc`)
+                     `CMAQ conc`, cmaq_prod_conc, cmaq_bc_conc)
 
 names(verify_all) <- c("Site", "Group", "Obs count", "Obs AQI", "MPCA AQI", 
                        "Ensemble AQI", "GradBoost AQI", "Robot AQI", 
@@ -961,7 +950,7 @@ names(verify_all) <- c("Site", "Group", "Obs count", "Obs AQI", "MPCA AQI",
                        "pollutant", "background_color", 
                        "Monitored", "MPCA", 
                        "Ensemble", "Big RF", "GradBoost", "Robot", 
-                       "CMAQ")
+                       "CMAQ", "CMAQ 6z", "CMAQ 6z beta+")
 
 
 # Drop model output value unless different than MPCA forecast
@@ -979,7 +968,9 @@ verify_o3 <- formattable(filter(verify_all, pollutant == "Ozone")[ , -c(2,4:12)]
                               `Big RF`    = col_mon_format(15, "ozone"),
                               `GradBoost` = col_mon_format(15, "ozone"),
                               `Robot`     = col_mon_format(15, "ozone"),
-                              `CMAQ`      = col_mon_format(15, "ozone")),
+                              `CMAQ`      = col_mon_format(15, "ozone"),
+                              `CMAQ 6z`   = col_mon_format(15, "ozone"),
+                              `CMAQ 6z beta+` = col_mon_format(15, "ozone")),
                           align = c("l","l","l","l","l","l","l"), digits = 1, format = "html")
 
 saveRDS(verify_o3, "o3_table.rdata")
@@ -994,7 +985,9 @@ verify_pm <- formattable(filter(verify_all, pollutant == "PM2.5")[ , -c(2,4:12,1
                               `Ensemble`  = col_mon_format(15, "pm25"),
                               `Big RF`    = col_mon_format(15, "pm25"),
                               `GradBoost` = col_mon_format(15, "pm25"),
-                              `Robot`     = col_mon_format(15, "pm25")),
+                              `Robot`     = col_mon_format(15, "pm25"),
+                              `CMAQ 6z`   = col_mon_format(15, "pm25"),
+                              `CMAQ 6z beta+` = col_mon_format(15, "pm25")),
                           align = c("l","l","l","l","l","l","l","l","l"), digits = 1, format = "html")
 
 saveRDS(verify_pm, "pm_table.rdata")
@@ -1161,25 +1154,43 @@ if (weekend) { cat('<br> _Note: Some of MPCA&#39;s forecasts only predicted AQI 
   
 ### Overall model performance for next-day forecasts
 
-<div style="margin-top: -11px; margin-left: 24px;">
+
+#### PM2.5
+
+<div style="margin-top: -10px; margin-left: 24px;">
 ```{r, echo = F, warning = F, message = F}
 #Dr-Robot is getting smarter everyday.
 lead_board <- readRDS('leader_board.rdata') 
 
 #lead_board[1, 1] <- "MPCA Team" 
 pm_board <- subset(lead_board, Pollutant == "PM25") %>%
-            rename(`Error ugm3` = `Error ugm3|ppb`)
+            rename(`Error ugm3` = `Error ugm3|ppb`) %>%
+            select(-Pollutant)
 
 pm_board
 ```
 
+</div>
 
-<p style="margin-top: 12px;"></p>
+
+<p style="margin-top: 8px;"></p>
+```{r echo=F, warning=F, message=F, results="asis"}
+if (ozone_season) {
+
+  cat('#### Ozone')  
+
+}
+
+```
+
+
+<div style="margin-top: -10px; margin-left: 24px;">
 ```{r, echo = F, warning = F, message = F}
 if (ozone_season) {
   
   o3_board <- subset(lead_board, Pollutant == "Ozone") %>%
-              rename(`Error ppb` = `Error ugm3|ppb`)
+              rename(`Error ppb` = `Error ugm3|ppb`) %>%
+              select(-Pollutant)
 
 o3_board
 }
