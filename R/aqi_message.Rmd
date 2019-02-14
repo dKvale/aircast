@@ -24,7 +24,7 @@ library(gridExtra)
 library(magrittr)
 
 # Save results?
-save_stats <- TRUE
+save_stats <- FALSE
 
 # Set No. of days before yesterday, 0 is default
 days_past <- 0
@@ -196,9 +196,13 @@ verify$Site  <- gsub("_", " ", verify$Site)
 verify$Group <- gsub("_", " ", verify$Group)
 
 
+# Drop CMAQ beta+
+verify <- select(verify, -contains("_bc_"))
+
+
 #-- Select highest forecast per group
 verify_pm <- verify %>%
-              group_by(Group, forecast_date) %>%
+              group_by(Group) %>%
               arrange(-obs_pm25_ugm3) %>%
               mutate_if(is.numeric, max, na.rm = T) %>%
               slice(1) %>%
@@ -217,7 +221,7 @@ verify_pm <- rename(verify_pm,
 
 
 verify_o3 <- verify %>%
-              group_by(Group, forecast_date) %>%
+              group_by(Group) %>%
               arrange(-obs_ozone_ppb) %>%
               mutate_if(is.numeric, max, na.rm = T) %>%
               slice(1) %>%
@@ -242,6 +246,8 @@ verify <- bind_rows(verify_pm, verify_o3)
 verify[verify == -Inf]       <- NA
 verify_o3[verify_o3 == -Inf] <- NA
 verify_pm[verify_pm == -Inf] <- NA
+
+
 
 
 # Ozone table
@@ -335,15 +341,15 @@ verify_o3 <-  verify_o3 %>%
               rowwise() %>%
               mutate(pollutant        = "Ozone",
                      background_color = aqi2color(`Obs AQI`)) %>%
-              rename(cmaq_prod_conc   = cmaq_prod_o3,
-                     cmaq_bc_conc     = cmaq_bc_o3)
+              rename(cmaq_prod_conc   = cmaq_prod_o3)
+                     #cmaq_bc_conc     = cmaq_bc_o3)
 
 verify_pm <-  verify_pm %>%
               rowwise() %>%
               mutate(pollutant = "PM2.5",
                      background_color = aqi2color(`Obs AQI`)) %>%
-              rename(cmaq_prod_conc   = cmaq_prod_pm,
-                     cmaq_bc_conc     = cmaq_bc_pm)
+              rename(cmaq_prod_conc   = cmaq_prod_pm)
+                     #cmaq_bc_conc     = cmaq_bc_pm)
                      
 if(nrow(verify_o3) < 1) {
   
@@ -487,6 +493,11 @@ names(lead_board) <- gsub("Forecasts n", "Forecasts", names(lead_board))
 
 names(lead_board)[12] <- "PM Forecasts"
 
+
+# Drop CMAQ beta+
+lead_board <- filter(lead_board, !grepl("z beta", Model))
+
+
 # New performance metrics
 pm_performance <- tall_pm %>%
                      group_by(Site) %>%
@@ -519,8 +530,8 @@ model_names <- data_frame(Model = c(
                             "Persistant Assistant",
                             "J.K. Rollings",
                             "BB3 Blender",
-                            "CMAQ 6z",
-                            "CMAQ 6z beta+"),
+                            "CMAQ 6z"),
+                            #"CMAQ 6z beta+"),
                           model_o3 = c(
                             "MPCA forecast",
                             "mod_aqi_gen1",
@@ -532,8 +543,8 @@ model_names <- data_frame(Model = c(
                             "persist_ozone_aqi",
                             "roll_ozone_aqi", 
                             "bb3_ozone_aqi",
-                            "cmaq_prod_o3",
-                            "cmaq_bc_o3"),
+                            "cmaq_prod_o3"),
+                            #"cmaq_bc_o3"),
                           model_pm = c(
                             "MPCA forecast",
                             "mod_aqi_gen1",
@@ -545,8 +556,8 @@ model_names <- data_frame(Model = c(
                             "persist_pm25_aqi",
                             "roll_pm25_aqi", 
                             "bb3_pm25_aqi",
-                            "cmaq_prod_aqi",
-                            "cmaq_bc_aqi"))
+                            "cmaq_prod_aqi"))
+                            #"cmaq_bc_aqi"))
                           
 if(nrow(tall_o3) > 0) {
   
@@ -941,7 +952,7 @@ verify_all <- select(verify_all,
                      pollutant:background_color, 
                      `Obs conc`:`MPCA conc`, 
                      `Model output`:mod_conc_gen1,
-                     `CMAQ conc`, cmaq_prod_conc, cmaq_bc_conc)
+                     `CMAQ conc`, cmaq_prod_conc) #cmaq_bc_conc)
 
 names(verify_all) <- c("Site", "Group", "Obs count", "Obs AQI", "MPCA AQI", 
                        "Ensemble AQI", "GradBoost AQI", "Robot AQI", 
@@ -950,7 +961,7 @@ names(verify_all) <- c("Site", "Group", "Obs count", "Obs AQI", "MPCA AQI",
                        "pollutant", "background_color", 
                        "Monitored", "MPCA", 
                        "Ensemble", "Big RF", "GradBoost", "Robot", 
-                       "CMAQ", "CMAQ 6z", "CMAQ 6z beta+")
+                       "CMAQ", "CMAQ 6z") # "CMAQ 6z beta+")
 
 
 # Drop model output value unless different than MPCA forecast
