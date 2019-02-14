@@ -329,8 +329,12 @@ hys <- bind_rows(hys, missing[ , names(missing)[names(missing) %in% names(hys)]]
 hys$traj_hours <- paste(hys$forecast_day, paste0(-hys$traj_hours, "hrs"), sep = "_")
 
 hys_mean <- group_by(hys, site_catid, parcel_date, traj_hours, hour) %>%
-            summarise(mean_Ozone_Noon_ppb = mean(wtd_Ozone_Noon_ppb, na.rm = T),
-                      mean_pm25_Noon      = mean(wtd_pm25_Noon, na.rm = T)) %>%
+            summarise(mean_Ozone_Noon_ppb      = mean(wtd_Ozone_Noon_ppb, na.rm = T),
+                      mean_Ozone_Noon_ppb_10m  = mean(wtd_Ozone_Noon_ppb[receptor_height == 10], na.rm = T),
+                      mean_Ozone_Noon_ppb_500m = mean(wtd_Ozone_Noon_ppb[receptor_height == 500], na.rm = T),
+                      mean_pm25_Noon      = mean(wtd_pm25_Noon, na.rm = T),
+                      mean_pm25_Noon_10m  = mean(wtd_pm25_Noon[receptor_height == 10], na.rm = T),
+                      mean_pm25_Noon_500m = mean(wtd_pm25_Noon[receptor_height == 500], na.rm = T)) %>%
             ungroup()
 
 
@@ -338,15 +342,36 @@ group_by(hys_mean, site_catid, traj_hours) %>% summarize(count = n()) %>% .$coun
 
 
 #-- Wide format
-hys_o3  <- spread(select(hys_mean, -parcel_date, -mean_pm25_Noon), traj_hours, mean_Ozone_Noon_ppb)
 
-hys_pm  <- spread(select(hys_mean, -parcel_date, -mean_Ozone_Noon_ppb), traj_hours, mean_pm25_Noon)
-
-
+# Ozone
+hys_o3  <- spread(select(hys_mean, -c(parcel_date, mean_Ozone_Noon_ppb_10m:mean_pm25_Noon_500m)), traj_hours, mean_Ozone_Noon_ppb)
 names(hys_o3)[3:ncol(hys_o3)]  <- paste0(names(hys_o3)[3:ncol(hys_o3)], "_mean_backgr_ozone")
+
+hys_o3_10m <- spread(select(hys_mean, -c(parcel_date, mean_Ozone_Noon_ppb, mean_Ozone_Noon_ppb_500m:mean_pm25_Noon_500m)), traj_hours, mean_Ozone_Noon_ppb_10m)
+names(hys_o3_10m)[3:ncol(hys_o3_10m)]  <- paste0(names(hys_o3_10m)[3:ncol(hys_o3_10m)], "_backgr_ozone_10m")
+
+hys_o3_500m <- spread(select(hys_mean, -c(parcel_date, mean_Ozone_Noon_ppb, mean_Ozone_Noon_ppb_10m, mean_pm25_Noon:mean_pm25_Noon_500m)), traj_hours, mean_Ozone_Noon_ppb_500m)
+names(hys_o3_500m)[3:ncol(hys_o3_500m)]  <- paste0(names(hys_o3_500m)[3:ncol(hys_o3_500m)], "_backgr_ozone_500m")
+
+
+# PM2.5
+hys_pm  <- spread(select(hys_mean, -c(parcel_date, mean_Ozone_Noon_ppb:mean_Ozone_Noon_ppb_500m, mean_pm25_Noon_10m:mean_pm25_Noon_500m)), traj_hours, mean_pm25_Noon)
 names(hys_pm)[3:ncol(hys_pm)]  <- paste0(names(hys_pm)[3:ncol(hys_pm)], "_mean_backgr_pm25")
 
-hys_wide <- left_join(hys_o3, hys_pm)
+hys_pm_10m <- spread(select(hys_mean, -c(parcel_date, mean_Ozone_Noon_ppb:mean_pm25_Noon, mean_pm25_Noon_500m)), traj_hours, mean_pm25_Noon_10m)
+names(hys_pm_10m)[3:ncol(hys_pm_10m)]  <- paste0(names(hys_pm_10m)[3:ncol(hys_pm_10m)], "_backgr_pm25_10m")
+
+hys_pm_500m <- spread(select(hys_mean, -c(parcel_date, mean_Ozone_Noon_ppb:mean_pm25_Noon_10m)), traj_hours, mean_pm25_Noon_500m)
+names(hys_pm_500m)[3:ncol(hys_pm_500m)]  <- paste0(names(hys_pm_500m)[3:ncol(hys_pm_500m)], "_backgr_pm25_500m")
+
+
+
+# Combine all
+hys_wide <- left_join(hys_o3, hys_pm) %>%
+            left_join(hys_pm_10m) %>%
+            left_join(hys_o3_10m) %>%
+            left_join(hys_pm_500m) %>%
+            left_join(hys_o3_500m) 
 
 hys_wide$row_id <- 1:nrow(hys_wide)
 
