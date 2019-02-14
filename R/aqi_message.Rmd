@@ -24,7 +24,7 @@ library(gridExtra)
 library(magrittr)
 
 # Save results?
-save_stats <- FALSE
+save_stats <- TRUE
 
 # Set No. of days before yesterday, 0 is default
 days_past <- 0
