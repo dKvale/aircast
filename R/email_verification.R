@@ -113,6 +113,30 @@ for(i in aqi_team) {
   }
 }
  
-#write.csv(data.frame(x = 5), "email_sent.csv")      
 
+# Update Github table
+
+# filter verification to last 7 days
+verify <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/verification_table2.csv")
+
+verify <- filter(verify, forecast_date > (Sys.Date() - 8), (forecast_day == 1) | (forecast_date > Sys.Date()))
+
+write_csv(verify, "../data/model_performance.csv")
+
+# Create git commands
+git <- "X: & CD X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/ & git "
+
+commit <- paste0(git, 'commit -m ', '"update obs"', ' "data\\model_performance.csv"')
+
+
+# Add account credentials
+system(paste0(git, "config --global user.name dkvale"))
+
+system(paste0(git, "config --global user.email ", creds$email))
+
+push <- paste0(commit, " & git push -f origin master")
+
+system(commit)
+
+system(push)
 ##
