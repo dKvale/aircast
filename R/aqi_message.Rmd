@@ -1114,6 +1114,8 @@ cat('</div> \n')
 ```{r, echo = F, warning = F, message = F}
 yest_board <- readRDS('yesterday_board.rdata')
 
+yest_board <- yest_board %>% subset(!Model %in% c("Farmer Weeks", "Persistant Assistant"))
+
 ```
 
 ```{r echo=F, warning=F, message=F, results="asis"}
@@ -1147,7 +1149,7 @@ if (ozone_season) {
 ```{r, echo = F, warning = F, message = F}
 
 if (ozone_season) {
-
+  
   yest_board[ , c(1, 7:11)]
   
 } 
@@ -1172,6 +1174,8 @@ if (weekend) { cat('<br> _Note: Some of MPCA&#39;s forecasts only predicted AQI 
 ```{r, echo = F, warning = F, message = F}
 #Dr-Robot is getting smarter everyday.
 lead_board <- readRDS('leader_board.rdata') 
+
+lead_board <- lead_board %>% subset(!Model %in% c("Farmer Weeks", "Persistant Assistant"))
 
 #lead_board[1, 1] <- "MPCA Team" 
 pm_board <- subset(lead_board, Pollutant == "PM25") %>%
