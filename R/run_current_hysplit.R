@@ -7,6 +7,9 @@ library(tidyr)
 library(here)
 
 
+# Set elevated trajectory height
+elev_ht <- 500
+
 source(paste0(aircast_path, "R/hysplit_traj.R"))
 source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
 
@@ -106,7 +109,7 @@ back_forecast <- aqi_traj(date = today, receptor_height = 10, traj_hours = 24)
 end.time <- Sys.time()
 end.time - start.time
 
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today, receptor_height = 500, traj_hours = 24))
+back_forecast <- bind_rows(back_forecast, aqi_traj(date = today, receptor_height = elev_ht, traj_hours = 24))
 
 # Tomorrow
 forecast_day  <- "day1"
@@ -129,8 +132,8 @@ if (is.na(day1)) {
 # Join
 back_forecast <- bind_rows(back_forecast, day1)
 
-# 500 meter background
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 1, receptor_height = 500, traj_hours = 24))
+# Elevated background
+back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 1, receptor_height = elev_ht, traj_hours = 24))
 
 
 # 2 days ahead
@@ -141,7 +144,7 @@ met_list      <- c("__today/hysplit.t12z.namf", "__today/hysplit.t12z.nama", "__
 met_list      <- met_list[min_exists(met_list)]
 
 back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 2, receptor_height = 10, traj_hours = 48))
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 2, receptor_height = 500, traj_hours = 48))
+back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 2, receptor_height = elev_ht, traj_hours = 48))
 
 # 3 days ahead
 forecast_day  <- "day3"
@@ -149,11 +152,11 @@ forecast_day  <- "day3"
 back_forecast <- bind_rows(back_forecast, 
                            aqi_traj(date = today + 3, receptor_height = 10, traj_hours = 72))
 
-day3_500m     <- aqi_traj(date = today + 3, receptor_height = 500, traj_hours = 72)
+day3_elev     <- aqi_traj(date = today + 3, receptor_height = elev_ht, traj_hours = 72)
 
-back_forecast <- bind_rows(back_forecast, day3_500m)
+back_forecast <- bind_rows(back_forecast, day3_elev)
 
-#back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 3, receptor_height = 500, traj_hours = 72))
+#back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 3, receptor_height = elev_ht, traj_hours = 72))
 
 
 # Filter to start location
