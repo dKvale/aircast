@@ -88,7 +88,7 @@ for (i in 0:4) {
   # Select Day 1 or next most recent forecast for yesterday
   aqi_forc <- filter(aqi_forc,
                      is_forecast == "F",
-                     DayIndex >= 0,
+                     DayIndex > 0,
                      Date >= Sys.Date() - 1)
 
   # Check for results
