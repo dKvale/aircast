@@ -121,7 +121,7 @@ verify <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluat
 
 verify <- filter(verify, forecast_date > (Sys.Date() - 8), (forecast_day == 1) | (forecast_date > Sys.Date()))
 
-write_csv(verify, "../data/model_performance.csv")
+write_csv(verify, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/data/model_performance.csv")
 
 # Create git commands
 git <- "X: & CD X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/ & git "
@@ -130,13 +130,13 @@ commit <- paste0(git, 'commit -m ', '"update obs"', ' "data\\model_performance.c
 
 
 # Add account credentials
-system(paste0(git, "config --global user.name dkvale"))
+system(paste0(git, "config --global user.name dkvale"), show.output.on.console = T, invisible = F)
 
-system(paste0(git, "config --global user.email ", creds$email))
+system(paste0(git, "config --global user.email ", creds$email), show.output.on.console = T, invisible = F)
 
 push <- paste0(commit, " & git push -f origin master")
 
-system(commit)
+#system(commit)
 
-system(push)
+shell(push)
 ##
