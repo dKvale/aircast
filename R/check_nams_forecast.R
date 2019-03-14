@@ -58,7 +58,7 @@ if(!min_exists("hysplit.t12z.namsa", min_size = 1.1E+9)) {
 }
 
 # NAMsf
-if(!min_exists("hysplit.t12z.namsf", min_size = 2.2E+9)) {
+if(!min_exists("hysplit.t12z.namsf", min_size = 2.35E+9)) {
   
   nam <- tryCatch(get_nams_forecast(date = new_date, folder = ".", type = "f", time_step = 1), 
                   error = function(err) NA, 

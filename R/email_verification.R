@@ -116,11 +116,19 @@ for(i in aqi_team) {
 
 # Update Github table
 
-# filter verification to last 7 days
+# Filter verification to last 7 days
 verify <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Verification/verification_table2.csv")
 
-verify <- filter(verify, forecast_date > (Sys.Date() - 8), (forecast_day == 1) | (forecast_date > Sys.Date()))
+verify <- filter(verify, forecast_date > (Sys.Date() - 8), forecast_date < Sys.Date())
 
+# Filter to one forecast per day for each site
+verify <- group_by(verify, forecast_date, site_catid) %>%
+          mutate(forecast_day = ifelse(forecast_day == 0, 99, forecast_day)) %>%
+          arrange(forecast_day) %>%
+          slice(1) %>%
+          mutate(forecast_day = ifelse(forecast_day == 99, 0, forecast_day))
+
+# Save
 write_csv(verify, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/data/model_performance.csv")
 
 # Create git commands
