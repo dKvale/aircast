@@ -464,7 +464,7 @@ verify_pm$background_color <- NULL
   
 ```{r echo=FALSE, message =FALSE, warning =FALSE, results='hide'}
 # Leader board
-#lead_board <- data_frame(Model            = c("MPCA Team", "Dr Robot", "CMAQ"),
+#lead_board <- tibble(Model            = c("MPCA Team", "Dr Robot", "CMAQ"),
 #                         `O3 accuracy %`  = c(100,100,100),
 #                         `PM accuracy %`  = c(100,100,100),
 #                         `O3 error ppb`    = c(5,5,5),
@@ -519,7 +519,7 @@ pm_performance <- tall_pm %>%
 
 
 ## New performance table
-model_names <- data_frame(Model = c( 
+model_names <- tibble(Model = c( 
                             "MPCA Team", 
                             "Dr Robot", 
                             "GradBooster", 
@@ -762,7 +762,7 @@ yest_board[yest_board$Model == "CMAQ", grep("PM", names(yest_board))] <- " "
 
 
 # Add date of forecast  
-# yest_board <- cbind(yest_board, data_frame("Date of forecast" = c(fcast_date, fcast_date, cmaq_date, rep(NA, 4))))
+# yest_board <- cbind(yest_board, tibble("Date of forecast" = c(fcast_date, fcast_date, cmaq_date, rep(NA, 4))))
   
 if (ozone_season) {
   

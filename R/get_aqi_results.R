@@ -41,8 +41,7 @@ aqi <- get_airnow(yesterday, site_list[!is.na(site_list)], pollutant_list) %>%
 
 
 # Flip to wide format
-
-# Create empty rows if table is blank
+## Create empty rows if table is blank
 if (nrow(aqi) < 1) {
   
   aqi[1:2, ] <- NA
@@ -68,10 +67,8 @@ aqi <- spread(aqi, Parameter, Concentration)
 names(aqi)[c(4:5)] <-  c("max_ozone_8hr", "pm25_24hr")
   
 
-
 # QC MPCA sites using AirVision data
-
-# Connect to aqi-watch FTP site
+## Connect to aqi-watch FTP site
 airvis_link <- paste0("ftp://", creds$airvis_ftp_usr_pwd, "@34.216.61.109/airvision/")
 
 # Find last file of the day
@@ -104,7 +101,7 @@ if (class(airvis_df) == "try-error") {
 # Create empty table if fail
 if (class(airvis_df) == "try-error") {
   
-  airvis_df <- data_frame(aqsid     = NA, x2 = NA, x3 = NA,
+  airvis_df <- tibble(aqsid     = NA, x2 = NA, x3 = NA,
                           date      = as.character(NA), 
                           Parameter = NA, x6 = NA, x7 = NA,
                           Concentration = NA, x9 = NA, 
@@ -209,7 +206,7 @@ air_all <- group_by(air_all, aqsid) %>%
 
 
 # Quality checks
-
+if (FALSE) {
 # Drop daily value if less than 14 observations
 air_all <- mutate(air_all, 
                   a_max_ozone_8hr_ppb = ifelse(n_ozone_obs < 14 & !is.na(n_ozone_obs), NA, a_max_ozone_8hr_ppb),
@@ -221,6 +218,7 @@ air_all <- mutate(air_all,
                   a_max_ozone_8hr_ppb = ifelse(n_ozone_uniq < 7 & !is.na(n_ozone_uniq), NA, a_max_ozone_8hr_ppb),
                   a_pm25_24hr_ugm3    = ifelse(n_pm25_uniq < 4 & !is.na(n_pm25_uniq), NA, a_pm25_24hr_ugm3))
 
+} 
 
 # Drop extra columns
 air_all <- dplyr::select(air_all, -c(max_ozone_8hr, pm25_24hr, max_ozone_8hr_vis, pm25_24hr_vis, n_pm25_uniq, n_ozone_uniq))
@@ -251,12 +249,12 @@ keep_columns <- c("date",
                   "obs_max_ozone_8hr_ppb", 
                   "obs_pm25_24hr_ugm3")
 
-file_name <- paste0(Sys.Date() - 1, "_AQI_observed", ".csv")
+file_name <- paste0(Sys.Date() - 1, "_AQI_observed.csv")
 
 # Write file only if it isn't already there
 if(!file_name %in% list.files()) {
   
-  write.csv(air_all[ , keep_columns], paste0(Sys.Date() - 1, "_AQI_observed", ".csv"), row.names = F)
+  write.csv(air_all[ , keep_columns], file_name, row.names = F)
 
   }
 
