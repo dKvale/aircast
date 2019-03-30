@@ -99,7 +99,6 @@ if(current_time > 12 & current_time < 15) {
   print("Downloading CMAQ")
   try(source(paste0(aircast_path, "R/update_cmaq_forecast.R")))
   
-  
 }
 
 
