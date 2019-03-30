@@ -525,8 +525,7 @@ all_verify <- bind_rows(yesterday_fcst, all_verify)
 
 
 # Limt table to past 365 days
-all_verify <- filter(all_verify,
-                     forecast_date > (today - 365))
+all_verify <- filter(all_verify, forecast_date > (today - 365))
 
 #------------------------------------------------#
 # Save master verification table

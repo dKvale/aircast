@@ -63,4 +63,6 @@ get_nams_forecast <- function(date        = Sys.Date(),
   
   closeAllConnections()
   
+  return("Download complete.")
+  
 } 
