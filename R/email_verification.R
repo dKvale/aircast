@@ -1,6 +1,17 @@
 #! /usr/bin/env Rscript
 
 
+#Java path
+Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+
+library(R.utils)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(lubridate)
+library(mailR)
+
+
 #"C:\Users\dkvale\Documents\R\R-3.5.1\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\email_verification.R"
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
@@ -10,16 +21,6 @@ results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluatio
 # AirNow credentials
 creds <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
 
-#Java path
-Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
-
-
-library(R.utils)
-library(dplyr)
-library(readr)
-library(tidyr)
-library(lubridate)
-library(mailR)
 
 # E-mail subscribers
 aqi_team <- c(paste0(c("dorian.kvale",
@@ -132,9 +133,12 @@ verify <- group_by(verify, forecast_date, site_catid) %>%
 write_csv(verify, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/data/model_performance.csv")
 
 # Create git commands
-git <- "X: & CD X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/ & git "
+git_exe <- "C:/Users/dkvale/Documents/Git/bin/git.exe"
+  
+git <- paste0("X: & CD X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/ & ",
+              git_exe, " ")
 
-commit <- paste0(git, 'commit -m ', '"update obs"', ' "data\\model_performance.csv"')
+commit <- paste0(git, 'commit -m ', '"update perf"', ' "data\\model_performance.csv"')
 
 
 # Add account credentials
