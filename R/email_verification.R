@@ -25,11 +25,11 @@ creds <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
 # E-mail subscribers
 aqi_team <- c(paste0(c("dorian.kvale",
                        "daniel.dix",
-                       "monika.vadali",
-                       "helen.waquiu",
                        "david.l.brown",
                        "luke.charpentier",
-                       "kari.palmer"), "@state.mn.us"), 
+                       "kari.palmer",
+                       "monika.vadali",
+                       "helen.waquiu",), "@state.mn.us"), 
               "kvaled@gmail.com",
               "sirwin.mobile@gmail.com") 
 
