@@ -646,7 +646,7 @@ if (!weekend) {
                           
   } else {
     
-     if ("new O3 error ppb" %in% names(yest_board) &&  is.na(yest_board[lead_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board[6, "O3 Forecasts"] <- 0
+     #if ((sum(grepl("O3 error", names(yest_board))) > 0) &&  is.na(yest_board[yest_board$Model == "CMAQ", ]$`new O3 error ppb`)) lead_board[6, "new_obs"] <- 0
     
      lead_board <- lead_board %>% 
                      rowwise() %>%
@@ -669,7 +669,7 @@ if (!weekend) {
 
                             `PM error ug/m3`  = sum(`PM error ug/m3` * (`PM Forecasts` - new_obs), `new PM error ug/m3` * new_obs, na.rm = T) / max(1, `PM Forecasts`, na.rm = T),
                             
-                            new_obs        = !is.na(`new O3 error ug/m3`),
+                            new_obs        = !is.na(`new O3 error ppb`),
                             
                             `O3 Forecasts` = sum(`O3 Forecasts`, new_obs, na.rm = T),
                           
@@ -692,7 +692,7 @@ if (!weekend) {
     
   if (ncol(yest_board) > 8) {
     
-     yest_board[1, c(4:6,9:11)] <- NA 
+     yest_board[1, c(4:6, 9:11)] <- NA 
     
      # Yesterday's performance
      yest_board <- yest_board %>%
@@ -738,6 +738,7 @@ if (ncol(yest_board) > 8) {
 
   yest_board[is.na(yest_board$`O3 yellow accuracy %`), "O3 yellow accuracy %"] <- " "
   
+
 } else {
   
    names(yest_board) <- gsub("new ", "", names(yest_board))
@@ -747,18 +748,19 @@ if (ncol(yest_board) > 8) {
                         "PM bullseyes %"       = "PM bullseyes", 
                         "PM cat accuracy %"    = "PM accuracy", 
                         "PM yellow accuracy %" = "PM yellow accuracy")
-  
+   
+
 }
 
 
-yest_board <- bind_cols(select(yest_board, matches("M error|Model")) %>%
+yest_board <- bind_cols(select(yest_board, matches("O3 err|M error|Model")) %>%
                            mutate_if(is.numeric, round, digits=1),
                          select(yest_board, -matches("M error|Model")) %>%
                               mutate_if(is.numeric, round))
 
 yest_board[is.na(yest_board$`PM yellow accuracy %`), "PM yellow accuracy %"] <- " "
   
-yest_board[yest_board$Model == "CMAQ", grep("PM", names(yest_board))] <- " "
+#yest_board[yest_board$Model == "CMAQ", grep("PM", names(yest_board))] <- " "
 
 
 # Add date of forecast  
@@ -1032,7 +1034,7 @@ if (!ozone_season) {
   if (!weekend) {  
     
 out <- '\n
-### MPCA forecast vs Monitoring results  \n
+## MPCA forecast vs Monitoring results  \n
 
 <div style = "margin-top: -16px; margin-left: 8px;">
 <img src="fcst_regression.png" width="550" height="564" style="margin-bottom: 15px; margin-left: 8px;"> 
@@ -1107,7 +1109,7 @@ cat('</div> \n')
 
  
 <div style="margin-top: 32px;">
-### Yesterday&#39;s model performance   
+## Yesterday&#39;s model performance   
 </div>
 
 <div style="margin-top: 8px; margin-left: 24px;">
@@ -1115,25 +1117,23 @@ cat('</div> \n')
 yest_board <- readRDS('yesterday_board.rdata')
 
 yest_board <- yest_board %>% subset(!Model %in% c("Farmer Weeks", "Persistant Assistant"))
-
 ```
 
 ```{r echo=F, warning=F, message=F, results="asis"}
-if (ozone_season) { cat('__Ozone__  <hr>')  }
+if (ozone_season) { cat('__Ozone__  <hr>')  
+} else { cat('<br> __PM2.5__  <hr>')  }
 ```
 
 ```{r, echo = F, warning = F, message = F}
-
 if (ozone_season) {
 
-  yest_board[ , 1:6]
+  yest_board[ , c(1,2,4:8)]
   
 } else { 
   
-  yest_board
+  yest_board[yest_board$Model != "CMAQ", ]
   
 }
-
 ```
 
 
@@ -1143,17 +1143,14 @@ if (ozone_season) {
   cat('<br> __PM2.5__  <hr>')  
 
 }
-
 ```
 
 ```{r, echo = F, warning = F, message = F}
-
 if (ozone_season) {
   
-  yest_board[ , c(1, 7:11)]
+  yest_board[yest_board$Model != "CMAQ", c(1,3,9:12)]
   
 } 
-
 ```
 
 
@@ -1165,8 +1162,8 @@ if (weekend) { cat('<br> _Note: Some of MPCA&#39;s forecasts only predicted AQI 
 
 <br>
   
-### Overall model performance for next-day forecasts
-
+  
+## Overall model performance for next-day forecasts
 
 #### PM2.5
 
