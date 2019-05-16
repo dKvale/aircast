@@ -752,14 +752,30 @@ if (ncol(yest_board) > 8) {
                         "PM cat accuracy %"    = "PM accuracy", 
                         "PM yellow accuracy %" = "PM yellow accuracy")
    
-
 }
+
+
+# Round decimals places
+yest_board <- yest_board %>% 
+                mutate(`O3 error ppb`         = `O3 error ppb` %>% as.numeric() %>% round(1), 
+                       `O3 on target %`       = `O3 on target %` %>% as.numeric() %>% round(),
+                       `O3 bullseyes %`       = `O3 bullseyes %` %>% as.numeric() %>% round(), 
+                       `O3 cat accuracy %`    = `O3 cat accuracy %` %>% as.numeric() %>% round(),
+                       `O3 yellow accuracy %` = `O3 yellow accuracy %` %>% as.numeric() %>% round(), 
+                       
+                       `PM error ug/m3`       = `PM error ug/m3` %>% as.numeric() %>% round(1),
+                       `PM on target %`       = `PM on target %` %>% as.numeric() %>% round(),
+                       `PM bullseyes %`       = `PM bullseyes %` %>% as.numeric() %>% round(),
+                       `PM cat accuracy %`    = `PM cat accuracy %` %>% as.numeric() %>% round(),
+                       `PM yellow accuracy %` = `PM yellow accuracy %` %>% as.numeric() %>% round())
+
+
 
 
 yest_board <- bind_cols(select(yest_board, matches("O3 err|M error|Model")) %>%
                            mutate_if(is.numeric, round, digits=1),
                          select(yest_board, -matches("M error|Model")) %>%
-                              mutate_if(is.numeric, round))
+                           mutate_if(is.numeric, round))
 
 yest_board[is.na(yest_board$`PM yellow accuracy %`), "PM yellow accuracy %"] <- " "
   
@@ -829,6 +845,8 @@ write_csv(lead_board, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Eval
 write_csv(lead_board, paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification/Archive leaders/", Sys.Date(), "-lead_board.csv"))
 
 }
+
+
 
 # Round decimals places
 lead_board <- lead_board %>% 
