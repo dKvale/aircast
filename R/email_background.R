@@ -5,6 +5,7 @@ library(dplyr)
 library(readr)
 library(mailR)  # mailR reference - https://github.com/rpremraj/mailR
 
+#"C:\Users\dkvale\Documents\R\R-3.5.1\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\email_background.R"
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
