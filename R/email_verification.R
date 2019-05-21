@@ -37,7 +37,7 @@ aqi_team <- c(paste0(c("dorian.kvale",
 #aqi_team <- "frank.kohlasch@state.mn.us"
 #aqi_team <- "kari.palmer@state.mn.us"
 #aqi_team <- aqi_team[1]
-
+#aqi_team <- "kvaled@gmail.com"
 
 # Set Pandoc location
 #Sys.setenv(RSTUDIO_PANDOC = "C:/Program Files/RStudio/bin/pandoc")

@@ -147,7 +147,7 @@ hysplit_columns <- c("date", "year", "month", "day", "hour", "receptor",
                      "hour.inc", "height", "receptor_height", "date2", 
                      "lat", "lon", "forecast_day")
 
-hys <- as_data_frame(hys[ , hysplit_columns])
+hys <- as_tibble(hys[ , hysplit_columns])
 
 names(hys)[c(1,7,8,10:12)] <- c("receptor_date", "traj_hours", "start_height", 
                                 "parcel_date", "start_lat", "start_lon")
