@@ -739,9 +739,6 @@ if (ncol(yest_board) > 8) {
                         "PM yellow accuracy %" = "PM yellow accuracy")
   
 
-  yest_board[is.na(yest_board$`O3 yellow accuracy %`), "O3 yellow accuracy %"] <- " "
-  
-
 } else {
   
    names(yest_board) <- gsub("new ", "", names(yest_board))
@@ -777,10 +774,9 @@ yest_board <- bind_cols(select(yest_board, matches("O3 err|M error|Model")) %>%
                          select(yest_board, -matches("M error|Model")) %>%
                            mutate_if(is.numeric, round))
 
-yest_board[is.na(yest_board$`PM yellow accuracy %`), "PM yellow accuracy %"] <- " "
+# Replace NA's with spaces
+yest_board[is.na(yest_board)] <- "--"
   
-#yest_board[yest_board$Model == "CMAQ", grep("PM", names(yest_board))] <- " "
-
 
 # Add date of forecast  
 # yest_board <- cbind(yest_board, tibble("Date of forecast" = c(fcast_date, fcast_date, cmaq_date, rep(NA, 4))))
