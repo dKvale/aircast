@@ -775,7 +775,7 @@ yest_board <- bind_cols(select(yest_board, matches("O3 err|M error|Model")) %>%
                            mutate_if(is.numeric, round))
 
 # Replace NA's with spaces
-yest_board[is.na(yest_board)] <- "--"
+yest_board[is.na(yest_board)] <- "NA"
   
 
 # Add date of forecast  
