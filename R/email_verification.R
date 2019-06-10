@@ -19,7 +19,7 @@ aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
 # AirNow credentials
-creds <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
+creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
 
 
 # E-mail subscribers
@@ -93,7 +93,7 @@ for(i in aqi_team) {
   print(i)
   
   setwd("~")
-  setwd("../Desktop")
+  setwd("../Desktop/credents")
 
   run_count <- 0
 

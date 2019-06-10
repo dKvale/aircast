@@ -65,7 +65,7 @@ for(i in aqi_team) {
   print(i)
   
   setwd("~")
-  setwd("../Desktop")
+  setwd("../Desktop/credents")
 
   run_count <- 0
 
