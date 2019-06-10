@@ -12,7 +12,7 @@ Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
 
 
 # AirNow credentials
-creds <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
+creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
 
 
 # Check file size function
@@ -81,6 +81,10 @@ if(current_time == 12) {
   # Attach background monitoring results for 16z
   print("Attaching 16Z monitoring results...")
   try(source(paste0(aircast_path, "R/update_background_aqi.R")))
+  
+  # Grab CMAQ forecast
+  #print("Downloading CMAQ")
+  #try(source(paste0(aircast_path, "R/update_cmaq_forecast.R")))
   
 }
 
