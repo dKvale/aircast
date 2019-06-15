@@ -437,7 +437,7 @@ pm_line_plot <- filter(verify_all, !is.na(`Obs conc`), pollutant == "PM2.5") %>%
 
 if (ozone_season) {
   # Save to PNG image
-  png("C:/Users/dkvale/Desktop/fcst_regression.png", width = 1300, height = 700, res = 300)
+  png("C:/Users/dkvale/Desktop/credents/fcst_regression.png", width = 1300, height = 700, res = 300)
   # Set 2 plots per row
   grid.arrange(pm_line_plot, o3_line_plot, ncol = 2) #print(line_plot + theme_gray(base_size = 4.5))
   dev.off()
