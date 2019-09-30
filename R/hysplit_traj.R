@@ -8,8 +8,8 @@ aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
 
-source(paste0(aircast_path, "R/hysplit_support_functions.R"))
-source(paste0(aircast_path, "R/traj_read.R"))
+aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
+
 
 
 # Test extended_met
@@ -32,7 +32,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                          daily_hours    = 17,
                          direction      = "backward",
                          met_type       = "narr",
-                         met_dir        = "D:/MNRisk/NARR",
+                         met_dir        = "D:/HYSPLIT/NARR",
                          extended_met   = TRUE,
                          vert_motion    = 0,
                          model_height   = 20000,
@@ -42,6 +42,11 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                          binary_path    = NULL,
                          os             = "win",
                          met_files      = met_list) {
+  
+  
+  source(paste0(aircast_path, "R/hysplit_support_functions.R"))
+  
+  source(paste0(aircast_path, "R/traj_read.R"))
   
   if (is.null(exec_dir)) exec_dir <- getwd()
   
@@ -78,13 +83,18 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
     #cat(setup_cfg,
     #    sep = "\n",
     #    file = paste0(exec_dir, "/", "SETUP.CFG"))
-    
     # dswf = DOWNWARD SHORT WAVE RADIATION FLUX
     # tppa = TOTAL ACCUMULATED PRECIPITATION
+    setup_cfg <- readLines(con = file.path(exec_dir, "SETUP.CFG"))
+    setup_cfg <- gsub("(tm_.* )(0),", "\\11,", setup_cfg)
     
-    cat(c("&SETUP","kmsl = 0,","tm_rain = 1,", "tm_relh = 1,", "tm_dswf = 1,", "/ "),
-        sep = "\n",
-        file = paste0(exec_dir, "/", "SETUP.CFG"))
+    # Drop potential temp and h2o-mixrate
+    #setup_cfg <- gsub("tm_tpot = 1", "tm_tpot = 0", setup_cfg)
+    #setup_cfg <- gsub("tm_mixr = 1", "tm_mixr = 0", setup_cfg)
+    
+    cat(setup_cfg, 
+        file = file.path(exec_dir, "/", "SETUP.CFG"), 
+        sep  = "\n")
   }
   
   
@@ -95,7 +105,8 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
   }
   
   # Create a coordinates list
-  coords <- list(lat = lat, lon = lon)
+  coords <- list(lat = lat, 
+                 lon = lon)
   
   z <- 1
 
@@ -140,7 +151,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
             tz = "UTC"),
           by = 86400)
     } else {
-      stop("A run type has not been selected")
+      stop("A run type has not been selected.")
     }
     
     # Initialize a vector that will contain names for
@@ -263,9 +274,9 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                sep = '', append = TRUE)
           
         
-        # The CONTROL file is now complete and in the
-        # working directory, so, execute the model run
-        shell(paste0('C: &&', 'cd "', exec_dir, '" && "', binary_path, '"'))
+    # The CONTROL file is now complete and in the
+    # working directory, so, execute the model run
+    shell(paste0('C: &&', ' CD "', exec_dir, '" && "', binary_path, '"'))
     
     # Create the output folder if it doesn't exist
     if (!dir.exists(paste0(exec_dir, "/", folder_name))) {
