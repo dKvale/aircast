@@ -5,7 +5,6 @@ library(gmailr)
 
 #-- Load e-mail credentials
 #creds  <- read_csv("C:/Users/dkvale/Desktop/credentials.csv")
-
 bg_alert_subscribers <- c("dorian.kvale@state.mn.us",
                           "daniel.dix@state.mn.us",
                           "david.l.brown@state.mn.us")
