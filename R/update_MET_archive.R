@@ -18,7 +18,7 @@ Sys.setenv(DARKSKY_API_KEY = d_key)
 
 
 # Create date table
-days <- data_frame(date = seq(as.Date("2009-12-31"), as.Date("2017-12-31"), 1),
+days <- data_frame(date = seq(as.Date("2006-12-31"), Sys.Date()-5, 1),
                    join = 1)
 
 days[1:5, ]
