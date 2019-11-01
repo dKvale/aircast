@@ -107,7 +107,7 @@ aqi_traj <- function(date            = NULL,
     
     traj <- filter(traj, `hour.inc` %in% c(-24, -48, -72))
     
-    Sys.sleep(0.7)
+    Sys.sleep(0.35)
     
     traj_forecast <- bind_rows(traj, traj_forecast)
   }
