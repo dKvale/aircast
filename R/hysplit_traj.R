@@ -62,13 +62,16 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
       all(grepl("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]",
                 run_period))) {
     
-    run_type <- "day"
-    run_day  <- run_period
+       run_type <- "day"
+    
+       run_day  <- run_period
   }
   
   if (length(run_period) == 1 &
       class(run_period) == "numeric") {
+       
        run_type <- "years"
+       
        run_years <- run_period
   }
   
