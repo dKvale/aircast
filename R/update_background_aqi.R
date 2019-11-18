@@ -248,12 +248,12 @@ hys$receptor   <- NULL
 #-- Fill missing values with nearest monitor
 
 #-- Create dummy table with all site + forecast day combinations
-blank_bg <- merge(data_frame(site_catid      = unique(sites$site_catid)),
-                  data_frame(forecast_day    = c("day0", "day1", "day2", "day3")),
+blank_bg <- merge(tibble(site_catid      = unique(sites$site_catid)),
+                  tibble(forecast_day    = c("day0", "day1", "day2", "day3")),
                   all = T)
 
 
-blank_bg <- merge(blank_bg, data_frame(receptor_height = c(10, 500)))
+blank_bg <- merge(blank_bg, tibble(receptor_height = c(10, 500)))
 
                   
 #-- Find missing background entries

@@ -535,8 +535,8 @@ setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fol
 print("Saving file...")
 
 all_verify  <- select(all_verify, -short_name) %>%
-                 left_join(select(sites, short_name, site_catid)) %>%
-                 select(forecast_date, forecast_day, site_catid, short_name, group, everything())
+               left_join(select(sites, short_name, site_catid)) %>%
+               select(forecast_date, forecast_day, site_catid, short_name, group, everything())
 
 saveRDS(all_verify, paste0("Archive/", Sys.Date(), "_verification_table.Rdata"))
 

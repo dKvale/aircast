@@ -7,9 +7,9 @@ output:
 ---
 
 
-## Minnesota AQI report   
+# Minnesota AQI report   
 
-<div style="margin-top: -19px;"> <i>Preliminary results for `r format(Sys.Date() - 1, "%A %b %d, %Y")`</i></div>  
+<div style="margin-top: -19px; font-size: 16px;"> Preliminary results for `r format(Sys.Date() - 1, "%A %b %d, %Y")`</div>  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=T, warning=F, message=F)
 ```
@@ -114,9 +114,11 @@ if (ozone_season) { forecasts <- c(verify$fcst_ozone_aqi, verify$fcst_pm25_aqi)
 } else forecasts <- verify$fcst_pm25_aqi
 
 
-if ("green" %in%  forecasts |
-    "yellow" %in% forecasts | 
-    "orange" %in% forecasts) weekend <- TRUE
+if (sum((forecasts == "green") + 
+        (forecasts == "yellow") + 
+        (forecasts == "orange"), na.rm = T) > 1) {
+        weekend <- TRUE
+}
 
 
 # If weekend convert forecast color to AQI
@@ -185,7 +187,6 @@ verify <- select(verify, short_name, group, aqs_id,
 names(verify)[1:3] <- c("Site", "Group", "AQS ID") 
 
 
-
 #-- Clip long site names
 verify$Site <- ifelse(verify$Site == "Duluth_WDSE", "Duluth WD", verify$Site)
 verify$Site <- ifelse(verify$Site == "St_Paul_Ramsey_Health", "St Paul Ramsey", verify$Site)
@@ -252,7 +253,6 @@ verify_pm[verify_pm == -Inf] <- NA
 
 
 
-
 # Ozone table
 verify_o3 <- select(verify_o3, -c(`AQS ID`, 
                                   `PM2.5 obs count`:bb3_pm25_aqi, 
@@ -262,7 +262,6 @@ verify_o3 <- select(verify_o3, -c(`AQS ID`,
              arrange(-`Ozone AQI`)
 
 names(verify_o3)[c(3:7,12)] <- c("Obs count", "conc", "Obs AQI", "MPCA forecast", "CMAQ forecast", "Model output")
-
 
 names(verify_o3) <- gsub("max_avg8hr", "conc", names(verify_o3))
 
@@ -462,8 +461,8 @@ if (ozone_season) {
 
 verify_o3$background_color <- NULL
 verify_pm$background_color <- NULL
-
 ```
+  
   
 ```{r echo=FALSE, results='hide'}
 # Leader board
@@ -1041,9 +1040,9 @@ cat(". \n")
 ```
 </div>
 
+
 <div style="margin-top: 16px;">
 ```{r echo=F, eval=T, results="asis"}
-
 out <- ''
 
 if (!ozone_season) {
@@ -1064,15 +1063,14 @@ if (!weekend) {
 out <- '\n 
 ### MPCA forecast vs Monitoring results \n
 
-<div style = "margin-top: -18px; margin-left: 8px;">
-<img src="fcst_regression.png" width="1000" height="500"> 
+<div style = "margin-top: -16px; margin-left: 8px;">
+<img src="fcst_regression.png" width="1000" height="564" style="margin-bottom: 15px; margin-left: 8px;"> 
 </div> <br>'
   } 
   
 }
 
 cat(out)
-
 ```
 
 
@@ -1089,8 +1087,7 @@ pm_df
 ```{r, echo = F, results="asis"}
 if (ozone_season) {
   
-  out <- paste0( 
-'<div style="margin-top: -10px"> \n
+out <- paste0('<div style="margin-top: -10px"> \n
 
 ### Ozone results in _ppb_ \n
     
@@ -1101,7 +1098,6 @@ if (ozone_season) {
 , collapse = "\n")
   
 cat(out)
-
 }
 ```
 
@@ -1117,15 +1113,14 @@ if (ozone_season) {
 ```{r, echo=F, results="asis"}
 
 if (ozone_season) {
-  
 cat('</div> \n')
-  
 }
    
 ```
 
  
 <div style="margin-top: 32px;">
+
 ## Yesterday&#39;s model performance   
 </div>
 
@@ -1136,21 +1131,24 @@ yest_board <- readRDS('yesterday_board.rdata')
 yest_board <- yest_board %>% subset(!Model %in% c("Farmer Weeks", "Persistant Assistant"))
 ```
 
-### PM2.5
 
+### PM2.5
 <div style="margin-left: 18px;">
 ```{r, echo=F}
 if (ozone_season) {
   yest_board[yest_board$Model != "CMAQ", c(1,3,9:12)]
 } else {
-   yest_board[yest_board$Model != "CMAQ", ]
+  yest_board
+  #filter(yest_board, Model != "CMAQ")
 }
 ```
 </div>
 
 <p style="margin-top: 8px;"></p>
 ```{r echo=F, results="asis"}
-cat('### Ozone ') 
+if (ozone_season) {
+  cat('### Ozone ') 
+}
 ```
 
 <div style="margin-left: 18px;">
