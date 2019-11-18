@@ -1,19 +1,22 @@
-#! /usr/bin/env Rscript
+#! /usr/bin/env 
+
+#Java path
+Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
 
 library(R.utils)
 library(dplyr)
 library(readr)
-library(mailR)  # mailR reference - https://github.com/rpremraj/mailR
+library(mailR)  #mailR reference - https://github.com/rpremraj/mailR
 
-#"C:\Users\dkvale\Documents\R\R-3.5.1\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\email_background.R"
+#"C:\Users\dkvale\Documents\R\R-3.5.2\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\email_background.R"
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
 
-#Java path
-Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+# AirNow credentials
+creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
 
 
 aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us", "sirwin.mobile@gmail.com")
@@ -79,11 +82,11 @@ for(i in aqi_team) {
     Sys.sleep(1)
     
     run_count <- run_count + 1
+    
+    if(is.na(send_fail)) print("Failed.")
 
   }
-
   }
        
-
 
 ##

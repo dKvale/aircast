@@ -1,5 +1,7 @@
 #! /usr/bin/env Rscript
 
+#"C:\Users\dkvale\Documents\R\R-3.5.2\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\run_current_hysplit.R"
+
 library(SplitR) #devtools::install_github("rich-iannone/SplitR")
 library(dplyr)
 library(readr)
@@ -7,7 +9,6 @@ library(tidyr)
 library(here)
 
 
-aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
@@ -107,7 +108,7 @@ aqi_traj <- function(date            = NULL,
     
     traj <- filter(traj, `hour.inc` %in% c(-24, -48, -72))
     
-    Sys.sleep(0.35)
+    Sys.sleep(0.3)
     
     traj_forecast <- bind_rows(traj, traj_forecast)
   }
