@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo=T, warning=F, message=F)
 ```{r, echo=F, results="asis"}
 options(warn = -1)
 
-cat("<div> \n &nbsp; </div> ")
+cat("\n<p>\n-- - -- - -- - -- - -- - -- - -- - -- - -- </p>")
 ```
   
 ```{r echo=FALSE}
