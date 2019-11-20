@@ -9,7 +9,7 @@ output:
 
 # Minnesota AQI report   
 
-<div style="margin-top: -19px; font-size: 16px;"> Preliminary results for `r format(Sys.Date() - 1, "%A %b %d, %Y")`</div>  
+<div style="margin-top: -20px; font-size: 18px; font-weight: 700;">`r format(Sys.Date() - 1, "%A %b %d, %Y")`</div>  
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=T, warning=F, message=F)
 ```
@@ -1038,7 +1038,7 @@ saveRDS(verify_pm, "pm_table.rdata")
 
 options(warn = -1)
 
-cat(paste0('\nThe category accuracy of the next-day forecast was __', round(pm_performance[5, ]$accuracy), '%__ (', sum(filter(tall_pm, !is.na(aqi), model == 'MPCA forecast')$fcst_correct, na.rm = T), '/', pm_performance[1, ]$n_preds, ') for PM2.5'))
+cat(paste0('The category accuracy of the next-day forecast was __', round(pm_performance[5, ]$accuracy), '%__ (', sum(filter(tall_pm, !is.na(aqi), model == 'MPCA forecast')$fcst_correct, na.rm = T), '/', pm_performance[1, ]$n_preds, ') for PM2.5'))
 
 if (ozone_season) { 
   cat(paste0(' and __', round(o3_performance[5, ]$accuracy), '%__ (', sum(filter(tall_o3, !is.na(aqi), model == 'MPCA forecast')$fcst_correct, na.rm = T), '/', o3_performance[1, ]$n_preds, ') for Ozone'))
