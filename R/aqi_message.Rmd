@@ -9,17 +9,16 @@ output:
 
 # Minnesota AQI report   
 
-<div style="margin-top: -20px; font-size: 18px; font-weight: 700;">`r format(Sys.Date() - 1, "%A %b %d, %Y")`</div>  
+<div style="margin-top: -20px; font-size: 18px; font-weight: 700; color: #606060;">
+`r format(Sys.Date() - 1, "%A %b %d, %Y")`</div>  
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=T, warning=F, message=F)
 ```
   
-```{r, echo=F, results="asis"}
-options(warn = -1)
+<hr style = "border: 1px dashed #d3d3d3; border-bottom: 0px; max-width: 1000px; margin-left: 0;">
 
-cat("\n<p>\n-- - -- - -- - -- - -- - -- - -- - -- - -- </p>")
-```
-  
+
 ```{r echo=FALSE}
 # C: & "C:\Users\dkvale\Documents\R\R-3.5.0\bin\i386\Rscript.exe" --no-save --no-restore "~\..\Desktop\aircast\aircast\R\email_background.R"
 
@@ -1039,24 +1038,24 @@ saveRDS(verify_pm, "pm_table.rdata")
   
 
 
-<div style="margin-top: 12px;">
+<div style="margin-top: 22px;">
 ```{r, echo=F, results="asis"}
 
 options(warn = -1)
 
-cat(paste0('The category accuracy of the next-day forecast was __', round(pm_performance[5, ]$accuracy), '%__ (', sum(filter(tall_pm, !is.na(aqi), model == 'MPCA forecast')$fcst_correct, na.rm = T), '/', pm_performance[1, ]$n_preds, ') for PM2.5'))
+cat(paste0('The category accuracy of the next-day forecast was __', round(pm_performance[5, ]$accuracy), '%__ (', sum(filter(tall_pm, !is.na(aqi), model == 'MPCA forecast')$fcst_correct, na.rm = T), '/', pm_performance[1, ]$n_preds, ' sites) for PM2.5'))
 
 if (ozone_season) { 
-  cat(paste0(' and __', round(o3_performance[5, ]$accuracy), '%__ (', sum(filter(tall_o3, !is.na(aqi), model == 'MPCA forecast')$fcst_correct, na.rm = T), '/', o3_performance[1, ]$n_preds, ') for Ozone'))
+  cat(paste0(' and __', round(o3_performance[5, ]$accuracy), '%__ (', sum(filter(tall_o3, !is.na(aqi), model == 'MPCA forecast')$fcst_correct, na.rm = T), '/', o3_performance[1, ]$n_preds, ' sites) for Ozone'))
 }
 
-cat(". \n")
+cat(". View this weeks complete modeling performance at [AQI Watch](http://ec2-34-216-61-109.us-west-2.compute.amazonaws.com/model_perf.html). \n")
 
 ```
 </div>
 
 
-<div style="margin-top: 16px;">
+<div style="margin-top: 24px;">
 ```{r echo=F, eval=T, results="asis"}
 out <- ''
 
@@ -1228,4 +1227,5 @@ o3_board
 
 </div>
   
+<br><br>
 
