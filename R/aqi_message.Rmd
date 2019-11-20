@@ -14,6 +14,12 @@ output:
 knitr::opts_chunk$set(echo=T, warning=F, message=F)
 ```
   
+```{r, echo=F, results="asis"}
+options(warn = -1)
+
+cat("<div> \n &nbsp; </div> ")
+```
+  
 ```{r echo=FALSE}
 # C: & "C:\Users\dkvale\Documents\R\R-3.5.0\bin\i386\Rscript.exe" --no-save --no-restore "~\..\Desktop\aircast\aircast\R\email_background.R"
 
@@ -1058,7 +1064,7 @@ if (!ozone_season) {
  
   if (!weekend) {  
     
-out <- '\n
+out <- '\n\n
 ## MPCA forecast vs Monitoring results  \n
 
 <div style = "margin-top: -4px; margin-left: 4px;">
@@ -1069,7 +1075,7 @@ out <- '\n
 } else {
   
 if (!weekend) {   
-out <- '\n 
+out <- '\n\n 
 ### MPCA forecast vs Monitoring results \n
 
 <div style = "margin-top: -4px; margin-left: 4px;">
