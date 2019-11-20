@@ -74,17 +74,17 @@ verify %<>% filter(forecast_day != 0)
 
 #-- Filter to most recent forecast
 verify_recent <- verify %>% 
-                   group_by(site_catid) %>% 
-                   filter(forecast_day == min(forecast_day, na.rm = T)) %>%
-                   ungroup()
+                 group_by(site_catid) %>% 
+                 filter(forecast_day == min(forecast_day, na.rm = T)) %>%
+                 ungroup()
 
 
 #-- Filter to most recent modeled values
 verify <- verify %>% 
-             group_by(site_catid) %>% 
-             filter(!is.na(mod_aqi_pm_ens) | !is.na(mod_aqi_o3_ens)) %>%
-             filter(forecast_day == min(forecast_day, na.rm = T)) %>%
-             ungroup()
+          group_by(site_catid) %>% 
+          filter(!is.na(mod_aqi_pm_ens) | !is.na(mod_aqi_o3_ens)) %>%
+          filter(forecast_day == min(forecast_day, na.rm = T)) %>%
+          ungroup()
 
 
 #-- Add forecast to modeled
@@ -110,9 +110,11 @@ verify$obs_pm25_aqi <- conc2aqi(verify$obs_pm25_ugm3, "pm25")
 
 
 # Check for color only forecasts, if found set "weekend" to TRUE
-if (ozone_season) { forecasts <- c(verify$fcst_ozone_aqi, verify$fcst_pm25_aqi)
-} else forecasts <- verify$fcst_pm25_aqi
-
+if (ozone_season) { 
+  forecasts <- c(verify$fcst_ozone_aqi, verify$fcst_pm25_aqi)
+} else {
+  forecasts <- verify$fcst_pm25_aqi
+}
 
 if (sum((forecasts == "green") + 
         (forecasts == "yellow") + 
@@ -123,11 +125,11 @@ if (sum((forecasts == "green") +
 
 # If weekend convert forecast color to AQI
 if (weekend) verify <- verify %>% 
-                         rowwise() %>% 
-                         mutate(fcst_ozone_aqi = ifelse(!fcst_ozone_aqi %in% c("green", "yellow", "orange"), 
+                       rowwise() %>% 
+                       mutate(fcst_ozone_aqi = ifelse(!fcst_ozone_aqi %in% c("green", "yellow", "orange"), 
                                                          as.numeric(fcst_ozone_aqi),
                                                          cat2aqi(fcst_ozone_aqi)),
-                                fcst_pm25_aqi  = ifelse(!fcst_pm25_aqi %in% c("green", "yellow", "orange"),
+                              fcst_pm25_aqi  = ifelse(!fcst_pm25_aqi %in% c("green", "yellow", "orange"),
                                                          as.numeric(fcst_pm25_aqi),
                                                          cat2aqi(fcst_pm25_aqi)))
 
@@ -206,11 +208,11 @@ verify <- select(verify, -contains("_bc_"))
 
 #-- Select highest forecast per group
 verify_pm <- verify %>%
-              group_by(Group) %>%
-              arrange(-obs_pm25_ugm3) %>%
-              mutate_if(is.numeric, max, na.rm = T) %>%
-              slice(1) %>%
-              ungroup()
+             group_by(Group) %>%
+             arrange(-obs_pm25_ugm3) %>%
+             mutate_if(is.numeric, max, na.rm = T) %>%
+             slice(1) %>%
+             ungroup()
 
 verify_pm <- rename(verify_pm,
                     `Ozone obs count` = count_ozone_obs,
@@ -361,7 +363,11 @@ if(nrow(verify_o3) < 1) {
   
   verify_all <- bind_rows(verify_o3[0, ], verify_pm)
   
-} else { verify_all <- bind_rows(verify_o3, verify_pm) }
+} else { 
+  
+  verify_all <- bind_rows(verify_o3, verify_pm) 
+  
+}
   
 
 verify_all <- verify_all %>%
@@ -407,6 +413,9 @@ o3_line_plot <- filter(verify_all, !is.na(`Obs conc`), pollutant == "Ozone") %>%
                   labs(title = "Ozone (ppb)", x = "Monitored", y = "MPCA forecast")
 
 
+# Make PM plot double wide if no Ozone
+aspect <- ifelse(ozone_season, 1, 0.5385)
+
 pm_line_plot <- filter(verify_all, !is.na(`Obs conc`), pollutant == "PM2.5") %>%
                 ggplot(aes(x = `Obs conc`, y = `MPCA conc`)) + 
                   geom_abline(intercept = 0, size = 0.25, color = "grey50") +
@@ -420,7 +429,7 @@ pm_line_plot <- filter(verify_all, !is.na(`Obs conc`), pollutant == "PM2.5") %>%
                   xlim(pm_range) +
                   theme_bw() + 
                   theme_gray(base_size = 5) + 
-                  theme(aspect.ratio  = 1, 
+                  theme(aspect.ratio  = aspect, 
                         plot.margin   = unit(c(0,0.5,0,0), "lines"),
                         plot.title    = element_text(size = 7.5, color = "grey20"),
                         panel.grid.major = element_line(color = "grey94", size = 0.3),
@@ -436,23 +445,23 @@ pm_line_plot <- filter(verify_all, !is.na(`Obs conc`), pollutant == "PM2.5") %>%
 
 if (ozone_season) {
   # Save to PNG image
-  png("C:/Users/dkvale/Desktop/credents/fcst_regression.png", width = 1300, height = 700, res = 300)
+  png("C:/Users/dkvale/Desktop/credents/fcst_regression.png", width = 1300, height = 730, res = 300)
   # Set 2 plots per row
   grid.arrange(pm_line_plot, o3_line_plot, ncol = 2) #print(line_plot + theme_gray(base_size = 4.5))
   dev.off()
   
-  png("fcst_regression.png", width = 1300, height = 700, res = 300)
+  png("fcst_regression.png", width = 1300, height = 730, res = 300)
   # Set 2 plots per row
   grid.arrange(pm_line_plot, o3_line_plot, ncol = 2) #print(line_plot + theme_gray(base_size = 4.5))
   dev.off()
 
 } else {
   # Save to PNG image
-  png("C:/Users/dkvale/Desktop/fcst_regression.png", width = 800, height = 820, res = 300)
+  png("C:/Users/dkvale/Desktop/credents/fcst_regression.png", width = 1300, height = 730, res = 300)
   grid.arrange(pm_line_plot, ncol = 1) #print(line_plot + theme_gray(base_size = 4.5))
   dev.off()
   
-  png("fcst_regression.png", width = 800, height = 820, res = 300)
+  png("fcst_regression.png", width = 1300, height = 730, res = 300)
   grid.arrange(pm_line_plot, ncol = 1) #print(line_plot + theme_gray(base_size = 4.5))
   dev.off()
 }
@@ -1052,8 +1061,8 @@ if (!ozone_season) {
 out <- '\n
 ## MPCA forecast vs Monitoring results  \n
 
-<div style = "margin-top: -16px; margin-left: 8px;">
-<img src="fcst_regression.png" width="550" height="564" style="margin-bottom: 15px; margin-left: 8px;"> 
+<div style = "margin-top: -4px; margin-left: 4px;">
+<img src="fcst_regression.png" width="1000" height="564" style="margin-bottom: 15px; margin-left: 8px;"> 
 </div>'
     
   }
@@ -1063,7 +1072,7 @@ if (!weekend) {
 out <- '\n 
 ### MPCA forecast vs Monitoring results \n
 
-<div style = "margin-top: -16px; margin-left: 8px;">
+<div style = "margin-top: -4px; margin-left: 4px;">
 <img src="fcst_regression.png" width="1000" height="564" style="margin-bottom: 15px; margin-left: 8px;"> 
 </div> <br>'
   } 

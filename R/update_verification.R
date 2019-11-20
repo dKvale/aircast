@@ -198,16 +198,13 @@ if (FALSE) {
 print("Loading modeling forecasts...")
 
 mod_o3   <- read.csv("All_Values_O3.csv", stringsAsFactors = FALSE)
-
 mod_pm   <- read.csv("All_Values_PM.csv", stringsAsFactors = FALSE)
-
 mod_forc <- full_join(mod_o3, mod_pm)
 
 
 # Change names of model forecast values to distinguish
 # between official submitted forecast
 names(mod_forc)[c(2:3,10:11)] <- c("mod_max_avg8hr", "mod_aqi_o3", "mod_pm25avg", "mod_aqi_pm")
-
 
 #-- Check for "/" slash in date
 if (grepl("[/]", mod_forc$Date[1])) {
@@ -222,6 +219,7 @@ if (grepl("[/]", mod_forc$Date[1])) {
 
 # Join tables into new table - "verify"
 verify  <- left_join(aqi_forc, select(mod_forc, -Group))
+
 }
 
 verify <- aqi_forc
@@ -234,7 +232,9 @@ names(verify) <- gsub("Pm25Avg ", "mod_pm25avg_", names(verify))
 
 names(verify) <- gsub("AQI_PM_", "mod_aqi_pm_", names(verify))
 
-verify <- rename(verify, forecast_day = DayIndex, site_catid = ID)
+verify <- rename(verify, 
+                 forecast_day = DayIndex, 
+                 site_catid   = ID)
 
 names(verify) <- gsub("AQI_O3", "fcst_ozone_aqi", names(verify))
 
@@ -256,7 +256,7 @@ verify <-  select(verify, forecast_date, everything())
 
 # Yesterday's model inputs
 #--------------------------------#
-setwd("X:\\Agency_Files\\Outcomes\\Risk_Eval_Air_Mod\\Air_Modeling\\AQI_Forecasting\\Tree_Data\\Forecast\\Forecast_Met")
+setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/Forecast_Met")
 print("Model inputs...")
 
 all_inputs <- read_csv("Met_View.csv")
@@ -465,7 +465,7 @@ yesterday_fcst <- left_join(yesterday_fcst, select(actuals, -air_monitor, -aqsid
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
 print("CMAQ...")
 
-cmaq_all <- data_frame()
+cmaq_all <- tibble()
 
 # Load CMAQ forecast from past 2 days
 for (i in 1:2) {
@@ -479,7 +479,10 @@ for (i in 1:2) {
   names(cmaq_forc) [1:2] <- c("day0", "day1")
 
   # Flip to long format
-  cmaq_forc <- tidyr::gather(data = cmaq_forc, key = forecast_day, value = cmaq_ozone_ppb, na.rm = FALSE, day0, day1)
+  cmaq_forc <- tidyr::gather(data = cmaq_forc, 
+                             key = forecast_day, 
+                             value = cmaq_ozone_ppb, 
+                             na.rm = FALSE, day0, day1)
 
 
   # Add category
