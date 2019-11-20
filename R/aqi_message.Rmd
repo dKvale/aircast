@@ -7,10 +7,10 @@ output:
 ---
 
 
-# Minnesota AQI report   
+<p style="font-size: 32px; font-weight: 800; margin-bottom: 0;"> Daily AQI report </p>   
 
-<div style="margin-top: -20px; font-size: 18px; font-weight: 700; color: #606060;">
-`r format(Sys.Date() - 1, "%A %b %d, %Y")`</div>  
+<p style="margin-top: 4px; font-size: 18px; font-weight: 700; color: #606060;">
+`r format(Sys.Date() - 1, "%A %b %d, %Y")`</p>  
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=T, warning=F, message=F)
@@ -1038,7 +1038,7 @@ saveRDS(verify_pm, "pm_table.rdata")
   
 
 
-<div style="margin-top: 22px;">
+<p style="margin-top: 26px;">
 ```{r, echo=F, results="asis"}
 
 options(warn = -1)
@@ -1049,13 +1049,13 @@ if (ozone_season) {
   cat(paste0(' and __', round(o3_performance[5, ]$accuracy), '%__ (', sum(filter(tall_o3, !is.na(aqi), model == 'MPCA forecast')$fcst_correct, na.rm = T), '/', o3_performance[1, ]$n_preds, ' sites) for Ozone'))
 }
 
-cat(". View this weeks complete modeling performance at [AQI Watch](http://ec2-34-216-61-109.us-west-2.compute.amazonaws.com/model_perf.html). \n")
+cat(".  \n\nView this weeks complete modeling performance at [AQI Watch](http://ec2-34-216-61-109.us-west-2.compute.amazonaws.com/model_perf.html). \n")
 
 ```
-</div>
+</p>
 
 
-<div style="margin-top: 24px;">
+<div style="margin-top: 26px;">
 ```{r echo=F, eval=T, results="asis"}
 out <- ''
 
@@ -1064,7 +1064,7 @@ if (!ozone_season) {
   if (!weekend) {  
     
 out <- '\n\n
-## MPCA forecast vs Monitoring results  \n
+## __Forecast__  _vs_ __Monitoring__  \n
 
 <div style = "margin-top: -4px; margin-left: 4px;">
 <img src="fcst_regression.png" width="1000" height="564" style="margin-bottom: 15px; margin-left: 8px;"> 
