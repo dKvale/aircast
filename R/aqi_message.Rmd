@@ -6,10 +6,11 @@ output:
     self_contained: no
 ---
 
+<hr style = "border: 1px dashed #d3d3d3; border-bottom: 0px; max-width: 1000px; margin-left: 0;">
 
 <p style="font-size: 32px; font-weight: 800; margin-bottom: 0;"> Daily AQI report </p>   
 
-<p style="margin-top: 4px; font-size: 18px; font-weight: 700; color: #606060;">
+<p style="margin-top: 8px; font-size: 18px; font-weight: 700; color: #606060;">
 `r format(Sys.Date() - 1, "%A %b %d, %Y")`</p>  
 
 ```{r setup, include=FALSE}
