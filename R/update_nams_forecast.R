@@ -32,10 +32,10 @@ print(new_date)
 options(timeout = 120)
 
 # Todays forecast
-get_nams_forecast(date = new_date, folder = "__today", type = "f", time_step = 3)
-get_nams_forecast(date = new_date, folder = "__today", type = "a", time_step = 3)
 get_nams_forecast(date = new_date, folder = "__today", type = "a", time_step = 1)
 get_nams_forecast(date = new_date, folder = "__today", type = "f", time_step = 1)
+get_nams_forecast(date = new_date, folder = "__today", type = "f", time_step = 3)
+get_nams_forecast(date = new_date, folder = "__today", type = "a", time_step = 3)
 
 closeAllConnections()
 
