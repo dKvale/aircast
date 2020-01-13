@@ -77,6 +77,9 @@ if(current_time == 12) {
   # Run HYSPLIT model
   print("Running HYSPLIT...")
   try(source(paste0(aircast_path, "R/run_current_hysplit.R")))
+  #try(source(paste0(aircast_path, "R/run_current_hysplit_pt1.R")))
+  #try(source(paste0(aircast_path, "R/run_current_hysplit_pt2.R")))
+  #try(source(paste0(aircast_path, "R/run_current_hysplit_combine.R")))
   
   # Attach background monitoring results for 16z
   print("Attaching 16Z monitoring results...")
