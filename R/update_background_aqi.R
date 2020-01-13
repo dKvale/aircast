@@ -7,6 +7,7 @@ library(measurements)
 library(tidyr)
 library(stringr)
 
+#"C:\Users\dkvale\Documents\R\R-3.5.2\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\update_background_aqi.R"
 
 # Filter to one site per forecast city
 sites <- filter(aqi_sites, !site_catid %in% c('27-017-7416'))
