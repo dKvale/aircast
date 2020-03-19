@@ -1,5 +1,6 @@
 #! /usr/bin/env Rscript
 
+#library(splitr)
 library(SplitR)
 library(lubridate)
 
