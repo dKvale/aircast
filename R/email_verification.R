@@ -40,7 +40,7 @@ aqi_team <- c(paste0(c("dorian.kvale",
 #aqi_team <- "frank.kohlasch@state.mn.us"
 #aqi_team <- "kari.palmer@state.mn.us"
 #aqi_team <- aqi_team[1]
-#aqi_team <- c("dorian.kvale@state.mn.us", "kvaled@gmail.com")
+aqi_team <- c("dorian.kvale@state.mn.us")
 
 # Set Pandoc location
 #Sys.setenv(RSTUDIO_PANDOC = "C:/Program Files/RStudio/bin/pandoc")
@@ -158,10 +158,8 @@ write_csv(verify, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluati
 # Create git commands
 git_exe <- "C:/Users/dkvale/Documents/Git/bin/git.exe"
   
-git <- paste0("X: & CD X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/ & ",
+git <- paste0("X: & CD \"X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/\" & ",
               git_exe, " ")
-
-commit <- paste0(git, 'commit -m ', '"update perf"', ' "data\\model_performance.csv"')
 
 
 # Add account credentials
@@ -169,9 +167,20 @@ system(paste0(git, "config --global user.name dkvale"), show.output.on.console =
 
 system(paste0(git, "config --global user.email ", creds$email), show.output.on.console = T, invisible = F)
 
+
+add <- paste0(git, 'add', ' "data/model_performance.csv"')
+
+cat(add)
+
+shell(add)
+
+commit <- paste0(git, 'commit -m ', '"update weekly performance"')
+cat(commit)
+system(commit)
+
 push <- paste0(commit, " & git push -f origin master")
 
-#system(commit)
+cat(push)
 
 shell(push)
 ##
