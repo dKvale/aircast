@@ -40,7 +40,7 @@ aqi_team <- c(paste0(c("dorian.kvale",
 #aqi_team <- "frank.kohlasch@state.mn.us"
 #aqi_team <- "kari.palmer@state.mn.us"
 #aqi_team <- aqi_team[1]
-aqi_team <- c("dorian.kvale@state.mn.us")
+#aqi_team <- c("dorian.kvale@state.mn.us")
 
 # Set Pandoc location
 #Sys.setenv(RSTUDIO_PANDOC = "C:/Program Files/RStudio/bin/pandoc")
@@ -152,6 +152,9 @@ verify <- group_by(verify, forecast_date, site_catid) %>%
           slice(1) %>%
           mutate(forecast_day = ifelse(forecast_day == 99, 0, forecast_day))
 
+# Round - set signif digits
+verify <- verify %>% mutate_at(vars(matches("mod_")), round, 3)
+
 # Save
 write_csv(verify, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/data/model_performance.csv")
 
@@ -176,9 +179,10 @@ shell(add)
 
 commit <- paste0(git, 'commit -m ', '"update weekly performance"')
 cat(commit)
+
 system(commit)
 
-push <- paste0(commit, " & git push -f origin master")
+push <- paste0(commit, " & git push origin master")
 
 cat(push)
 
