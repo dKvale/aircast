@@ -1,6 +1,5 @@
 #! /usr/bin/env Rscript
 
-
 #Java path
 Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
 
@@ -29,16 +28,15 @@ creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
 aqi_team <- c(paste0(c("dorian.kvale",
                        "daniel.dix",
                        "david.l.brown",
-                       "luke.charpentier",
+                       "michael.smith",
                        "kari.palmer",
                        "monika.vadali",
                        "helen.waquiu",
-                       "nicholas.witcraft"), "@state.mn.us"), 
+                       "nicholas.witcraft",
+                       "matthew.taraldsen"), "@state.mn.us"), 
               "kvaled@gmail.com",
               "sirwin.mobile@gmail.com") 
 
-#aqi_team <- "frank.kohlasch@state.mn.us"
-#aqi_team <- "kari.palmer@state.mn.us"
 #aqi_team <- aqi_team[1]
 #aqi_team <- c("dorian.kvale@state.mn.us")
 
