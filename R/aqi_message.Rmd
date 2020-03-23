@@ -751,11 +751,7 @@ if (ncol(yest_board) > 8) {
                         "O3 on target %"       = "O3 on target", 
                         "O3 bullseyes %"       = "O3 bullseyes", 
                         "O3 cat accuracy %"    = "O3 accuracy",  
-                        "O3 yellow accuracy %" = "O3 yellow accuracy", 
-                        "PM on target %"       = "PM on target", 
-                        "PM bullseyes %"       = "PM bullseyes", 
-                        "PM cat accuracy %"    = "PM accuracy", 
-                        "PM yellow accuracy %" = "PM yellow accuracy")
+                        "O3 yellow accuracy %" = "O3 yellow accuracy")
    
    # Round decimals places
     yest_board <- yest_board %>% 
