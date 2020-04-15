@@ -18,8 +18,8 @@ Sys.setenv(DARKSKY_API_KEY = d_key)
 
 
 # Create date table
-days <- data_frame(date = seq(as.Date("2006-12-31"), Sys.Date()-5, 1),
-                   join = 1)
+days <- tibble(date = seq(as.Date("2006-12-31"), as.Date("2019-01-01"), 1),
+               join = 1)
 
 days[1:5, ]
 
@@ -57,7 +57,7 @@ for (file in files) {
     print(file)
     
     tmp <- read_csv(paste0(folder, "/", file)) %>% 
-             filter(!is.na(site_catid), site_catid == gsub("[.csv]", "", file))
+           filter(!is.na(site_catid), site_catid == gsub("[.csv]", "", file))
     
     if (nrow(tmp) > 0) {
     
@@ -97,7 +97,7 @@ sites$run_order <- 2
 sites <- bind_rows(sites, 
                    filter(all_sites, !site_catid %in% sites$site_catid))
 
-# Drop duplicate sites
+# Drop duplicate Fond du Lac site
 sites <- filter(sites,  !site_catid %in% "27-017-7417")
 
 
@@ -112,12 +112,12 @@ sites$site_date <- paste(sites$site_catid, sites$date)
 
 
 # Put 909 first
-sites$run_order <- ifelse(sites$site_catid %in% c("27-053-0909"), 1, sites$run_order) #"27-053-0910" Pacific street
+#sites$run_order <- ifelse(sites$site_catid %in% c("27-053-0909"), 1, sites$run_order) #"27-053-0910" Pacific street
 
 # Put AQI sites first
 sites$run_order <- ifelse(sites$site_catid %in% aqi_sites$site_catid, 1.1, sites$run_order)
 
-sites <- arrange(sites, run_order, site_catid, desc(date))
+sites <- arrange(sites, -run_order, site_catid, desc(date))
 
 
 # Drop dates already downloaded 
@@ -129,7 +129,7 @@ sites %>% filter(site_catid %in% aqi_sites$site_catid) %>% nrow() %>% print()
 
 
 # Loop through site table and send DarkSky request
-all_forecasts <- data_frame()
+all_forecasts <- tibble()
 
 requests <- 0
 
@@ -138,7 +138,7 @@ for (i in 1:nrow(sites)) {
   
   site <- sites[i, ]
   
-  if (requests > 990) break()
+  if (requests > 998) break()
   
   print(site$site_date)
   
