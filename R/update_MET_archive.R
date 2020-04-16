@@ -37,38 +37,39 @@ forecast_col_names <- c("site_catid", "time", "summary", "icon",
 forecast_col_types <- 'ccccdddddddddidddc'
 
 
-
 # Generate table of downloaded site-dates
-all_met <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/DarkSky MET data - daily summary - 2003-2017.csv") %>% 
-             select(site_catid, date) %>% 
-             group_by(site_catid, date) %>% 
-             slice(1) %>%
-             ungroup() %>%
-             mutate(date = as.character(date))
-  
-all_met <- all_met[0, ]
-
 folder <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/sites" 
     
 files <- list.files(folder)
   
-for (file in files) {
+all_met <- read_csv(paste0(folder, "/", files[1]), guess_max = 5) %>% 
+           filter(!is.na(site_catid), 
+                  site_catid == gsub("[.csv]", "", files[1])) %>%
+           rowwise() %>%
+           mutate(date = format(time, "%Y-%m-%d")) %>%
+           select(site_catid, date) %>% 
+           group_by(site_catid, date) %>% 
+           slice(1)
+
+
+for (file in files[-1]) {
     
     print(file)
     
-    tmp <- read_csv(paste0(folder, "/", file)) %>% 
-           filter(!is.na(site_catid), site_catid == gsub("[.csv]", "", file))
+    tmp <- read_csv(paste0(folder, "/", file), guess_max = 5) %>% 
+           filter(!is.na(site_catid), 
+                  site_catid == gsub("[.csv]", "", file))
     
     if (nrow(tmp) > 0) {
     
       tmp$date <- format(tmp$time, "%Y-%m-%d") 
       
-      tmp <- select(tmp, site_catid, date) %>% 
+      tmp <- tmp %>%
+             select(site_catid, date) %>% 
              group_by(site_catid, date) %>% 
              slice(1)
       
       all_met <- bind_rows(tmp, all_met)
-    
 }
 }
 
@@ -81,7 +82,7 @@ all_met$site_date <- paste(all_met$site_catid, all_met$date)
 # Add air toxics sites
 all_sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/AirToxics_sites.csv")
 
-all_sites <- filter(all_sites, Year %in% 2010:2017, !duplicated(AQS_ID)) %>%
+all_sites <- filter(all_sites, Year %in% 2010:2019, !duplicated(AQS_ID)) %>%
              select(Report_Name, AQS_ID, lat, long) %>% 
              rowwise() %>%
              mutate(AQS_ID = paste(substring(AQS_ID, 1, 2), 
@@ -98,7 +99,7 @@ sites <- bind_rows(sites,
                    filter(all_sites, !site_catid %in% sites$site_catid))
 
 # Drop duplicate Fond du Lac site
-sites <- filter(sites,  !site_catid %in% "27-017-7417")
+sites <- filter(sites, !site_catid %in% "27-017-7417")
 
 
 # Join sites to calendar
@@ -127,6 +128,7 @@ sites <- filter(sites, !site_date %in% all_met$site_date)
 # Count site-days left to download for AQI
 sites %>% filter(site_catid %in% aqi_sites$site_catid) %>% nrow() %>% print()
 
+rm(all_met)
 
 # Loop through site table and send DarkSky request
 all_forecasts <- tibble()
@@ -164,7 +166,6 @@ for (i in 1:nrow(sites)) {
     next()
     
   }
-  
 }
 
 
@@ -222,9 +223,11 @@ if (nrow(all_forecasts) > 0) {
                                                paste(collapse = ""))
         
         # Join tables
-        site_met <- bind_rows(filter(all_forecasts, site_catid == i), temp)
+        site_met <- bind_rows(temp, filter(all_forecasts, site_catid == i))
         
-        site_met <- group_by(site_met, time, site_catid) %>% slice(1)
+        site_met <- group_by(site_met, time, site_catid) %>% 
+                    arrange(precipProbability, windGust, temperature) %>%
+                    slice(1)
         
         write_csv(site_met, file_loc)
       
