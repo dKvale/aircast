@@ -1,6 +1,6 @@
 #! /usr/bin/env Rscript
 
-library(purrr)   
+#library(purrr)   
 library(dplyr)
 library(readr)
 library(darksky) #devtools::install_github("hrbrmstr/darksky")
@@ -28,6 +28,7 @@ day <- 5
 days[day, ]
 
 
+# MET file structure
 forecast_col_names <- c("site_catid", "time", "summary", "icon", 
                         "precipIntensity", "precipProbability", "temperature", "apparentTemperature", "dewPoint", "humidity", "pressure", "windSpeed", "windGust", 
                         "windBearing", 
@@ -38,8 +39,13 @@ forecast_col_types <- 'ccccdddddddddidddc'
 
 
 # Generate table of downloaded site-dates
+## Or load the pre-generated list
 folder <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/sites" 
-    
+
+all_met <- read_csv(paste0(folder, "/../progress_on_downloaded_met_site_data.csv"))
+
+if(F) {
+  
 files <- list.files(folder)
   
 all_met <- read_csv(paste0(folder, "/", files[1]), guess_max = 5) %>% 
@@ -71,6 +77,8 @@ for (file in files[-1]) {
       
       all_met <- bind_rows(tmp, all_met)
 }
+}
+
 }
 
 # Create site/date identifier
@@ -128,19 +136,20 @@ sites <- filter(sites, !site_date %in% all_met$site_date)
 # Count site-days left to download for AQI
 sites %>% filter(site_catid %in% aqi_sites$site_catid) %>% nrow() %>% print()
 
-rm(all_met)
+#rm(all_met)
 
 # Loop through site table and send DarkSky request
 all_forecasts <- tibble()
 
 requests <- 0
 
+max_requests <- 100 #998
 
 for (i in 1:nrow(sites)) {
   
   site <- sites[i, ]
   
-  if (requests > 998) break()
+  if (requests > max_requests) break()
   
   print(site$site_date)
   
@@ -194,6 +203,24 @@ if (nrow(all_forecasts) > 0) {
   
   range(unique(as.Date(all_forecasts$time)))
   
+  
+  # Update download progress file
+  new_met_dates <- all_forecasts %>%
+                   rowwise() %>%
+                   mutate(date = as.Date(time) %>% format("%Y-%m-%d")) %>%
+                   select(site_catid, date) %>%
+                   unique()
+                   
+  
+  all_met <- all_met %>%
+             mutate(date = as.character(date)) %>%
+             bind_rows(new_met_dates) %>%             
+             select(site_catid, date) %>%
+             ungroup() %>% 
+             unique()
+             
+  
+  write_csv(all_met, paste0(folder, "/../progress_on_downloaded_met_site_data.csv"))
 
   # Update individual site files
   for (i in unique(all_forecasts$site_catid)) {
