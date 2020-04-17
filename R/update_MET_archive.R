@@ -45,39 +45,39 @@ folder <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff
 all_met <- read_csv(paste0(folder, "/../progress_on_downloaded_met_site_data.csv"))
 
 if(F) {
-  
-files <- list.files(folder)
-  
-all_met <- read_csv(paste0(folder, "/", files[1]), guess_max = 5) %>% 
-           filter(!is.na(site_catid), 
-                  site_catid == gsub("[.csv]", "", files[1])) %>%
-           rowwise() %>%
-           mutate(date = format(time, "%Y-%m-%d")) %>%
-           select(site_catid, date) %>% 
-           group_by(site_catid, date) %>% 
-           slice(1)
-
-
-for (file in files[-1]) {
     
-    print(file)
+  files <- list.files(folder)
     
-    tmp <- read_csv(paste0(folder, "/", file), guess_max = 5) %>% 
-           filter(!is.na(site_catid), 
-                  site_catid == gsub("[.csv]", "", file))
-    
-    if (nrow(tmp) > 0) {
-    
-      tmp$date <- format(tmp$time, "%Y-%m-%d") 
-      
-      tmp <- tmp %>%
+  all_met <- read_csv(paste0(folder, "/", files[1]), guess_max = 5) %>% 
+             filter(!is.na(site_catid), 
+                    site_catid == gsub("[.csv]", "", files[1])) %>%
+             rowwise() %>%
+             mutate(date = format(time, "%Y-%m-%d")) %>%
              select(site_catid, date) %>% 
              group_by(site_catid, date) %>% 
              slice(1)
+  
+  
+  for (file in files[-1]) {
       
-      all_met <- bind_rows(tmp, all_met)
-}
-}
+      print(file)
+      
+      tmp <- read_csv(paste0(folder, "/", file), guess_max = 5) %>% 
+             filter(!is.na(site_catid), 
+                    site_catid == gsub("[.csv]", "", file))
+      
+      if (nrow(tmp) > 0) {
+      
+        tmp$date <- format(tmp$time, "%Y-%m-%d") 
+        
+        tmp <- tmp %>%
+               select(site_catid, date) %>% 
+               group_by(site_catid, date) %>% 
+               slice(1)
+        
+        all_met <- bind_rows(tmp, all_met)
+  }
+  }
 
 }
 
@@ -147,6 +147,8 @@ max_requests <- 100 #998
 
 for (i in 1:nrow(sites)) {
   
+  Sys.sleep(0.5)
+  
   site <- sites[i, ]
   
   if (requests > max_requests) break()
@@ -162,6 +164,8 @@ for (i in 1:nrow(sites)) {
                        error = function(err) NA)
   
   if (!is.na(day_forc)) {
+    
+    print("Download successful!")
   
     day_forc            <- day_forc$hourly 
   
@@ -171,6 +175,8 @@ for (i in 1:nrow(sites)) {
                            select(site_catid, everything())
     
   } else {
+    
+    print("Download failed.")
     
     next()
     
