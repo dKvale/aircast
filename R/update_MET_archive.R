@@ -143,7 +143,7 @@ all_forecasts <- tibble()
 
 requests <- 0
 
-max_requests <- 100 #998
+max_requests <- 995 #998
 
 for (i in 1:nrow(sites)) {
   
