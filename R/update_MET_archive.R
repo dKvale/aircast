@@ -1,6 +1,5 @@
 #! /usr/bin/env Rscript
 
-#library(purrr)   
 library(dplyr)
 library(readr)
 library(darksky) #devtools::install_github("hrbrmstr/darksky")
@@ -165,7 +164,7 @@ for (i in 1:nrow(sites)) {
   
   if (!is.na(day_forc)) {
     
-    print("Download successful!")
+    print("Download success!")
   
     day_forc            <- day_forc$hourly 
   
@@ -176,7 +175,7 @@ for (i in 1:nrow(sites)) {
     
   } else {
     
-    print("Download failed.")
+    print("Download fail.")
     
     next()
     
@@ -270,7 +269,7 @@ if (nrow(all_forecasts) > 0) {
       
         site_met <- filter(all_forecasts, site_catid == i)
         
-        site_met$precipAccumulation <- as.numeric(site_met$precipAccumulation)
+        site_met$precipIntensity <- as.numeric(site_met$precipIntensity)
         
         site_met$time <- as.character(site_met$time)
         
@@ -330,27 +329,6 @@ met_sum <- group_by(all_met2, as.Date(time)) %>%
                      cloud_miss     = sum(is.na(cloudCover)),
                      sum_miss       = sum(is.na(summary)),
                      precip_miss    = sum(is.na(precipIntensity)))
-
-}
-
-if (FALSE) {
-#------------------------------#
-# Use purr for multiple sites
-#-------------------------------#
-more_than_one <- data.frame(loc  = c("Maine", "Seattle"),
-                            lon  = c(43.2672, 47.6097),
-                            lat  = c(70.8617, 122.3331),
-                            when = c("2013-05-06T12:00:00-0400",
-                                     "2013-05-06T12:00:00-0400"),
-                            stringsAsFactors = FALSE)
-
-bigger_list <- pmap(list(more_than_one$lon, more_than_one$lat,
-                         more_than_one$when),
-                    get_forecast_for)
-
-names(bigger_list) <- more_than_one$loc
-
-bigger_list$Seattle
 
 }
 
