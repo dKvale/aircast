@@ -19,7 +19,7 @@ results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluatio
 creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
 
 
-aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us", "sirwin.mobile@gmail.com")
+aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us")
 
 #aqi_team <- "dorian.kvale@state.mn.us"
 
