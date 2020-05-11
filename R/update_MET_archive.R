@@ -239,7 +239,7 @@ if (nrow(all_forecasts) > 0) {
       # Load previously downloaded data
       temp <- read_csv(file_loc) %>% filter(!is.na(temperature), !is.na(site_catid))
       
-      if (nrow(temp) > 0) {
+      if (nrow(temp) > 1) {
         
         # Check for missing columns
         column_chk <- forecast_col_names %in% names(temp)
@@ -261,7 +261,7 @@ if (nrow(all_forecasts) > 0) {
                     arrange(precipProbability, windGust, temperature) %>%
                     slice(1)
         
-        write_csv(site_met, file_loc)
+        write_csv(site_met, file_loc, na = "")
       
       }
       
@@ -273,7 +273,7 @@ if (nrow(all_forecasts) > 0) {
         
         site_met$time <- as.character(site_met$time)
         
-        write_csv(site_met, file_loc)
+        write_csv(site_met, file_loc, na = "")
     
     }
     
@@ -312,8 +312,6 @@ if (nrow(all_forecasts) > 0) {
   
   #saveRDS(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.rdata")
   
-  #write_csv(all_met2, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.csv")
-  
   #check <- readRDS("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/MET data/DarkSky database/AQI MET archive_wair.rdata")
   
   }
@@ -329,7 +327,6 @@ met_sum <- group_by(all_met2, as.Date(time)) %>%
                      cloud_miss     = sum(is.na(cloudCover)),
                      sum_miss       = sum(is.na(summary)),
                      precip_miss    = sum(is.na(precipIntensity)))
-
 }
 
 
