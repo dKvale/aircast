@@ -80,10 +80,8 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
   # ASCDATA.CFG files in the working directory
   hysplit_config_init(dir = exec_dir)
   
-  
   if (extended_met) {
     #setup_cfg <- readLines('SETUP.CFG')
-    #setup_cfg <- gsub("(tm_.* )(0),", "\\11,", setup_cfg)
     #cat(setup_cfg,
     #    sep = "\n",
     #    file = paste0(exec_dir, "/", "SETUP.CFG"))

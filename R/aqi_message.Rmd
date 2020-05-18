@@ -1092,6 +1092,7 @@ cat(out)
 <div style="margin-top: -18px; margin-left: 18px;">
 ```{r, echo = F}
 pm_df <- readRDS('pm_table.rdata')
+
 pm_df
 ```
 </div>
@@ -1141,7 +1142,7 @@ cat('</div> \n')
 ```{r, echo = F}
 yest_board <- readRDS('yesterday_board.rdata')
 
-yest_board <- yest_board %>% subset(!Model %in% c("Farmer Weeks", "Persistant Assistant"))
+yest_board <- subset(yest_board, !Model %in% c("Farmer Weeks", "Persistant Assistant", "J.K. Rollings", "BB3 Blender",  ""))
 ```
 
 
@@ -1190,7 +1191,7 @@ if (weekend) { cat('<br> _Note: Some of MPCA&#39;s forecasts only predicted AQI 
 #Dr-Robot is getting smarter everyday.
 lead_board <- readRDS('leader_board.rdata') 
 
-lead_board <- lead_board %>% subset(!Model %in% c("Farmer Weeks", "Persistant Assistant"))
+lead_board <- subset(lead_board, !Model %in% c("Farmer Weeks", "Persistant Assistant", "J.K. Rollings", "BB3 Blender",  ""))
 
 #lead_board[1, 1] <- "MPCA Team" 
 pm_board <- subset(lead_board, Pollutant == "PM25") %>%
