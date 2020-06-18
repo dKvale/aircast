@@ -1,8 +1,8 @@
 #! /usr/bin/env Rscript
 
 library(downloader)
-library(reports)
 library(magrittr)
+#library(reports)
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
@@ -16,8 +16,8 @@ setwd("~")
 setwd(hysplit_path)
 
 # Delete old data
-delete(list.files()[grepl("traj-", list.files())])
-delete("__today")
+unlink(list.files()[grepl("traj-", list.files())])
+unlink("__today", recursive = T)
 
 
 # Create directory
@@ -50,7 +50,7 @@ closeAllConnections()
 #--------------------------------------------#
 n  <- 0  
 
-if(FALSE) {
+if (FALSE) {
   for(n in (0:5)) {
   
   new_date <- Sys.Date() - n - days_past
