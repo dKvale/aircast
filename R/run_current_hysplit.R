@@ -53,8 +53,6 @@ source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
 
 
 # Check if HYSPLIT has already run
-setwd(paste0())
-
 if (!min_exists(paste0(results_path, "/", Sys.Date(), "_AQI_raw_HYSPLIT.csv"), min_size = 100)) {
 
 # Load site locations
@@ -67,7 +65,8 @@ sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 # Trajectory function to read all sites
 aqi_traj <- function(date            = NULL, 
                      receptor_height = NULL, 
-                     traj_hours      = NULL
+                     traj_hours      = NULL,
+                     met_dir         = hysplit_path
                      ) {
   
   # Trajectory table
@@ -87,7 +86,7 @@ aqi_traj <- function(date            = NULL,
                              daily_hours  = 17,
                              direction    = "backward",
                              met_type     = "NAM",
-                             met_dir      = "C:/Users/dkvale/Desktop/aircast/hysplit/",
+                             met_dir      = met_dir,
                              extended_met = TRUE,
                              vert_motion  = 0,
                              model_height = 20000,
