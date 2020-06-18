@@ -4,8 +4,8 @@ library(readr)
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
-hysplit_path  <- "../Desktop/aircast/hysplit"
+results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/"
+hysplit_path  <- "../Desktop/aircast/hysplit/"
 
 
 #Java path
@@ -24,7 +24,8 @@ min_exists <- function(file_name, min_size = 7.2E+8) {
 }
 
 # Load site locations
-aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
+aqi_sites <- read_csv(paste0(aircast_path, 
+                             "data/monitors_and_wx_stations.csv"))
 
 names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
 
@@ -73,7 +74,7 @@ if(current_time == 12) {
   try(source(paste0(aircast_path, "R/check_nams_forecast.R")))
   
   # Send e-mail alert if today's background NAM data is missing
-  try(source(paste0(aircast_path, "R/background_alert_msg.R")))
+  #try(source(paste0(aircast_path, "R/background_alert_msg.R")))
   
   # Run HYSPLIT model
   print("Running HYSPLIT...")

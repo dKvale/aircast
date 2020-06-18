@@ -2,7 +2,8 @@
 
 #"C:\Users\dkvale\Documents\R\R-3.5.2\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\run_current_hysplit.R"
 
-library(SplitR) #devtools::install_github("rich-iannone/SplitR")
+tryCatch(library(SplitR), error = function(e) NA) #devtools::install_github("rich-iannone/SplitR")
+tryCatch(library(splitr), error = function(e) NA)
 library(dplyr)
 library(readr)
 library(tidyr)
@@ -10,16 +11,24 @@ library(here)
 
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+#aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
+
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
+#results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
+
+
+setwd("~")
+setwd(hysplit_path)
 
 
 #Java path
-Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+#Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
 
 
 # AirNow credentials
-creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
+#creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
+
+#current_time <- as.numeric(format(Sys.time(), "%H"))
 
 
 # Check file size function
@@ -30,27 +39,23 @@ min_exists <- function(file_name, min_size = 7.2E+8) {
 }
 
 # Load site locations
-aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
+#aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
-
-
-current_time <- as.numeric(format(Sys.time(), "%H"))
 
 
 # Set elevated trajectory height
 elev_ht <- 500
 
-aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
 
 source(paste0(aircast_path, "R/hysplit_traj.R"))
 source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
 
 
 # Check if HYSPLIT has already run
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
+setwd(paste0())
 
-if (!min_exists(paste0(Sys.Date(), "_AQI_raw_HYSPLIT.csv"), min_size = 100)) {
+if (!min_exists(paste0(results_path, "/", Sys.Date(), "_AQI_raw_HYSPLIT.csv"), min_size = 100)) {
 
 # Load site locations
 sites <- aqi_sites
@@ -58,9 +63,6 @@ sites <- aqi_sites
 # Filter to one site per forecast city
 sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 
-
-setwd("~")
-setwd("../Desktop/aircast/hysplit")
 
 # Trajectory function to read all sites
 aqi_traj <- function(date            = NULL, 
@@ -118,8 +120,6 @@ aqi_traj <- function(date            = NULL,
   
 }
 
-setwd("C:/Users/dkvale/Desktop/aircast/hysplit")
-
 # of days in the past, Zero is today
 days_past <- 0 
 
@@ -128,7 +128,10 @@ today <- Sys.Date() - days_past
 # Today
 forecast_day  <- "day0"
 
-met_list      <- c("__today/hysplit.t12z.namsf", "__today/hysplit.t12z.namsa", "__today/hysplit.t06z.namsf", "__today/hysplit.t06z.namsa")
+met_list      <- c("__today/hysplit.t12z.namsf",
+                   "__today/hysplit.t12z.namsa",
+                   "__today/hysplit.t06z.namsf", 
+                   "__today/hysplit.t06z.namsa")
 
 # Drop missing met data
 met_list      <- met_list[min_exists(met_list)]
@@ -137,30 +140,41 @@ closeAllConnections()
 
 start.time <- Sys.time()
 
-back_forecast <- aqi_traj(date = today, 
+back_forecast <- aqi_traj(date            = today, 
                           receptor_height = 10, 
-                          traj_hours = 24)
+                          traj_hours      = 24)
 
 end.time <- Sys.time()
 end.time - start.time
 
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today, receptor_height = elev_ht, traj_hours = 24))
+back_forecast <- bind_rows(back_forecast, 
+                           aqi_traj(date            = today, 
+                                    receptor_height = elev_ht, 
+                                    traj_hours      = 24))
 
 # Tomorrow
 forecast_day  <- "day1"
 
-day1 <- tryCatch(aqi_traj(date = today + 1, receptor_height = 10, traj_hours = 24), error = function(err) NA, silent = T)
+day1 <- tryCatch(aqi_traj(date            = today + 1, 
+                          receptor_height = 10,
+                          traj_hours      = 24),
+                 error = function(err) NA, silent = T)
 
 # If fail, use namsf      
 if (is.na(day1)) {
   
-  met_list   <- c("__today/hysplit.t12z.namf", "__today/hysplit.t12z.nama", "__today/hysplit.t06z.namf", "__today/hysplit.t06z.nama")
+  met_list   <- c("__today/hysplit.t12z.namf", 
+                  "__today/hysplit.t12z.nama",
+                  "__today/hysplit.t06z.namf", 
+                  "__today/hysplit.t06z.nama")
   
   # Drop missing met data
   met_list   <- met_list[min_exists(met_list)]
   
   # Run HYSPLIT
-  day1 <- aqi_traj(date = today + 1, receptor_height = 10, traj_hours = 24)
+  day1 <- aqi_traj(date            = today + 1, 
+                   receptor_height = 10, 
+                   traj_hours      = 24)
   
 } 
 
@@ -168,30 +182,45 @@ if (is.na(day1)) {
 back_forecast <- bind_rows(back_forecast, day1)
 
 # Elevated background
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 1, receptor_height = elev_ht, traj_hours = 24))
-
+back_forecast <- bind_rows(back_forecast, 
+                           aqi_traj(date            = today + 1, 
+                                    receptor_height = elev_ht,
+                                    traj_hours      = 24))
 
 # 2 days ahead
 forecast_day  <- "day2"
-met_list      <- c("__today/hysplit.t12z.namf", "__today/hysplit.t12z.nama", "__today/hysplit.t06z.namf", "__today/hysplit.t06z.nama")
+
+met_list      <- c("__today/hysplit.t12z.namf", 
+                   "__today/hysplit.t12z.nama",
+                   "__today/hysplit.t06z.namf", 
+                   "__today/hysplit.t06z.nama")
 
 # Drop missing met data
 met_list      <- met_list[min_exists(met_list)]
 
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 2, receptor_height = 10, traj_hours = 48))
-back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 2, receptor_height = elev_ht, traj_hours = 48))
+back_forecast <- bind_rows(back_forecast, 
+                           aqi_traj(date            = today + 2, 
+                                    receptor_height = 10,
+                                    traj_hours      = 48))
+
+back_forecast <- bind_rows(back_forecast, 
+                           aqi_traj(date            = today + 2, 
+                                    receptor_height = elev_ht,
+                                    traj_hours      = 48))
 
 # 3 days ahead
 forecast_day  <- "day3"
 
 back_forecast <- bind_rows(back_forecast, 
-                           aqi_traj(date = today + 3, receptor_height = 10, traj_hours = 72))
+                           aqi_traj(date            = today + 3,
+                                    receptor_height = 10, 
+                                    traj_hours      = 72))
 
-day3_elev     <- aqi_traj(date = today + 3, receptor_height = elev_ht, traj_hours = 72)
+day3_elev     <- aqi_traj(date            = today + 3, 
+                          receptor_height = elev_ht, 
+                          traj_hours      = 72)
 
 back_forecast <- bind_rows(back_forecast, day3_elev)
-
-#back_forecast <- bind_rows(back_forecast, aqi_traj(date = today + 3, receptor_height = elev_ht, traj_hours = 72))
 
 
 # Filter to start location
@@ -201,11 +230,9 @@ back_forecast <- filter(back_forecast, as.Date(date2) %in% c(Sys.Date() - days_p
 # Save HYSPLIT results
 back_forecast
 
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
-
-write_csv(back_forecast, paste0(Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
+write_csv(back_forecast, 
+          paste0(results_path, "/", Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
 
 }
 
 ##
-
