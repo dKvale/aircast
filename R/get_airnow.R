@@ -16,7 +16,7 @@ get_airnow <- function(dates      = c(Sys.Date(), Sys.Date()-1),
   # Connect to AirNow data site
   #https://files.airnowtech.org/
 
-  all_results <- data_frame()
+  all_results <- tibble()
   
   for (i in seq_along(dates)) {
   
@@ -36,8 +36,8 @@ get_airnow <- function(dates      = c(Sys.Date(), Sys.Date()-1),
   
     
     # Create blank table it empty
-    if (class(aqi) == "try-error") aqi <- data_frame("date" = as.character(NA),
-                                                     "aqsid" = as.character(NA),3,4,5,6,7,8)[0, ]
+    if (class(aqi) == "try-error") aqi <- tibble("date" = as.character(NA),
+                                                 "aqsid" = as.character(NA),3,4,5,6,7,8)[0, ]
   
     # Clean
     names(aqi) <- c("date", "aqsid", "City", "Parameter", "Units", "Concentration", "Hours", "Agency")
