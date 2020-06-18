@@ -279,7 +279,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
         
     # The CONTROL file is now complete and in the
     # working directory, so, execute the model run
-    shell(paste0('C: &&', ' CD "', exec_dir, '" && "', binary_path, '"'))
+    system2(paste0('C: &&', ' CD "', exec_dir, '" && "', binary_path, '"'))
     
     # Create the output folder if it doesn't exist
     if (!dir.exists(paste0(exec_dir, "/", folder_name))) {
@@ -289,7 +289,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
     # Perform the movement of all trajectory files
     # into a folder residing to the output directory
     for (i in 1:length(all_trajectory_files)) {
-         shell(paste0("(cd \"", exec_dir, "\" && move \"",
+         system2(paste0("(cd \"", exec_dir, "\" && move \"",
                       all_trajectory_files[i], "\" \"",
                       paste0(exec_dir, "/",
                              folder_name),
