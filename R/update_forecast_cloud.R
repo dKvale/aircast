@@ -7,6 +7,8 @@ aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 results_path  <- getwd()
 
 
+system("mkdir test")
+
 
 # AirNow credentials
 #creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
