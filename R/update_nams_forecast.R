@@ -4,13 +4,16 @@ library(downloader)
 library(reports)
 library(magrittr)
 
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
+#results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
 source(paste0(aircast_path, "R/get_nams_forecast.R"))
 
 
 # Navigate to user Desktop
 setwd("~")
-setwd("../Desktop/aircast/hysplit")
+setwd(hysplit_path)
 
 # Delete old data
 delete(list.files()[grepl("traj-", list.files())])
@@ -41,7 +44,6 @@ closeAllConnections()
 
 # Yesterday's
 #get_forecast_nams(date = new_date - 1, folder = "__yesterday", type = "f", time_step = 3)
-
 
 #--------------------------------------------#
 # For recent trajectories before current day
@@ -75,4 +77,3 @@ if(FALSE) {
 }
 
 ##
-

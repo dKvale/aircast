@@ -4,7 +4,7 @@ library(downloader)
 
 get_nams_forecast <- function(date        = Sys.Date(), 
                               hour        = 12, 
-                              folder      = date, 
+                              folder      = "__today", 
                               resolution  = "12km",  # "12km" or "3km"
                               type        = "a",
                               time_step   = 1        # 1 or 3 hrs
@@ -38,19 +38,8 @@ get_nams_forecast <- function(date        = Sys.Date(),
     
     file_loc <- paste0(folder, "/", file)
     
-    ## Working
-    #data  <- httr::content(GET(paste0("ftp://arlftp.arlhq.noaa.gov/forecast/", date, "/", file)))
-    
-    #save_data <- file(file_loc, "wb")
-    
-    #writeBin(a, save_data)
-
-    #data  <- getURLContent(paste0("ftp://arlftp.arlhq.noaa.gov/forecast/", date, "/", file))
-
-    
-    #writeLines(data, paste0(folder, "/", file))
-    
     if (T) {
+      
       download(url      = url,
                destfile = file_loc,
                method   = "internal",
