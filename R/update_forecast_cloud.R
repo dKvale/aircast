@@ -7,7 +7,6 @@ aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 results_path  <- getwd()
 hysplit_path  <- getwd()
 
-system("mkdir test")
 
 # AirNow credentials
 #creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
@@ -32,7 +31,7 @@ if(current_time >= 15 & current_time < 17) {
   
   # Update background NAMS data
   print("Downloading NAMS data...")
-  try(source(paste0(aircast_path, "R/update_nams_forecast.R")))
+  try(source(paste0(aircast_path, "R/update_nams_forecast.R")), silent = T)
   
 }
 
@@ -41,15 +40,15 @@ if(current_time == 17) {
   
   # Update background NAMS data (backup in case NOAA files did not download)
   print("Check background download...")
-  try(source(paste0(aircast_path, "R/check_nams_forecast.R")))
+  try(source(paste0(aircast_path, "R/check_nams_forecast.R")), silent = T)
   
   # Run HYSPLIT model
   print("Running HYSPLIT...")
-  try(source(paste0(aircast_path, "R/run_current_hysplit.R")))
+  try(source(paste0(aircast_path, "R/run_current_hysplit.R")), silent = T)
   
   # Attach background monitoring results for 16z
   print("Attaching 16Z monitoring results...")
-  try(source(paste0(aircast_path, "R/update_background_aqi.R")))
+  try(source(paste0(aircast_path, "R/update_background_aqi.R")), silent = T)
   
 
 }
@@ -59,7 +58,7 @@ if (current_time %in% c(18:20)) {
   
   # Attach background monitoring results for 17z
   print("Attaching 17Z monitoring results")
-  try(source(paste0(aircast_path, "R/update_background_aqi.R")))
+  try(source(paste0(aircast_path, "R/update_background_aqi.R")), silent = T)
   
   # E-mail background results
   #print("E-mailing background results")

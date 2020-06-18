@@ -11,15 +11,15 @@ library(stringr)
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
+#results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
 
 #Java path
-Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+#Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
 
 
 # AirNow credentials
-creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
+#creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
 
 # Check file size function
 min_exists <- function(file_name, min_size = 7.2E+8) { 
@@ -29,7 +29,7 @@ min_exists <- function(file_name, min_size = 7.2E+8) {
 }
 
 # Load site locations
-aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
+#aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
 
@@ -43,9 +43,7 @@ days_past   <- 0
 
 
 # Load HYSPLIT trajectories
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
-
-hys  <- read_csv(paste0(Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
+hys  <- read_csv(paste0(results_path, "/", Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
 
 
 # Download current AQI monitor readings for Noon
@@ -61,7 +59,7 @@ if (gmt_time > 17 | gmt_time < 14) gmt_time <- 17
 
 
 # Check if background AQI update has already run
-if (!min_exists(paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), min_size = 100)) {
+if (!min_exists(paste0(results_path, "/", Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), min_size = 100)) {
 
 airnow_base <- paste0('https://s3-us-west-1.amazonaws.com/files.airnowtech.org/airnow/', year, '/', day, '/')
 
@@ -145,7 +143,7 @@ aqi$OZONE <- ifelse(aqi$OZONE < -8, NA, aqi$OZONE)
 aqi$OZONE <- ifelse(aqi$OZONE > 250, NA, aqi$OZONE)
 
 aqi$PM25 <- ifelse(aqi$PM25 < -8, NA, aqi$PM25)
-aqi$PM25 <- ifelse(aqi$PM25 > 250, NA, aqi$PM25)
+aqi$PM25 <- ifelse(aqi$PM25 > 199, NA, aqi$PM25)
 
 missing_conc <- filter(aqi, is.na(OZONE))
 
@@ -248,7 +246,6 @@ for (i in 1:nrow(hys)) {
         hys[i, ]$wtd_pm25_Noon <- sum(near_sites_85$PM25 / sqrt(near_sites_85$dist_to_hys), na.rm = T) / sum(1/sqrt(near_sites_85$dist_to_hys))
         
       }
-      
     }
   }
 }
@@ -408,12 +405,9 @@ names(hys_wide)[1:2] <- c("site_catid", "hour_gmt")
 
 
 # SAVE results
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
-
 write.csv(hys_wide[ , ], 
-          paste0(Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
+          paste0(results_path, "/", Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
 
 }
-
 
 ##

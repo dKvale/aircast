@@ -1,15 +1,16 @@
 #! /usr/bin/env Rscript
 
 #library(splitr)
-library(SplitR)
+tryCatch(library(SplitR), error = function(e) NA) #devtools::install_github("rich-iannone/SplitR")
+tryCatch(library(splitr), error = function(e) NA)
 library(lubridate)
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
+#results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
 
-aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
+#aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
 
 
 
