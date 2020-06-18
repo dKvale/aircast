@@ -7,7 +7,7 @@ source(paste0(aircast_path, "R/get_nams_forecast.R"))
 
 
 setwd("~")
-setwd(paste0(hysplit_path, "__today"))
+setwd(paste0(hysplit_path, "/__today"))
 
 
 # Set file date as today
