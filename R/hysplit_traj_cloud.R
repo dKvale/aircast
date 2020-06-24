@@ -26,6 +26,29 @@ if (FALSE) {
                          extended_met = T) 
 }
 
+
+if (F) {
+lat            = 44.88;  # Minneapolis
+                         lon            = -93.22;
+                         height         = 10;
+                         duration       = 24;
+                         run_period     = "2017-03-23";
+                         daily_hours    = 17;
+                         direction      = "backward";
+                         met_type       = "narr";
+                         met_dir        = "__today";
+                         extended_met   = TRUE;
+                         vert_motion    = 0;
+                         model_height   = 20000;
+                         return_traj_df = TRUE;
+                         traj_name      = as.character(round(runif(1), 5));
+                         exec_dir       = getwd();
+                         binary_path    = NULL;
+                         os             = "unix";
+                         met_files      = met_list
+
+}
+
 hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                          lon            = -93.22,
                          height         = 10,
@@ -47,14 +70,18 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
   
   
   source(paste0(aircast_path, "R/hysplit_support_functions.R"))
-  
+   
   source(paste0(aircast_path, "R/traj_read.R"))
-  
+   
   if (is.null(exec_dir)) exec_dir <- getwd()
   
   if (is.null(met_dir)) met_dir   <- getwd()
   
-  binary_path <- system.file("win/hyts_std.exe", package = "SplitR")
+  binary_path <- system.file(file.path("linux-amd64", "hyts_std"), package = "splitr")
+  
+  binary_path <- paste0("..", binary_path)
+  
+  #binary_path <- "/usr/local/lib/R/site-library/splitr/linux-amd64/hysts_std.exe"
   
   # Generate name of output folder
   folder_name <- paste0("traj-", format(Sys.time(), "%Y-%m-%d-%H-%M-%S"))
@@ -118,8 +145,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
   lat <- coords$lat[z]
   lon <- coords$lon[z]
     
-  # Determine whether the run_years input is a single
-  # year or a range
+  # Determine whether the run_years input is a single year or a range
   if (exists("run_years")) run_years_single_range <- ifelse(nchar(run_years) == 4, "single", "range")
     
   # Make a vector list of run days in POSIXct format
@@ -159,33 +185,30 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
     
     # Initialize a vector that will contain names for
     # all files generated
-    all_trajectory_files <-  vector(mode = "character", length = 0)
+    all_trajectory_files <- vector(mode = "character", length = 0)
     
     # Make loop with all run days
-    i  <- 1
+    i <- 1
       
     # Define starting time parameters
-      start_year_GMT <- 
-        substr(as.character(year(list_run_days[i])), 3, 4)
+    start_year_GMT  <- substr(as.character(year(list_run_days[i])), 3, 4)
       
-      start_month_GMT <-
-        formatC(as.numeric(month(list_run_days[i])),
-                width = 2, format = "d", flag = "0")
+    start_month_GMT <- formatC(as.numeric(month(list_run_days[i])),
+                               width = 2, format = "d", flag = "0")
       
-      start_day_GMT <-
-        formatC(as.numeric(day(list_run_days[i])),
-                width = 2, format = "d", flag = "0")
+    start_day_GMT <- formatC(as.numeric(day(list_run_days[i])),
+                             width = 2, format = "d", flag = "0")
       
-      start_hour_GMT <-  daily_hours[[1]]
+    start_hour_GMT <-  daily_hours[[1]]
       
-      print(met_files)
+    print(met_files)
         
-      met <- met_files
+    met <- met_files
           
          
-      # Construct the output filename string for this
-      # model run
-      output_filename <-
+    # Construct the output filename string for this
+    # model run
+    output_filename <-
           paste0("traj-",
                  ifelse(is.null(traj_name), 
                         "", traj_name),
@@ -207,7 +230,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
         
         # Write start year, month, day, hour to
         # 'CONTROL'
-          cat(start_year_GMT, " ", 
+        cat(start_year_GMT, " ", 
               start_month_GMT, " ",
               start_day_GMT, " ",
               start_hour_GMT, "\n",
@@ -279,7 +302,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
         
     # The CONTROL file is now complete and in the
     # working directory, so, execute the model run
-    system2(paste0('C: &&', ' CD "', exec_dir, '" && "', binary_path, '"'))
+    system(paste0('cd ', exec_dir, ' && ', binary_path)) #, ' >> /dev/null 2>&1'))
     
     # Create the output folder if it doesn't exist
     if (!dir.exists(paste0(exec_dir, "/", folder_name))) {

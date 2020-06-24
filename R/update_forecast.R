@@ -5,7 +5,7 @@ library(readr)
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/"
-hysplit_path  <- "../Desktop/aircast/hysplit/"
+hysplit_path  <- "C:/users/dkvale/Desktop/aircast/hysplit/"
 
 
 #Java path
@@ -78,6 +78,7 @@ if(current_time == 12) {
   
   # Run HYSPLIT model
   print("Running HYSPLIT...")
+  try(source(paste0(aircast_path, "R/hysplit_traj.R")), silent = T)
   try(source(paste0(aircast_path, "R/run_current_hysplit.R")))
   #try(source(paste0(aircast_path, "R/run_current_hysplit_pt1.R")))
   #try(source(paste0(aircast_path, "R/run_current_hysplit_pt2.R")))

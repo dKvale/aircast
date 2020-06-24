@@ -196,11 +196,11 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
                  start_month_GMT, "-",
                  start_day_GMT, "-",
                  start_hour_GMT, "-",
-                 z,
+                 as.character(z),
                  "lat_", gsub("\\.", "p", as.character(lat)), "_",
                  "lon_", gsub("\\.", "p", as.character(lon)), "-",
-                 "hgt_", height, "-",
-                 duration, "h")
+                 "hgt_", as.character(height), "-",
+                 as.character(duration), "h")
 
         
         all_trajectory_files <- c(all_trajectory_files, output_filename)
