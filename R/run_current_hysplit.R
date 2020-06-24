@@ -4,52 +4,59 @@
 
 tryCatch(library(SplitR), error = function(e) NA) #devtools::install_github("rich-iannone/SplitR")
 tryCatch(library(splitr), error = function(e) NA)
+#library(splitr)
 library(dplyr)
 library(readr)
 library(tidyr)
 library(here)
+library(lubridate)
 
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
-#aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
-
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-#results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
 
-setwd("~")
-setwd(hysplit_path)
-
-
-#Java path
-#Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
-
-
-# AirNow credentials
-#creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
-
-#current_time <- as.numeric(format(Sys.time(), "%H"))
-
-
-# Check file size function
-min_exists <- function(file_name, min_size = 7.2E+8) { 
+if (F) {
+  aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
+  results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
+  hysplit_path  <- "C:/users/dkvale/Desktop/aircast/hysplit/"
   
-  file.exists(file_name) & file.size(file_name) > min_size
+  
+  setwd("~")
+  setwd(hysplit_path)
+  
+  
+  #Java path
+  Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+  
+  
+  # AirNow credentials
+  creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
+
+  
+  current_time <- as.numeric(format(Sys.time(), "%H"))
+  
+  
+  # Check file size function
+  min_exists <- function(file_name, min_size = 7.2E+8) { 
+    
+    file.exists(file_name) & file.size(file_name) > min_size
+    
+  }
+  
+  
+  # Load site locations
+  aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
+  
+  names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
+  
+  source(paste0(aircast_path, "R/hysplit_traj.R"))
+  source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
   
 }
 
-# Load site locations
-#aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
-
-names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
-
-
 # Set elevated trajectory height
 elev_ht <- 500
-
-
-source(paste0(aircast_path, "R/hysplit_traj.R"))
-source(paste0(aircast_path, "R/get_cmaq_forecast.R"))
 
 
 # Check if HYSPLIT has already run
@@ -66,7 +73,7 @@ sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 aqi_traj <- function(date            = NULL, 
                      receptor_height = NULL, 
                      traj_hours      = NULL,
-                     met_dir         = hysplit_path
+                     met_dir         = paste0(hysplit_path)
                      ) {
   
   # Trajectory table
@@ -120,7 +127,7 @@ aqi_traj <- function(date            = NULL,
 }
 
 # of days in the past, Zero is today
-days_past <- 0 
+days_past <- 0
 
 today <- Sys.Date() - days_past
 
@@ -139,9 +146,7 @@ closeAllConnections()
 
 start.time <- Sys.time()
 
-back_forecast <- aqi_traj(date            = today, 
-                          receptor_height = 10, 
-                          traj_hours      = 24)
+back_forecast <- aqi_traj(date = today, receptor_height = 10, traj_hours = 24)
 
 end.time <- Sys.time()
 end.time - start.time
