@@ -28,11 +28,11 @@ if (FALSE) {
 
 
 if (F) {
-lat            = 44.88;  # Minneapolis
+                         lat            = 44.88;  # Minneapolis
                          lon            = -93.22;
                          height         = 10;
                          duration       = 24;
-                         run_period     = "2017-03-23";
+                         run_period     = today;
                          daily_hours    = 17;
                          direction      = "backward";
                          met_type       = "narr";
@@ -79,7 +79,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
   
   binary_path <- system.file(file.path("linux-amd64", "hyts_std"), package = "splitr")
   
-  binary_path <- paste0("..", binary_path)
+  #binary_path <- paste0("..", binary_path)
   
   #binary_path <- "/usr/local/lib/R/site-library/splitr/linux-amd64/hysts_std.exe"
   
@@ -312,7 +312,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
     # Perform the movement of all trajectory files
     # into a folder residing to the output directory
     for (i in 1:length(all_trajectory_files)) {
-         system2(paste0("(cd \"", exec_dir, "\" && move \"",
+         system(paste0("(cd \"", exec_dir, "\" && mv \"",
                       all_trajectory_files[i], "\" \"",
                       paste0(exec_dir, "/",
                              folder_name),

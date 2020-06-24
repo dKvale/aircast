@@ -4,7 +4,7 @@ library(readr)
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-results_path  <- getwd()
+results_path  <- paste0(getwd(), "/results/")
 hysplit_path  <- getwd()
 
 
