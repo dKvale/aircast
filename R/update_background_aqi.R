@@ -182,10 +182,10 @@ names(hys)[c(1,7,8,10:12)] <- c("receptor_date", "traj_hours", "start_height",
                                 "parcel_date", "start_lat", "start_lon")
 
 
-hys$wtd_Ozone_Noon_ppb         <- NA
-hys$wtd_pm25_Noon              <- NA
-hys$backgr_o3_site_distance    <- NA
-hys$backgr_pm25_site_distance  <- NA
+hys$wtd_Ozone_Noon_ppb         <- as.numeric(NA)
+hys$wtd_pm25_Noon              <- as.numeric(NA)
+hys$backgr_o3_site_distance    <- as.numeric(NA)
+hys$backgr_pm25_site_distance  <- as.numeric(NA)
 
 hys$parcel_date   <- as.character(format(as.Date(hys$parcel_date), "%m/%d/%y"))
 
@@ -242,13 +242,13 @@ for (i in 1:nrow(hys)) {
         
         hys[i, ]$backgr_o3_site_distance  <- min(near_sites$dist_to_hys, na.rm = T) 
         
-        hys[i, ]$wtd_Ozone_Noon_ppb <- sum(near_sites_85$OZONE / sqrt(near_sites_85$dist_to_hys), na.rm = T) / sum(1/sqrt(near_sites_85$dist_to_hys))
+        hys[i, ]$wtd_Ozone_Noon_ppb <- sum(near_sites_85$OZONE / sqrt(near_sites_85$dist_to_hys), na.rm = T) / sum(1 / sqrt(near_sites_85$dist_to_hys))
         
       } else {
         
         hys[i, ]$backgr_pm25_site_distance  <- min(near_sites$dist_to_hys, na.rm = T) 
         
-        hys[i, ]$wtd_pm25_Noon <- sum(near_sites_85$PM25 / sqrt(near_sites_85$dist_to_hys), na.rm = T) / sum(1/sqrt(near_sites_85$dist_to_hys))
+        hys[i, ]$wtd_pm25_Noon <- sum(near_sites_85$PM25 / sqrt(near_sites_85$dist_to_hys), na.rm = T) / sum(1 / sqrt(near_sites_85$dist_to_hys))
         
       }
     }
@@ -275,7 +275,7 @@ hys$receptor   <- NULL
 
 #-- Fill missing values with nearest monitor
 
-#-- Create dummy table with all site + forecast day combinations
+#-- Create blank table with all site + forecast day combinations
 blank_bg <- merge(tibble(site_catid      = unique(sites$site_catid)),
                   tibble(forecast_day    = c("day0", "day1", "day2", "day3")),
                   all = T)
