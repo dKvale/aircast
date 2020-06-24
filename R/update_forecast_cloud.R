@@ -44,6 +44,7 @@ if(current_time == 17) {
   
   # Run HYSPLIT model
   print("Running HYSPLIT...")
+  try(source(paste0(aircast_path, "R/hysplit_traj_cloud.R")), silent = T)
   try(source(paste0(aircast_path, "R/run_current_hysplit.R")), silent = T)
   
   # Attach background monitoring results for 16z
