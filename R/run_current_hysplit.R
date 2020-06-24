@@ -73,7 +73,7 @@ sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 aqi_traj <- function(date            = NULL, 
                      receptor_height = NULL, 
                      traj_hours      = NULL,
-                     met_dir         = paste0(hysplit_path)
+                     met_dir         = hysplit_path
                      ) {
   
   # Trajectory table
@@ -236,6 +236,8 @@ back_forecast
 
 write_csv(back_forecast, 
           paste0(results_path, "/", Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
+
+unlink(list.files()[grepl("traj-", list.files())])
 
 }
 

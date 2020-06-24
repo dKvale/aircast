@@ -11,28 +11,33 @@ library(stringr)
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-#results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
 
-#Java path
-#Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
-
-
-# AirNow credentials
-#creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
-
-# Check file size function
-min_exists <- function(file_name, min_size = 7.2E+8) { 
+if (F) {
+    
+  results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/"
   
-  file.exists(file_name) & file.size(file_name) > min_size
+  
+  #Java path
+  Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+  
+  
+  # AirNow credentials
+  creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
+  
+  # Check file size function
+  min_exists <- function(file_name, min_size = 7.2E+8) { 
+    
+    file.exists(file_name) & file.size(file_name) > min_size
+    
+  }
+  
+  # Load site locations
+  aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
+  
+  names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
   
 }
-
-# Load site locations
-#aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
-
-names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
-
 
 # Filter to one site per forecast city
 sites <- filter(aqi_sites, !site_catid %in% c('27-017-7416'))
