@@ -237,7 +237,7 @@ back_forecast
 write_csv(back_forecast, 
           paste0(results_path, "/", Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
 
-unlink(list.files()[grepl("traj-", list.files())])
+unlink(list.files()[grepl("traj-", list.files())], force = T, recursive = T)
 
 }
 

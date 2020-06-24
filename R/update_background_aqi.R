@@ -126,7 +126,7 @@ aqi <- spread(aqi, Parameter, Concentration)
 
 
 # Check for missing site coordinates
-missing <- aqi[!unique(aqi$AqsID) %in% site_coords$AqsID, ]
+missing <- aqi[!aqi$AqsID %in% site_coords$AqsID, ]
 
 print(sort(unique(missing$Agency)))
 

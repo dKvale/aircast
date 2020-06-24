@@ -27,6 +27,8 @@ names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
 current_time <- as.numeric(format(Sys.time(), "%H"))
 
 
+
+
 if(current_time >= 15 & current_time < 17) {
   
   # Update background NAMS data
@@ -55,7 +57,7 @@ if(current_time == 17) {
 }
 
 
-if (current_time %in% c(18:20)) {
+if (current_time > 17) {
   
   # Attach background monitoring results for 17z
   print("Attaching 17Z monitoring results")
