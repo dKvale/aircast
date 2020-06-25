@@ -44,8 +44,8 @@ if(current_time == 17) {
   
   
   # Attach background monitoring results for 16z
-  print("Attaching 16Z monitoring results...")
-  try(source(paste0(aircast_path, "R/update_background_aqi.R")), silent = T)
+  #print("Attaching 16Z monitoring results...")
+  #try(source(paste0(aircast_path, "R/update_background_aqi.R")), silent = T)
 }
 
 
