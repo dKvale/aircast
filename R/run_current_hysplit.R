@@ -64,7 +64,8 @@ sites <- filter(sites, !site_catid %in% c('27-017-7416'))
 aqi_traj <- function(date            = NULL, 
                      receptor_height = NULL, 
                      traj_hours      = NULL,
-                     met_dir         = hysplit_path
+                     met_dir         = hysplit_path,
+                     met_list        = met_list
                      ) {
   
   # Trajectory table
@@ -108,7 +109,7 @@ aqi_traj <- function(date            = NULL,
     
     traj <- filter(traj, `hour.inc` %in% c(-24, -48, -72))
     
-    Sys.sleep(0.3)
+    Sys.sleep(0.25)
     
     traj_forecast <- bind_rows(traj, traj_forecast)
   }

@@ -4,11 +4,11 @@
 #' directory and processes all files into a data frame object.
 #' @param output_folder The path of the directory containing the trajectory
 #'   endpoints files.
+#' @param os Operating system. Default is "win".
 #' @return A tibble with HYSPLIT trajectory data.
 #' @examples
 #' \dontrun{
-#' # Process all trajectory output files in the
-#' # specified output directory
+#' # Process all trajectory output files in the specified output directory
 #' trajectory_df <-
 #'   trajectory_read(
 #'     output_folder = "traj--2015-06-16--23-58-44")
@@ -18,7 +18,8 @@
 #' 
 traj_read <- function(output_folder,
                       year = NULL,
-                      start_height_m_AGL = NULL) {  
+                      start_height_m_AGL = NULL,
+                      os   = "win") {  
   
   # Get file list for trajectories from the specified folder
   if (is.null(year) &
@@ -65,17 +66,17 @@ traj_read <- function(output_folder,
   traj_df <-
     dplyr::tibble(
       receptor = integer(0),
-      year = integer(0),
-      month = integer(0),
-      day = integer(0),
-      hour = integer(0),
+      year     = integer(0),
+      month    = integer(0),
+      day      = integer(0),
+      hour     = integer(0),
       hour.inc = integer(0),
-      lat = numeric(0),
-      lon = numeric(0), 
-      height = numeric(0),
+      lat      = numeric(0),
+      lon      = numeric(0), 
+      height   = numeric(0),
       pressure = numeric(0),
-      date2 = lubridate::as_datetime("2015-01-01")[-1],
-      date = lubridate::as_datetime("2015-01-01")[-1]
+      date2    = lubridate::as_datetime("2015-01-01")[-1],
+      date     = lubridate::as_datetime("2015-01-01")[-1]
     )
   
   # Process all trajectory files
@@ -162,19 +163,19 @@ traj_read <- function(output_folder,
     traj_extra_df <-
       dplyr::tibble(
         receptor = integer(0),
-        year = integer(0),
-        month = integer(0),
-        day = integer(0),
-        hour = integer(0),
-        theta = numeric(0),
+        year     = integer(0),
+        month    = integer(0),
+        day      = integer(0),
+        hour     = integer(0),
+        theta    = numeric(0),
         air_temp = numeric(0), 
         rainfall = numeric(0),
         mixdepth = numeric(0),
-        rh = numeric(0),
+        rh       = numeric(0),
         sp_humidity = numeric(0),
         h2o_mixrate = numeric(0),
-        terr_msl = numeric(0),
-        sun_flux = numeric(0)
+        terr_msl    = numeric(0),
+        sun_flux    = numeric(0)
       )
     
     extra_column_widths <- c(rep(6, 8), 8, rep(9, 13))
@@ -183,18 +184,25 @@ traj_read <- function(output_folder,
       
       file_i_path <- file.path(output_folder, file_i)
       
-      # Collapse overflow lines
+      # Collapse overflow lines on Windows
       df <- readLines(con = file.path(output_folder, file_i)) %>%
             .[nchar(.) > 0]
       
-      df_collapsed <- df[0]
+      df_collapsed <- df
       
-      for (i in seq(7, length(df)-1, 2)) {
+      if (os == "win") {
         
-        df_collapsed[i-6] <- paste0(df[i], df[i+1]) 
-      }
-      
-      df_collapsed <- df_collapsed[!is.na(df_collapsed)]
+        df_collapsed <- df[0]
+        
+        for (i in seq(7, length(df)-1, 2)) {
+          
+          df_collapsed[i-6] <- paste0(df[i], df[i+1])
+          
+        }
+        
+        df_collapsed <- df_collapsed[!is.na(df_collapsed)]
+        
+      } 
       
       traj_extra <- 
         utils::read.fwf(
@@ -211,11 +219,11 @@ traj_read <- function(output_folder,
           "air_temp", "rainfall", "mixdepth", "rh", "sp_humidity", 
           "h2o_mixrate", "terr_msl", "sun_flux") 
       
-      # Continuously bind data frames together to make
-      # a large df from all trajectory files
+      # Bind trajectory files together into a large df
       traj_extra_df <- traj_extra_df %>% dplyr::bind_rows(traj_extra)
     }
     
+    # Join extended MET to default HYSPLIT output
     traj_df <-
       traj_df %>% 
       dplyr::left_join(
@@ -223,5 +231,5 @@ traj_read <- function(output_folder,
         by = c("receptor", "year", "month", "day", "hour"))
   }
   
-  traj_df
+  return(traj_df)
 }
