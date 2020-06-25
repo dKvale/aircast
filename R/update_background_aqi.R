@@ -408,9 +408,12 @@ hys_wide$row_id <- 1:nrow(hys_wide)
 
 names(hys_wide)[1:2] <- c("site_catid", "hour_gmt")
 
+hys_wide$date <- today
+
+hys_wide <- select(hys_wide, row_id, date, everything())
 
 # SAVE results
-write.csv(hys_wide[ , ], 
+write.csv(hys_wide, 
           paste0(results_path, "/", Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
 
 }
