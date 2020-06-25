@@ -16,7 +16,7 @@ setwd("~")
 setwd(hysplit_path)
 
 # Delete old data
-unlink(list.files()[grepl("traj-", list.files())])
+unlink(list.files()[grepl("traj-", list.files())], recursive = T)
 unlink("__today", recursive = T)
 
 

@@ -1,7 +1,5 @@
 #! /usr/bin/env 
 
-#Java path
-Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
 
 library(R.utils)
 library(dplyr)
@@ -12,11 +10,20 @@ library(mailR)  #mailR reference - https://github.com/rpremraj/mailR
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
-results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
 
-
-# AirNow credentials
-creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
+if (F) {
+  
+  results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/"
+  hysplit_path  <- "C:/users/dkvale/Desktop/aircast/hysplit/"
+  gmail_path    <- "../Desktop/credents"
+  
+  # AirNow credentials
+  creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
+  
+  #Java path
+  Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+  
+}
 
 
 aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us")
@@ -25,14 +32,14 @@ aqi_team <- c("aqi.pca@state.mn.us", "dorian.kvale@state.mn.us")
 
 
 #-- Load today's AQI background file
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Current forecast")
+setwd(results_path)
 
+todays_path <- paste0(results_path, Sys.Date(), "_17z_AQI_background.csv")
 
 #-- Create e-mail message
-msg_body <- readLines(paste0(Sys.Date(), "_17z_AQI_background.csv"))
+msg_body <- readLines(todays_path)
 
 msg_body <- paste0(msg_body, collapse = "\n")
-
 
 
 #-- Send message function
@@ -49,14 +56,13 @@ send_msg <- function(x) {
             to           = x,
             subject      = paste("Background for", Sys.Date()),
             body         = msg_body,
-            html         = FALSE,
-            attach.files = paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Current forecast/", Sys.Date(), "_17z_AQI_background.csv"),
+            html         = TRUE,
+            attach.files = todays_path,
             #file.name   = ,
             #file.descriptions = c("Description for download log"),
             smtp         = smtp,
             authenticate = TRUE,
             send         = TRUE)
-  
   
 }
     
@@ -68,7 +74,7 @@ for(i in aqi_team) {
   print(i)
   
   setwd("~")
-  setwd("../Desktop/credents")
+  setwd(gmail_path)
 
   run_count <- 0
 
@@ -88,9 +94,16 @@ for(i in aqi_team) {
       
        print("Failed.")
     }
+  }
+}
 
-  }
-  }
-       
+# Delete NAMS data
+setwd("~")
+setwd(hysplit_path)
+
+# Delete old data
+unlink(list.files()[grepl("traj-", list.files())], recursive = T)
+unlink("__today", recursive = T)
+
 
 ##
