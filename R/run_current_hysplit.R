@@ -18,16 +18,14 @@ aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 
 if (F) {
   #aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
-  results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
+  results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/"
   hysplit_path  <- "C:/users/dkvale/Desktop/aircast/hysplit/"
   
   
   #Java path
   Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
   
-  
   current_time <- as.numeric(format(Sys.time(), "%H"))
-  
   
   # Check file size function
   min_exists <- function(file_name, min_size = 7.2E+8) { 
