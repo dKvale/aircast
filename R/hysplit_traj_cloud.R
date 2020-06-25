@@ -321,7 +321,8 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
 
     
     # Obtain a trajectory data frame
-    traj_df <- traj_read(output_folder = paste0(exec_dir, "/", folder_name))
+    traj_df <- traj_read(output_folder = paste0(exec_dir, "/", folder_name),
+                         os = "unix")
     
     col_names   <- colnames(traj_df)
     
