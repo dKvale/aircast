@@ -108,8 +108,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
   }
   
   # Create a coordinates list
-  coords <- list(lat = lat, 
-                 lon = lon)
+  coords <- list(lat = lat, lon = lon)
   
   z <- 1
 
@@ -118,8 +117,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
   lat <- coords$lat[z]
   lon <- coords$lon[z]
     
-  # Determine whether the run_years input is a single
-  # year or a range
+  # Determine whether the run_years input is a single year or a range
   if (exists("run_years")) run_years_single_range <- ifelse(nchar(run_years) == 4, "single", "range")
     
   # Make a vector list of run days in POSIXct format

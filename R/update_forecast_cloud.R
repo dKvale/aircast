@@ -23,6 +23,7 @@ names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
 
 current_time <- as.numeric(format(Sys.time(), "%H"))
 
+print(paste0("The current time is ", current_time))
 
 
 if(current_time == 17) {
