@@ -59,7 +59,7 @@ if (F) {
 elev_ht <- 500
 
 
-# Check if HYSPLIT has already run
+# Chefck if HYSPLIT has already run
 if (!min_exists(paste0(results_path, "/", Sys.Date(), "_AQI_raw_HYSPLIT.csv"), min_size = 100)) {
 
 # Load site locations
@@ -229,6 +229,14 @@ back_forecast <- bind_rows(back_forecast, day3_elev)
 
 # Filter to start location
 back_forecast <- filter(back_forecast, as.Date(date2) %in% c(Sys.Date() - days_past, Sys.Date() - 1 - days_past))
+
+
+# Organize
+back_forecast$run_date <- today
+
+back_forecast$row_id <- 1:nrow(back_forecast)
+
+back_forecast <- select(back_forecast, row_id, run_date, everything())
 
 
 # Save HYSPLIT results
