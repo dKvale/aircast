@@ -25,7 +25,6 @@ current_time <- as.numeric(format(Sys.time(), "%H"))
 
 
 
-
 if(current_time == 17) {
   
   # Update background NAMS data
@@ -43,11 +42,10 @@ if(current_time == 17) {
   try(source(paste0(aircast_path, "R/hysplit_traj_cloud.R")), silent = T)
   try(source(paste0(aircast_path, "R/run_current_hysplit.R")), silent = T)
   
+  
   # Attach background monitoring results for 16z
   print("Attaching 16Z monitoring results...")
   try(source(paste0(aircast_path, "R/update_background_aqi.R")), silent = T)
-  
-
 }
 
 
