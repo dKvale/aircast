@@ -17,22 +17,14 @@ aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 
 
 if (F) {
-  aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
+  #aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
   results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
   hysplit_path  <- "C:/users/dkvale/Desktop/aircast/hysplit/"
-  
-  
-  setwd("~")
-  setwd(hysplit_path)
   
   
   #Java path
   Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
   
-  
-  # AirNow credentials
-  creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
-
   
   current_time <- as.numeric(format(Sys.time(), "%H"))
   
@@ -41,9 +33,7 @@ if (F) {
   min_exists <- function(file_name, min_size = 7.2E+8) { 
     
     file.exists(file_name) & file.size(file_name) > min_size
-    
   }
-  
   
   # Load site locations
   aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
@@ -55,6 +45,9 @@ if (F) {
   
 }
 
+setwd("~")
+setwd(hysplit_path)
+  
 # Set elevated trajectory height
 elev_ht <- 500
 
