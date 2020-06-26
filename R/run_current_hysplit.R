@@ -65,7 +65,7 @@ aqi_traj <- function(date            = NULL,
                      receptor_height = NULL, 
                      traj_hours      = NULL,
                      met_dir         = hysplit_path,
-                     met_list        = met_list
+                     met_list        = met
                      ) {
   
   # Trajectory table
@@ -126,19 +126,22 @@ today <- Sys.Date() - days_past
 # Today
 forecast_day  <- "day0"
 
-met_list      <- c("__today/hysplit.t12z.namsf",
-                   "__today/hysplit.t12z.namsa",
-                   "__today/hysplit.t06z.namsf", 
-                   "__today/hysplit.t06z.namsa")
+met      <- c("__today/hysplit.t12z.namsf",
+              "__today/hysplit.t12z.namsa",
+              "__today/hysplit.t06z.namsf", 
+              "__today/hysplit.t06z.namsa")
 
 # Drop missing met data
-met_list      <- met_list[min_exists(met_list)]
+met <- met[min_exists(met)]
 
 closeAllConnections()
 
 start.time <- Sys.time()
 
-back_forecast <- aqi_traj(date = today, receptor_height = 10, traj_hours = 24)
+back_forecast <- aqi_traj(date            = today, 
+                          receptor_height = 10,
+                          traj_hours      = 24,
+                          met_list        = met)
 
 end.time <- Sys.time()
 end.time - start.time
@@ -146,26 +149,28 @@ end.time - start.time
 back_forecast <- bind_rows(back_forecast, 
                            aqi_traj(date            = today, 
                                     receptor_height = elev_ht, 
-                                    traj_hours      = 24))
+                                    traj_hours      = 24,
+                                    met_list        = met))
 
-# Tomorrow
+ # Tomorrow
 forecast_day  <- "day1"
 
 day1 <- tryCatch(aqi_traj(date            = today + 1, 
                           receptor_height = 10,
-                          traj_hours      = 24),
+                          traj_hours      = 24,
+                          met_list        = met),
                  error = function(err) NA, silent = T)
 
 # If fail, use namsf      
 if (is.na(day1)) {
   
-  met_list   <- c("__today/hysplit.t12z.namf", 
+  met   <- c("__today/hysplit.t12z.namf", 
                   "__today/hysplit.t12z.nama",
                   "__today/hysplit.t06z.namf", 
                   "__today/hysplit.t06z.nama")
   
   # Drop missing met data
-  met_list   <- met_list[min_exists(met_list)]
+  met   <- met[min_exists(met)]
   
   # Run HYSPLIT
   day1 <- aqi_traj(date            = today + 1, 
@@ -177,32 +182,36 @@ if (is.na(day1)) {
 # Join
 back_forecast <- bind_rows(back_forecast, day1)
 
+
 # Elevated background
 back_forecast <- bind_rows(back_forecast, 
                            aqi_traj(date            = today + 1, 
                                     receptor_height = elev_ht,
-                                    traj_hours      = 24))
+                                    traj_hours      = 24,
+                                    met_list        = met))
 
 # 2 days ahead
 forecast_day  <- "day2"
 
-met_list      <- c("__today/hysplit.t12z.namf", 
-                   "__today/hysplit.t12z.nama",
-                   "__today/hysplit.t06z.namf", 
-                   "__today/hysplit.t06z.nama")
+met      <- c("__today/hysplit.t12z.namf", 
+              "__today/hysplit.t12z.nama",
+              "__today/hysplit.t06z.namf", 
+              "__today/hysplit.t06z.nama")
 
 # Drop missing met data
-met_list      <- met_list[min_exists(met_list)]
+met      <- met[min_exists(met)]
 
 back_forecast <- bind_rows(back_forecast, 
                            aqi_traj(date            = today + 2, 
                                     receptor_height = 10,
-                                    traj_hours      = 48))
+                                    traj_hours      = 48,
+                                    met_list        = met))
 
 back_forecast <- bind_rows(back_forecast, 
                            aqi_traj(date            = today + 2, 
                                     receptor_height = elev_ht,
-                                    traj_hours      = 48))
+                                    traj_hours      = 48,
+                                    met_list        = met))
 
 # 3 days ahead
 forecast_day  <- "day3"
@@ -210,14 +219,17 @@ forecast_day  <- "day3"
 back_forecast <- bind_rows(back_forecast, 
                            aqi_traj(date            = today + 3,
                                     receptor_height = 10, 
-                                    traj_hours      = 72))
+                                    traj_hours      = 72,
+                                    met_list        = met))
 
 day3_elev     <- aqi_traj(date            = today + 3, 
                           receptor_height = elev_ht, 
-                          traj_hours      = 72)
+                          traj_hours      = 72,
+                          met_list        = met)
 
 back_forecast <- bind_rows(back_forecast, day3_elev)
 
+bk <- back_forecast
 
 # Filter to start location
 back_forecast <- filter(back_forecast, as.Date(date2) %in% c(Sys.Date() - days_past, Sys.Date() - 1 - days_past))

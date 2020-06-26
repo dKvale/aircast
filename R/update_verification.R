@@ -35,6 +35,8 @@ aqi_forc_all <- tibble()
 
 for (i in 0:4) {
 
+  print(i)
+  
   aqi_forc <- readLines(paste0("https://s3-us-west-1.amazonaws.com//files.airnowtech.org/airnow/",
                                 format(Sys.Date() - i, "%Y/%Y%m%d"),
                                "/reportingarea.dat"))
@@ -64,6 +66,8 @@ for (i in 0:4) {
 
 
   # Replace missing forecast values with AQI color
+  aqi_forc$aqi <- as.character(aqi_forc$aqi)
+  
   aqi_forc[is.na(aqi_forc$aqi), ]$aqi <- label2cat(aqi_forc[is.na(aqi_forc$aqi), ]$aqi_cat)
 
 
@@ -440,10 +444,14 @@ actuals <- ungroup(actuals) %>%
 actuals[actuals$aqsid == "271370034", "site_catid"] <- "27-137-9000"
 
 
-# Collapse Duluth sites to one
-duluth_pm <- as.numeric(actuals[actuals$site_catid == "27-137-7554", c("count_pm25_obs", "obs_pm25_ugm3", "obs_pm25_aqi")])
+# Collapse Duluth sites to one row
+if ("27-137-7554" %in% actuals$site_catid & "27-137-7550" %in% actuals$site_catid) {
+  
+  duluth_pm <- as.numeric(actuals[actuals$site_catid == "27-137-7554", c("count_pm25_obs", "obs_pm25_ugm3", "obs_pm25_aqi")]) %>% unlist()
+  
+  actuals[actuals$site_catid == "27-137-7550", c("count_pm25_obs", "obs_pm25_ugm3", "obs_pm25_aqi")] <- as.list(duluth_pm)
 
-actuals[actuals$site_catid == "27-137-7550", c("count_pm25_obs", "obs_pm25_ugm3", "obs_pm25_aqi")] <- duluth_pm
+}
 
 # Drop non-forecasted sites
 actuals <- filter(actuals, !air_monitor %in% c("Voyageurs", "Laura McArthur Sch"))
@@ -580,6 +588,5 @@ print("Saving event file...")
 write.csv(all_events, "event_table.csv", row.names = F)
 
 saveRDS(all_events, paste0("Archive/", Sys.Date(), "_event_table.Rdata"))
-
 
 ##

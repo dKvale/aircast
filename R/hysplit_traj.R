@@ -54,7 +54,14 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
   
   if (is.null(met_dir)) met_dir   <- getwd()
   
-  binary_path <- system.file("win/hyts_std.exe", package = "SplitR")
+  binary_path <- system.file("win/hyts_std.exe", package = "splitr")
+  
+  if (nchar(binary_path) < 4) {
+    
+    binary_path <- system.file("win/hyts_std.exe", package = "SplitR")
+    
+    
+  }
   
   # Generate name of output folder
   folder_name <- paste0("traj-", format(Sys.time(), "%Y-%m-%d-%H-%M-%S"))
@@ -176,7 +183,7 @@ hysplit_traj <- function(lat            = 44.88,  # Minneapolis
       
       start_hour_GMT <-  daily_hours[[1]]
       
-      print(met_files)
+      #print(met_files)
         
       met <- met_files
           
