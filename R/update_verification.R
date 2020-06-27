@@ -323,6 +323,9 @@ while (!load_hys) {
 
 if (!is.na(hys)) {
 
+# Drop run_date and row_id
+hys <- select(hys, -row_id, -run_date)  
+  
 # Convert day index column
 hys$forecast_day <- as.numeric(gsub("day", "", hys$forecast_day))
 
@@ -512,6 +515,7 @@ for (i in 1:2) {
 
 # Attach CMAQ to yesterday forecasts
 if (nrow(cmaq_all) > 0) {
+  
   yesterday_fcst <- left_join(select(yesterday_fcst, -cmaq_ozone_ppb, -cmaq_ozone_aqi),
                               cmaq_all)
 }

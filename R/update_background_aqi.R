@@ -47,7 +47,8 @@ days_past   <- 0
 
 
 # Load HYSPLIT trajectories
-hys  <- read_csv(paste0(results_path, "/", Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
+hys  <- read_csv(paste0(results_path, "/", Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv")) %>%
+        select(-row_id, -run_date)
 
 
 # Download current AQI monitor readings for Noon
@@ -254,9 +255,10 @@ for (i in 1:nrow(hys)) {
   }
 }
 
-
-
 hys_bk <- hys
+
+# Filter out extra parcel dates
+hys <- dplyr::filter(hys, parcel_date != format(Sys.Date()-1, "%m/%d/%y") | forecast_day != "day1")
 
 # Round values
 hys$wtd_Ozone_Noon_ppb <- round(hys$wtd_Ozone_Noon_ppb, 1)
@@ -371,13 +373,16 @@ hys_mean <- group_by(hys, site_catid, parcel_date, traj_hours, hour) %>%
 group_by(hys_mean, site_catid, traj_hours) %>% summarize(count = n()) %>% .$count %>% range()
 
 
+
 #-- Wide format
 
 # Ozone
 hys_o3  <- spread(select(hys_mean, -c(parcel_date, mean_Ozone_Noon_ppb_10m:mean_pm25_Noon_elev)), traj_hours, mean_Ozone_Noon_ppb)
+
 names(hys_o3)[3:ncol(hys_o3)]  <- paste0(names(hys_o3)[3:ncol(hys_o3)], "_mean_backgr_ozone")
 
 hys_o3_10m <- spread(select(hys_mean, -c(parcel_date, mean_Ozone_Noon_ppb, mean_Ozone_Noon_ppb_elev:mean_pm25_Noon_elev)), traj_hours, mean_Ozone_Noon_ppb_10m)
+
 names(hys_o3_10m)[3:ncol(hys_o3_10m)]  <- paste0(names(hys_o3_10m)[3:ncol(hys_o3_10m)], "_backgr_ozone_10m")
 
 hys_o3_elev <- spread(select(hys_mean, -c(parcel_date, mean_Ozone_Noon_ppb, mean_Ozone_Noon_ppb_10m, mean_pm25_Noon:mean_pm25_Noon_elev)), traj_hours, mean_Ozone_Noon_ppb_elev)
