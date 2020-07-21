@@ -88,6 +88,11 @@ if(current_time == 12) {
   print("Attaching 16Z monitoring results...")
   try(source(paste0(aircast_path, "R/update_background_aqi.R")))
   
+  hys <- read_csv(paste0(results_path, "/", Sys.Date(), "_16z_AQI_background.csv"))
+  try(hys <- dplyr::select(hys, -row_id, -date), silent = T)
+  
+  write.csv(hys, paste0(results_path, "/", Sys.Date(), "_16z_AQI_background.csv"), row.names = F)
+  
   # Grab CMAQ forecast
   #print("Downloading CMAQ")
   #try(source(paste0(aircast_path, "R/update_cmaq_forecast.R")))
@@ -100,6 +105,13 @@ if(current_time > 12 & current_time < 15) {
   # Attach background monitoring results for 17z
   print("Attaching 17Z monitoring results")
   try(source(paste0(aircast_path, "R/update_background_aqi.R")))
+  
+  hys <- read_csv(paste0(results_path, "/", Sys.Date(), "_17z_AQI_background.csv"))
+  
+  try(hys <- dplyr::select(hys, -row_id, -date), silent = T)
+  
+  # SAVE results
+  write.csv(hys, paste0(results_path, "/", Sys.Date(), "_17z_AQI_background.csv"), row.names = F)
   
   # E-mail background results
   print("E-mailing background results")

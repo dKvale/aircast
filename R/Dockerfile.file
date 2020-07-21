@@ -1,0 +1,36 @@
+FROM rocker/r-ver:4.0.0
+
+RUN set -ex ;\
+  apt-get update ;\
+  apt-get -y dist-upgrade ;\
+  apt-get install -y libcurl4-openssl-dev ;\
+  apt-get install -y libpng-dev ;\
+  apt-get install -y libssl-dev ;\
+  apt-get install -y libxml2-dev ;\
+  apt-get install -y \
+    r-cran-devtools \
+    r-cran-rcurl \
+    r-cran-downloader \
+    r-cran-ggrepel \
+    r-cran-gridextra \
+    r-cran-lubridate \
+    r-cran-xml2 \
+    r-cran-magrittr \
+    r-cran-rvest \
+    r-cran-r.utils ;\
+  apt-get install -y --no-install-recommends \
+    r-cran-rjava \
+    r-cran-rpostgresql ;\
+  echo "deb http://ftp.osuosl.org/pub/ubuntu bionic main universe" | tee -a /etc/apt/sources.list ;\
+  apt-get update ;\
+  apt-get install -y libgfortran3 ;\
+  apt-get autoremove --purge -y ;\
+  rm -rf /var/lib/apt/lists/*
+
+RUN set -ex ;\
+  R -e 'install.packages(c("darksky", "here", "measurements", "remotes", "geosphere", "tidyverse", "stringr"), ncpus = 2)' ;\
+  R -e 'remotes::install_github("rich-iannone/splitr", upgrade="never")'
+
+VOLUME ["/data"]
+WORKDIR /data
+

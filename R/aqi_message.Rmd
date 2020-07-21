@@ -580,7 +580,7 @@ model_names <- tibble(Model = c(
                             "cmaq_prod_aqi"))
                             #"cmaq_bc_aqi"))
                           
-if(nrow(tall_o3) > 0) {
+if (nrow(tall_o3) > 0) {
   
 o3_performance <- tall_o3 %>%
                      group_by(Site) %>%
@@ -713,7 +713,7 @@ if (!weekend) {
     
   if (ncol(yest_board) > 8) {
     
-     yest_board[1, c(4:6, 9:11)] <- NA 
+     #yest_board[1, c(4:6, 9:11)] <- NA 
     
      # Yesterday's performance
      yest_board <- yest_board %>%
@@ -761,7 +761,6 @@ if (ncol(yest_board) > 8) {
                          `O3 cat accuracy %`    = `O3 cat accuracy %` %>% as.numeric() %>% round(),
                          `O3 yellow accuracy %` = `O3 yellow accuracy %` %>% as.numeric() %>% round())
   
-
 } 
   
 yest_board <- rename(yest_board,
@@ -782,13 +781,17 @@ yest_board <- yest_board %>%
 
 
 yest_board <- bind_cols(select(yest_board, matches("O3 err|M error|Model")) %>%
-                           mutate_if(is.numeric, round, digits=1),
-                         select(yest_board, -matches("M error|Model")) %>%
-                           mutate_if(is.numeric, round))
+                           mutate_if(is.numeric, round, digits = 1),
+                         select(yest_board, -matches("O3 err|M error|Model")) %>%
+                           mutate_if(is.numeric, round)) %>%
+              select(Model, contains("O3"), contains("PM"))
 
 # Replace NA's with spaces
+yest_board <- mutate_all(yest_board, as.character)
+
 yest_board[is.na(yest_board)] <- "NA"
   
+yest_board[yest_board == "NaN"] <- " "
 
 # Add date of forecast  
 # yest_board <- cbind(yest_board, tibble("Date of forecast" = c(fcast_date, fcast_date, cmaq_date, rep(NA, 4))))
@@ -831,6 +834,7 @@ names(yest_board) <- gsub("O3 ", "", names(yest_board)) %>%
                      gsub("yell", "Yell", .) %>%
                      gsub("err", "Err", .)
 
+yest_board[yest_board == "NaN"] <- " "
 
 
 # Total running performance
@@ -1150,7 +1154,7 @@ yest_board <- subset(yest_board, !Model %in% c("Farmer Weeks", "Persistant Assis
 <div style="margin-left: 18px;">
 ```{r, echo=F}
 if (ozone_season) {
-  yest_board[yest_board$Model != "CMAQ", c(1,3,9:12)]
+  yest_board[yest_board$Model != "CMAQ", c(1,7:11)]
 } else {
   yest_board
   #filter(yest_board, Model != "CMAQ")
@@ -1168,7 +1172,7 @@ if (ozone_season) {
 <div style="margin-left: 18px;">
 ```{r, echo=F}
 if (ozone_season) {
-  yest_board[ , c(1,2,4:8)]
+  yest_board[ , c(1:6)]
 }
 ```
 </div>
