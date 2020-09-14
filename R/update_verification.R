@@ -123,7 +123,7 @@ for (i in 0:4) {
     if (!"PM2.5" %in% names(aqi_forc)) aqi_forc$`PM2.5` <- NA
 
     # Join all
-    aqi_forc_all <-  rbind(aqi_forc, aqi_forc_all )
+    aqi_forc_all <-  rbind(aqi_forc, aqi_forc_all)
 
   }
 
@@ -427,10 +427,15 @@ all_verify$cmaq_prod_pm_aqi <- as.numeric(all_verify$cmaq_prod_pm_aqi)
 all_verify$cmaq_prod_o3 <- as.numeric(all_verify$cmaq_prod_o3)
 all_verify$cmaq_prod_o3_aqi <- as.numeric(all_verify$cmaq_prod_o3_aqi)
 
-verify$fcst_ozone_aqi     <- as.character(verify$fcst_ozone_aqi)
-verify$fcst_pm25_aqi      <- as.character(verify$fcst_pm25_aqi)
+# All logical columns to numeric
+all_verify <- mutate_if(all_verify, is.logical, as.numeric)
+verify     <- mutate_if(verify, is.logical, as.numeric)
 
-all_verify <- bind_rows(verify, all_verify, )
+
+verify$fcst_ozone_aqi <- as.character(verify$fcst_ozone_aqi)
+verify$fcst_pm25_aqi  <- as.character(verify$fcst_pm25_aqi)
+
+all_verify <- bind_rows(verify, all_verify)
 
 
 # Yesterday's actuals
@@ -559,9 +564,12 @@ setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fol
 
 print("Saving file...")
 
-all_verify  <- select(all_verify, -short_name) %>%
+all_verify <- select(all_verify, -short_name) %>%
                left_join(select(sites, short_name, site_catid)) %>%
                select(forecast_date, forecast_day, site_catid, short_name, group, everything())
+
+all_verify <- dplyr::filter(all_verify, 
+                            as.numeric(format(forecast_date, "%Y")) > (as.numeric(format(Sys.Date(), "%Y")) - 1))
 
 saveRDS(all_verify, paste0("Archive/", Sys.Date(), "_verification_table.Rdata"))
 
