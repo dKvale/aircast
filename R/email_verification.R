@@ -174,6 +174,7 @@ cat(add)
 shell(add)
 
 commit <- paste0(git, 'commit -m ', '"update weekly performance"')
+
 cat(commit)
 
 system(commit)
