@@ -6,6 +6,23 @@ library(darksky) #devtools::install_github("hrbrmstr/darksky")
 
 options(digits = 12)
 
+
+
+aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
+aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
+results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
+
+
+# Load site locations
+aqi_sites <- read_csv(paste0(aircast_path,
+                             "data/monitors_and_wx_stations.csv"))
+
+names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
+
+
+#"C:\Users\dkvale\Documents\R\R-4.0.2\bin\x64\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\update_MET_archive.R"
+
+
 # AQI monitoring sites
 sites <- aqi_sites
 
