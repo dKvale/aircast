@@ -36,7 +36,6 @@ sites <- aqi_sites
 sites <- dplyr::filter(sites, !fcst_region %in% c("CA", "ND", "SD", "WI", "IA"))
 
 
-
 # Yesterday's official submitted forecast
 #--------------------------------#
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values")
@@ -398,14 +397,17 @@ if ("try-error" %in% class(all_verify)) {
 
 }
 
-all_verify <- dplyr::filter(all_verify, !duplicated(paste0(forecast_date, forecast_day, site_catid)))
+all_verify <-  all_verify %>%
+               group_by(forecast_date, forecast_day, site_catid) %>%
+               slice(1) %>%
+               ungroup()
 
 
 #-- Remove duplicates and NA forecast days
 all_verify <- dplyr::filter(all_verify,
-                     !paste(forecast_date, forecast_day, site_catid) %in% paste(verify$forecast_date, verify$forecast_day, site_catid),
-                     !is.na(forecast_day),
-                     !is.na(forecast_date))
+                            !paste(forecast_date, forecast_day, site_catid) %in% paste(verify$forecast_date, verify$forecast_day, site_catid),
+                            !is.na(forecast_day),
+                            !is.na(forecast_date))
 
 
 #-- Set background types for joining
@@ -428,8 +430,8 @@ all_verify$cmaq_prod_o3 <- as.numeric(all_verify$cmaq_prod_o3)
 all_verify$cmaq_prod_o3_aqi <- as.numeric(all_verify$cmaq_prod_o3_aqi)
 
 # All logical columns to numeric
-all_verify <- mutate_if(all_verify, is.logical, as.numeric)
-verify     <- mutate_if(verify, is.logical, as.numeric)
+all_verify <- try(mutate_if(all_verify, is.logical, as.numeric))
+verify     <- try(mutate_if(verify, is.logical, as.numeric))
 
 
 verify$fcst_ozone_aqi <- as.character(verify$fcst_ozone_aqi)
