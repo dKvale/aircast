@@ -6,17 +6,28 @@ output:
     self_contained: no
 ---
 
+
+```{r setup, include=F}
+
+# Set No. of days before yesterday, 0 is default
+days_past <- 0
+
+# Date for report
+report_date <- Sys.Date() - 1 - days_past
+
+knitr::opts_chunk$set(echo=T, warning=F, message=F)
+```
+
+
 <hr style = "border: 1px dashed #d3d3d3; border-bottom: 0px; max-width: 1000px; margin-left: 0;">
 
 <p style="font-size: 32px; font-weight: 800; margin-bottom: 0;"> Daily AQI report </p>   
 
 <p style="margin-top: 8px; font-size: 18px; font-weight: 700; color: #606060;">
-`r format(Sys.Date() - 1, "%A %b %d, %Y")`</p>  
+`r format(report_date, "%A %b %d, %Y")`</p>  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo=T, warning=F, message=F)
-```
-  
+
+ 
 <hr style = "border: 1px dashed #d3d3d3; border-bottom: 0px; max-width: 1000px; margin-left: 0;">
 
 
@@ -35,19 +46,17 @@ library(magrittr)
 # Save results?
 save_stats <- TRUE
 
-# Set No. of days before yesterday, 0 is default
-days_past <- 0
-
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 
 
 # Test for weekend
-weekend <- weekdays(Sys.Date() - 1 - days_past) %in% c("Sunday","Monday")
+weekend <- weekdays(report_date) %in% c("Sunday","Monday")
 
 
 # Test for Ozone season
-ozone_season <- as.numeric(format(Sys.Date() - 1, "%m")) %in% 4:10
+ozone_season <- yday(report_date) > 74 & month(report_date) %in% 3:9
+
 
 
 # AQI conversion functions
@@ -139,7 +148,6 @@ if (weekend) verify <- verify %>%
                                                          as.numeric(fcst_pm25_aqi),
                                                          cat2aqi(fcst_pm25_aqi)))
 
-
 # Set forecast to numeric
 verify <- mutate(verify, 
                  fcst_ozone_aqi = as.numeric(fcst_ozone_aqi),
@@ -155,7 +163,7 @@ verify <- left_join(select(verify, -matches("roll_ozone_aqi|roll_pm25_aqi|roll11
 
 
 #-- Dates
-fcast_date <- Sys.Date() - 1 - as.numeric(gsub("day", "", verify$forecast_day[1]))
+fcast_date <- report_date - as.numeric(gsub("day", "", verify$forecast_day[1]))
 
 cmaq_date  <- fcast_date
 
@@ -336,7 +344,7 @@ tall_o3 <- tall_o3 %>%
 ```
   
   
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.width=6, fig.height=6, fig.show='hide'}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.width=6, fig.height=6, fig.show='hide'}
   
 # Order sites
 tall_o3$Site <- factor(tall_o3$Site, levels = rev(arrange(filter(tall_o3, model == "Obs AQI"), -conc)$Site))
@@ -351,21 +359,23 @@ verify_o3 <-  verify_o3 %>%
               rowwise() %>%
               mutate(pollutant        = "Ozone",
                      background_color = aqi2color(`Obs AQI`)) %>%
-              rename(cmaq_prod_conc   = cmaq_prod_o3)
+              rename(cmaq_prod_conc   = cmaq_prod_o3) %>%
+              filter(!is.na(Site))
                      #cmaq_bc_conc     = cmaq_bc_o3)
 
 verify_pm <-  verify_pm %>%
               rowwise() %>%
               mutate(pollutant = "PM2.5",
                      background_color = aqi2color(`Obs AQI`)) %>%
-              rename(cmaq_prod_conc   = cmaq_prod_pm)
+              rename(cmaq_prod_conc   = cmaq_prod_pm) %>%
+              filter(!is.na(Site))
                      #cmaq_bc_conc     = cmaq_bc_pm)
                      
 if(nrow(verify_o3) < 1) {
   
   verify_o3[1, ] <- NA
  
-  verify_o3$background_color <- NA
+  verify_o3$background_color <- as.character(NA)
   
   verify_all <- bind_rows(verify_o3[0, ], verify_pm)
   
@@ -496,7 +506,7 @@ verify_pm$background_color <- NULL
 # Load past results
 #lead_board <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification/lead_board.csv")
 
-lead_board <- try(read_csv(paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification/Archive leaders/", Sys.Date() - 1, "-lead_board.csv")),
+lead_board <- try(read_csv(paste0("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/Verification/Archive leaders/", report_date, "-lead_board.csv")),
                   silent = TRUE)
 
 
