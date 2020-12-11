@@ -9,8 +9,7 @@ results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluatio
 
 
 # Load site locations
-aqi_sites <- read_csv(paste0(aircast_path,
-                             "data/monitors_and_wx_stations.csv"))
+aqi_sites <- read_csv(paste0(aircast_path, "data/monitors_and_wx_stations.csv"))
 
 names(aqi_sites) <- gsub(" ", "_", tolower(names(aqi_sites)))
 
@@ -125,7 +124,6 @@ for (i in 0:4) {
     aqi_forc_all <-  rbind(aqi_forc, aqi_forc_all)
 
   }
-
 }
 
 
@@ -173,7 +171,6 @@ aqi_forc_updates <- select(aqi_forc, Group, OZONE, `PM2.5`, DayIndex, Date) %>%
 
 aqi_forc_updates <- left_join(aqi_forc_updates,
                               select(aqi_forc_int, Group:Longitude) %>% unique())
-
 
 
 aqi_forc <- bind_rows(aqi_forc_original, aqi_forc_updates)
@@ -299,6 +296,7 @@ all_inputs$site_catid
 verify   <- left_join(verify, select(all_inputs, -short_name))
 
 
+
 # Yesterday's HYSPLIT origins
 #--------------------------------#
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
@@ -356,9 +354,9 @@ hys_10m             <- hys_10m[ , -c(2:11,13)]
 names(hys_10m)[4:ncol(hys_10m)]  <- paste0(names(hys_10m)[4:ncol(hys_10m)], "_10m")
 
 #hys_500m           <- spread(hys_500m[ , -c(2:13)], forecast_day, lat_long)
-hys_500m            <- hys_500m[ , -c(2:11,13)]
+hys_500m            <- hys_500m[ , -c(2:11,13,14)]
 
-names(hys_500m)[4:ncol(hys_500m)] <- paste0(names(hys_500m)[4:ncol(hys_500m)], "_500m")
+names(hys_500m)[3:ncol(hys_500m)] <- paste0(names(hys_500m)[3:ncol(hys_500m)], "_500m")
 
 
 #-- Join 10m and 500m tables
@@ -369,7 +367,7 @@ hys_origin <- full_join(hys_10m, hys_500m)
 hys_origin$date <- as.Date(hys_origin$date)
 
 
-#-- Join HYSPLIT origin to verifcation table
+#-- Join HYSPLIT origin to verification table
 names(hys_origin)[1:2] <- c("site_catid", "forecast_date")
 
 verify <- left_join(verify, hys_origin)
@@ -403,13 +401,6 @@ all_verify <-  all_verify %>%
                ungroup()
 
 
-#-- Remove duplicates and NA forecast days
-all_verify <- dplyr::filter(all_verify,
-                            !paste(forecast_date, forecast_day, site_catid) %in% paste(verify$forecast_date, verify$forecast_day, site_catid),
-                            !is.na(forecast_day),
-                            !is.na(forecast_date))
-
-
 #-- Set background types for joining
 if (!is.na(hys)) {
   verify$background_10m_500m_avg_24hr_ozone_noon_ppb <- as.numeric(verify$background_10m_500m_avg_24hr_ozone_noon_ppb)
@@ -429,6 +420,7 @@ all_verify$cmaq_prod_pm_aqi <- as.numeric(all_verify$cmaq_prod_pm_aqi)
 all_verify$cmaq_prod_o3 <- as.numeric(all_verify$cmaq_prod_o3)
 all_verify$cmaq_prod_o3_aqi <- as.numeric(all_verify$cmaq_prod_o3_aqi)
 
+
 # All logical columns to numeric
 all_verify <- try(mutate_if(all_verify, is.logical, as.numeric))
 verify     <- try(mutate_if(verify, is.logical, as.numeric))
@@ -437,6 +429,36 @@ verify     <- try(mutate_if(verify, is.logical, as.numeric))
 verify$fcst_ozone_aqi <- as.character(verify$fcst_ozone_aqi)
 verify$fcst_pm25_aqi  <- as.character(verify$fcst_pm25_aqi)
 
+
+## Use Archive table Day 1 forecast if model results missing
+#verify <- bind_rows(verify, filter(all_verify, forecast_date == (today -days_past), forecast_day == 1))
+
+#verify <- verify %>%
+#          group_by(site_catid, forecast_date, forecast_day) %>%
+#          arrange()
+
+
+#-- Remove duplicates and NA forecast days
+all_verify <- dplyr::filter(all_verify,
+                            !is.na(forecast_day),
+                            !is.na(forecast_date))
+
+unique_forecasts <- with(subset(all_verify, !is.na(mod_aqi_pm_ens)), paste(forecast_date, forecast_day, site_catid))
+
+verify <- filter(verify, 
+                 !paste(forecast_date, forecast_day, site_catid) %in% unique_forecasts)
+
+unique_forecasts <- with(subset(verify, !is.na(mod_aqi_pm_ens)), paste(forecast_date, forecast_day, site_catid))
+
+all_verify <- filter(all_verify, 
+                     !paste(forecast_date, forecast_day, site_catid) %in% unique_forecasts)
+
+unique_forecasts <- with(all_verify, paste(forecast_date, forecast_day, site_catid))
+
+verify <- filter(verify, 
+                 !paste(forecast_date, forecast_day, site_catid) %in% unique_forecasts)
+
+# Join all
 all_verify <- bind_rows(verify, all_verify)
 
 
@@ -473,7 +495,7 @@ if ("27-137-7554" %in% actuals$site_catid & "27-137-7550" %in% actuals$site_cati
 
 }
 
-# Drop non-forecasted sites
+# Drop non-forcasted sites
 actuals <- dplyr::filter(actuals, !air_monitor %in% c("Voyageurs", "Laura McArthur Sch"))
 
 actuals <- dplyr::filter(actuals, !is.na(site_catid))
@@ -557,7 +579,7 @@ all_verify <- rbind(yesterday_fcst, all_verify)
 
 
 # Limit table to past 365 days
-all_verify <- dplyr::filter(all_verify, forecast_date > (today - 365))
+all_verify <- subset(all_verify, forecast_date > (today - 365))
 
 #------------------------------------------------#
 # Save master verification table
@@ -567,11 +589,11 @@ setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Fol
 print("Saving file...")
 
 all_verify <- select(all_verify, -short_name) %>%
-               left_join(select(sites, short_name, site_catid)) %>%
-               select(forecast_date, forecast_day, site_catid, short_name, group, everything())
+              left_join(select(sites, short_name, site_catid)) %>%
+              select(forecast_date, forecast_day, site_catid, short_name, group, everything())
 
-all_verify <- dplyr::filter(all_verify, 
-                            as.numeric(format(forecast_date, "%Y")) > (as.numeric(format(Sys.Date(), "%Y")) - 1))
+all_verify <- subset(all_verify, 
+                     as.numeric(format(forecast_date, "%Y")) > (as.numeric(format(Sys.Date(), "%Y")) - 1))
 
 saveRDS(all_verify, paste0("Archive/", Sys.Date(), "_verification_table.Rdata"))
 
