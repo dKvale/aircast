@@ -89,8 +89,6 @@ for (i in 0:4) {
 
 
   # Filter sites, drop Voyageurs
-  #unique(aqi_forc$Group)
-
   unique(sites$fcst_region)
 
   aqi_forc <- dplyr::filter(aqi_forc,
@@ -132,7 +130,7 @@ aqi_forc <- unique(aqi_forc_all)
 
 
 # Select most recent forecast
-aqi_forc <- aqi_forc %>% arrange(DayIndex) %>% group_by(Date, Group) %>% slice(1)
+#aqi_forc <- aqi_forc %>% arrange(DayIndex) %>% group_by(Date, Group) %>% slice(1)
 
 
 # Load internal forecasts for missing sites
@@ -240,9 +238,10 @@ names(verify) <- gsub("AQI_O3_", "mod_aqi_o3_", names(verify))
 names(verify) <- gsub("Pm25Avg ", "mod_pm25avg_", names(verify))
 names(verify) <- gsub("AQI_PM_", "mod_aqi_pm_", names(verify))
 
-verify <- rename(verify, 
-                 forecast_day = DayIndex, 
-                 site_catid   = ID)
+verify <- rename(verify,
+                 forecast_date = Date,
+                 forecast_day  = DayIndex, 
+                 site_catid    = ID)
 
 names(verify) <- gsub("AQI_O3", "fcst_ozone_aqi", names(verify))
 names(verify) <- gsub("Max Avg8Hr", "fcst_ozone_ppb", names(verify))
@@ -250,8 +249,6 @@ names(verify) <- gsub("AQI_PM", "fcst_pm25_aqi", names(verify))
 names(verify) <- gsub("Pm25Avg", "fcst_pm25_ugm3", names(verify))
 
 names(verify) <- tolower(names(verify))
-
-verify <- rename(verify, forecast_date = date)
 
 
 # Rearrange columns with dates first
@@ -294,7 +291,6 @@ verify$site_catid
 all_inputs$site_catid
 
 verify   <- left_join(verify, select(all_inputs, -short_name))
-
 
 
 # Yesterday's HYSPLIT origins
@@ -373,6 +369,7 @@ names(hys_origin)[1:2] <- c("site_catid", "forecast_date")
 verify <- left_join(verify, hys_origin)
 
 }
+
 
 # Clean table
 #--------------------------------#
@@ -457,6 +454,7 @@ unique_forecasts <- with(all_verify, paste(forecast_date, forecast_day, site_cat
 
 verify <- filter(verify, 
                  !paste(forecast_date, forecast_day, site_catid) %in% unique_forecasts)
+
 
 # Join all
 all_verify <- bind_rows(verify, all_verify)
