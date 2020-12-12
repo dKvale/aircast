@@ -427,19 +427,48 @@ verify$fcst_ozone_aqi <- as.character(verify$fcst_ozone_aqi)
 verify$fcst_pm25_aqi  <- as.character(verify$fcst_pm25_aqi)
 
 
-## Use Archive table Day 1 forecast if model results missing
-#verify <- bind_rows(verify, filter(all_verify, forecast_date == (today -days_past), forecast_day == 1))
 
-#verify <- verify %>%
-#          group_by(site_catid, forecast_date, forecast_day) %>%
-#          arrange()
 
+# Join all
+all_verify <- bind_rows(verify, all_verify)
 
 #-- Remove duplicates and NA forecast days
-all_verify <- dplyr::filter(all_verify,
-                            !is.na(forecast_day),
-                            !is.na(forecast_date))
+all_verify <- dplyr::filter(all_verify, !is.na(forecast_day), !is.na(forecast_date))
 
+
+##-- Take Max value to use numeric forecast instead of color when both available
+get_max <- function(values) {
+  return(max(as.numeric(unlist(values)), na.rm = T))
+}
+
+max_is_positive <- function(values) {
+  return(get_max(unlist(values)) >= 0)
+}
+
+first_value <- function(values) {
+  sort(values)[1]
+}
+
+
+# Get only current and future dates
+collapse <- filter(all_verify, forecast_date %in% seq(today-days_past, today+5, 1))
+
+
+# Collapse down to single forecast row
+collapse <- collapse %>%
+            group_by(forecast_date, forecast_day, site_catid) %>%
+            mutate_all(first_value) %>%
+            slice(1)
+
+
+# Add back to full table
+all_verify <- filter(all_verify, !forecast_date %in% seq(today-days_past, today+5, 1))
+
+all_verify <- bind_rows(all_verify, collapse)
+
+
+##-- Drop this
+if(FALSE) {
 unique_forecasts <- with(subset(all_verify, !is.na(mod_aqi_pm_ens)), paste(forecast_date, forecast_day, site_catid))
 
 verify <- filter(verify, 
@@ -455,10 +484,7 @@ unique_forecasts <- with(all_verify, paste(forecast_date, forecast_day, site_cat
 verify <- filter(verify, 
                  !paste(forecast_date, forecast_day, site_catid) %in% unique_forecasts)
 
-
-# Join all
-all_verify <- bind_rows(verify, all_verify)
-
+}
 
 # Yesterday's actuals
 #--------------------------#
