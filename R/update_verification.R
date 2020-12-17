@@ -467,25 +467,6 @@ all_verify <- filter(all_verify, !forecast_date %in% seq(today-days_past, today+
 all_verify <- bind_rows(all_verify, collapse)
 
 
-##-- Drop this
-if(FALSE) {
-unique_forecasts <- with(subset(all_verify, !is.na(mod_aqi_pm_ens)), paste(forecast_date, forecast_day, site_catid))
-
-verify <- filter(verify, 
-                 !paste(forecast_date, forecast_day, site_catid) %in% unique_forecasts)
-
-unique_forecasts <- with(subset(verify, !is.na(mod_aqi_pm_ens)), paste(forecast_date, forecast_day, site_catid))
-
-all_verify <- filter(all_verify, 
-                     !paste(forecast_date, forecast_day, site_catid) %in% unique_forecasts)
-
-unique_forecasts <- with(all_verify, paste(forecast_date, forecast_day, site_catid))
-
-verify <- filter(verify, 
-                 !paste(forecast_date, forecast_day, site_catid) %in% unique_forecasts)
-
-}
-
 # Yesterday's actuals
 #--------------------------#
 setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast")
