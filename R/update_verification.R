@@ -129,13 +129,14 @@ for (i in 0:4) {
 aqi_forc <- unique(aqi_forc_all)
 
 
-# Select most recent forecast
-#aqi_forc <- aqi_forc %>% arrange(DayIndex) %>% group_by(Date, Group) %>% slice(1)
-
-
 # Load internal forecasts for missing sites
 aqi_forc_int <- read_csv("All_Values_gen2.csv")
 
+
+# Update Leech Lake name
+aqi_forc <- aqi_forc %>% mutate(Group = gsub("Leech Lake Nation: Cass Lake",  "Leech Lake", Group))
+
+aqi_forc_int <- aqi_forc_int %>% mutate(Group = gsub("Leech Lake Nation: Cass Lake",  "Leech Lake", Group))
 
 
 # Date format
