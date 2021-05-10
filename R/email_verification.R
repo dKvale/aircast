@@ -31,7 +31,7 @@ aqi_team <- c(paste0(c("dorian.kvale",
                        "michael.smith",
                        "kari.palmer",
                        "monika.vadali",
-                       "helen.waquiu",
+                       #"helen.waquiu",
                        "nicholas.witcraft",
                        "matthew.taraldsen"), "@state.mn.us"), 
               "kvaled@gmail.com")
