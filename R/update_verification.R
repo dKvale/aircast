@@ -89,11 +89,11 @@ for (i in 0:4) {
 
 
   # Filter sites, drop Voyageurs
-  unique(sites$fcst_region)
+  unique(sites$fcst_region) %>% sort
 
   aqi_forc <- dplyr::filter(aqi_forc,
                      state %in% c("MN"),
-                     Group %in% sites$fcst_region,
+                     Group %in% c(sites$fcst_region, "Leech Lake Nation: Cass Lake"),
                      !grepl("Voyage", Group))
 
   # Date format
