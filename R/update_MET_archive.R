@@ -106,12 +106,14 @@ all_met$site_date <- paste(all_met$site_catid, all_met$date)
 # Add air toxics sites
 all_sites <- read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/MET data/AirToxics_sites.csv")
 
-all_sites <- filter(all_sites, Year %in% 2010:2019, !duplicated(AQS_ID)) %>%
+all_sites <- filter(all_sites, Year %in% 2010:2019) %>%
              select(Report_Name, AQS_ID, lat, long) %>% 
              rowwise() %>%
              mutate(AQS_ID = paste(substring(AQS_ID, 1, 2), 
                                    substring(AQS_ID, 3, 5), 
-                                   substring(AQS_ID, 6, 9), sep = "-"))
+                                   substring(AQS_ID, 6, 9), sep = "-")) %>%
+            group_by(AQS_ID) %>%
+            slice(1)
 
 names(all_sites) <- c("air_monitor", "site_catid", "monitor_lat", "monitor_long")
 
@@ -124,6 +126,26 @@ sites <- bind_rows(sites,
 
 # Drop duplicate Fond du Lac site
 sites <- filter(sites, !site_catid %in% "27-017-7417")
+
+
+# Combine Rosemounts- Flint Hills
+sites <- filter(sites, !site_catid %in% c("27-037-0020", "27-037-0423", "27-037-0442"))
+
+
+# Combine Red Lake Nation
+sites <- filter(sites, !site_catid %in% "27-007-2303")
+
+
+# Drop sites with similar coordinates
+sites2 <- sites %>%
+          group_by(round(monitor_lat, 1), round(monitor_long, 1)) %>%
+          slice(1)
+
+sites$air_monitor[!sites$site_catid %in% sites2$site_catid]
+
+
+sites <- sites2
+
 
 
 # Join sites to calendar
