@@ -34,7 +34,7 @@ Sys.setenv(DARKSKY_API_KEY = d_key)
 
 
 # Create date table
-days <- tibble(date = seq(as.Date("2006-12-31"), as.Date("2020-01-02"), 1),
+days <- tibble(date = seq(as.Date("2006-12-31"), as.Date("2021-01-02"), 1),
                join = 1)
 
 days[1:5, ]
