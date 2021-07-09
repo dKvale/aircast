@@ -4,7 +4,6 @@
 
 tryCatch(library(SplitR), error = function(e) NA) #devtools::install_github("rich-iannone/SplitR")
 tryCatch(library(splitr), error = function(e) NA)
-#library(splitr)
 library(dplyr)
 library(readr)
 library(tidyr)
