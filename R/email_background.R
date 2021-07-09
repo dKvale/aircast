@@ -1,12 +1,16 @@
 #! /usr/bin/env 
 
+#Java path
+Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
 
 library(R.utils)
 library(dplyr)
 library(readr)
+library(rJava)
 library(mailR)  #mailR reference - https://github.com/rpremraj/mailR
 
 #"C:\Users\dkvale\Documents\R\R-3.5.2\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\email_background.R"
+#"C:\Program Files\R\R-4.1.0\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\email_background.R"
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
@@ -19,9 +23,6 @@ if (T) {
   
   # AirNow credentials
   creds <- read_csv("C:/Users/dkvale/Desktop/credents/credentials.csv")
-  
-  #Java path
-  Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
   
 }
 
@@ -96,6 +97,7 @@ for(i in aqi_team) {
     }
   }
 }
+
 
 # Delete NAMS data
 setwd("~")

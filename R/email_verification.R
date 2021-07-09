@@ -39,7 +39,7 @@ aqi_team <- c(paste0(c("dorian.kvale",
               "kvaled@gmail.com")
               #"sirwin.mobile@gmail.com") 
 
-aqi_team <- aqi_team[1]
+#aqi_team <- aqi_team[1]
 #aqi_team <- c("dorian.kvale@state.mn.us", "david.l.brown@state.mn.us", "nicholas.witcraft@state.mn.us")
 
 # Set Pandoc location
