@@ -157,9 +157,9 @@ verify <- verify %>% mutate_at(vars(matches("mod_")), round, 3)
 write_csv(verify, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/data/model_performance.csv")
 
 # Create git commands
-git_exe <- "C:/Users/dkvale/Documents/Git/bin/git.exe"
+git_exe <- "\"C:/Program Files/Git/bin/git.exe\""
   
-git <- paste0("X: & CD \"X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/\" & ",
+git <- paste0("C: & X: & CD \"X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/\" & ",
               git_exe, " ")
 
 
