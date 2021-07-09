@@ -58,7 +58,6 @@ weekend <- weekdays(report_date) %in% c("Sunday","Monday")
 ozone_season <- yday(report_date) > 74 & month(report_date) %in% 3:9
 
 
-
 # AQI conversion functions
 source(paste0(aqiwatch_path, "R/aqi_convert.R"))
 
@@ -904,7 +903,8 @@ lead_board <- bind_rows(lead_board_pm, lead_board_o3) %>%
 
 
 # Blank NAs for days without yellow/orange
-lead_board[is.na(lead_board$`Yellow accuracy %`), "Yellow accuracy %"] <- " "
+lead_board <- lead_board %>%
+              mutate(ifelse(is.na(`Yellow accuracy %`), " ", as.character(`Yellow accuracy %`)))
 
 
 # Drop CMAQ from PM2.5 forecasts

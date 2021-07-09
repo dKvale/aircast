@@ -2,6 +2,7 @@
 
 #Java path
 Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+#Sys.getenv()
 
 library(R.utils)
 library(dplyr)
@@ -12,6 +13,7 @@ library(mailR)
 
 
 #"C:\Users\dkvale\Documents\R\R-3.5.2\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\email_verification.R"
+#"C:\Program Files\R\R-4.1.0\bin\i386\Rscript.exe" --no-save --no-restore "X:\Agency_Files\Outcomes\Risk_Eval_Air_Mod\_Air_Risk_Evaluation\Staff folders\Dorian\AQI\aircast\R\email_verification.R"
 
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
@@ -37,12 +39,12 @@ aqi_team <- c(paste0(c("dorian.kvale",
               "kvaled@gmail.com")
               #"sirwin.mobile@gmail.com") 
 
-#aqi_team <- aqi_team[1]
+aqi_team <- aqi_team[1]
 #aqi_team <- c("dorian.kvale@state.mn.us", "david.l.brown@state.mn.us", "nicholas.witcraft@state.mn.us")
 
 # Set Pandoc location
-Sys.setenv(RSTUDIO_PANDOC = "C:/Users/dkvale/Documents/RStudio/bin/pandoc")
-
+#Sys.setenv(RSTUDIO_PANDOC = "C:/Users/dkvale/Documents/RStudio/bin/pandoc")
+Sys.setenv(RSTUDIO_PANDOC = "C:/Program Files/RStudio/bin/pandoc")
 
 #-- Knit Rmarkdown document
 md_file <- readLines(paste0(aircast_path, "R/aqi_message.Rmd"))
