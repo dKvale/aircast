@@ -1212,7 +1212,7 @@ pm_board <- subset(lead_board, Pollutant == "PM25") %>%
             rename(`Error ugm3` = `Error ugm3|ppb`) %>%
             select(-Pollutant)
 
-formattable(pm_board[  , 1:ncol(pm_board)])
+formattable::formattable(pm_board[  , 1:ncol(pm_board)])
 ```
 
 </div>
@@ -1235,7 +1235,7 @@ if (ozone_season) {
               rename(`Error ppb` = `Error ugm3|ppb`) %>%
               select(-Pollutant)
 
-  formattable(o3_board[  , 1:ncol(o3_board)])
+  formattable::formattable(o3_board[  , 1:ncol(o3_board)])
 }
 ```
 
