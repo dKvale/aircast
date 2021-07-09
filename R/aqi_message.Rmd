@@ -904,7 +904,7 @@ lead_board <- bind_rows(lead_board_pm, lead_board_o3) %>%
 
 # Blank NAs for days without yellow/orange
 lead_board <- lead_board %>%
-              mutate(ifelse(is.na(`Yellow accuracy %`), " ", as.character(`Yellow accuracy %`)))
+              mutate(`Yellow accuracy %` = ifelse(is.na(`Yellow accuracy %`), " ", as.character(`Yellow accuracy %`)))
 
 
 # Drop CMAQ from PM2.5 forecasts
@@ -1212,7 +1212,7 @@ pm_board <- subset(lead_board, Pollutant == "PM25") %>%
             rename(`Error ugm3` = `Error ugm3|ppb`) %>%
             select(-Pollutant)
 
-pm_board[  , 1:ncol(pm_board)]
+formattable(pm_board[  , 1:ncol(pm_board)])
 ```
 
 </div>
@@ -1235,7 +1235,7 @@ if (ozone_season) {
               rename(`Error ppb` = `Error ugm3|ppb`) %>%
               select(-Pollutant)
 
-o3_board[  , 1:ncol(o3_board)]
+  formattable(o3_board[  , 1:ncol(o3_board)])
 }
 ```
 
