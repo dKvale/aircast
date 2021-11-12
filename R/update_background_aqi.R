@@ -16,9 +16,10 @@ aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 if (F) {
     
   results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/"
+  results_path  <- "~/../Desktop/aircast/forecast/hysplit/"
   
   #Java path
-  Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+  Sys.setenv(JAVA_HOME = "C:/Program Files (x86)/Java/jre1.8.0_181")
   
   
   # AirNow credentials
@@ -64,7 +65,7 @@ if (gmt_time > 17 | gmt_time < 14) gmt_time <- 17
 
 
 # Check if background AQI update has already run
-if (!min_exists(paste0(results_path, "/", Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), min_size = 100)) {
+if (!min_exists(paste0(results_path, "/../forecast/background/", Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), min_size = 100)) {
 
 airnow_base <- paste0('https://s3-us-west-1.amazonaws.com/files.airnowtech.org/airnow/', year, '/', day, '/')
 
@@ -417,8 +418,9 @@ hys_wide$date <- today
 hys_wide <- select(hys_wide, row_id, date, everything())
 
 # SAVE results
-write.csv(hys_wide, 
-          paste0(results_path, "/", Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F)
+try(write.csv(hys_wide, paste0(results_path, "../forecast/background/", Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F))
+
+#try(write.csv(hys_wide, paste0(results_path, "/", Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), row.names = F))
 
 }
 
