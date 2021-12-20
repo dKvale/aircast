@@ -26,7 +26,7 @@ current_time <- as.numeric(format(Sys.time(), "%H"))
 print(paste0("The current time is ", current_time))
 
 
-if(current_time == 17) {
+if(current_time == 13) {
   
   # Update background NAMS data
   print("Downloading NAMS data...")
@@ -50,7 +50,7 @@ if(current_time == 17) {
 }
 
 
-if (current_time > 17) {
+if (current_time > 13) {
   
   # Attach background monitoring results for 17z
   print("Attaching 17Z monitoring results")
