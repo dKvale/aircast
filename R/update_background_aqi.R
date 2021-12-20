@@ -65,7 +65,7 @@ if (gmt_time > 17 | gmt_time < 14) gmt_time <- 17
 
 
 # Check if background AQI update has already run
-if (!min_exists(paste0(results_path, "/../forecast/background/", Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), min_size = 100)) {
+if (!min_exists(paste0(results_path, Sys.Date(), "_", gmt_time, "z_AQI_background.csv"), min_size = 100)) {
 
 airnow_base <- paste0('https://s3-us-west-1.amazonaws.com/files.airnowtech.org/airnow/', year, '/', day, '/')
 
