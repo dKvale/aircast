@@ -26,7 +26,7 @@ current_time <- as.numeric(format(Sys.time(), "%H"))
 print(paste0("The current time is ", current_time))
 
 
-if(current_time == 13) {
+if(current_time < 12) {
   
   # Update background NAMS data
   print("Downloading NAMS data...")
@@ -50,7 +50,16 @@ if(current_time == 13) {
 }
 
 
-if (current_time > 13) {
+if (current_time >= 12) {
+  
+  # Update background NAMS data (backup in case NOAA files did not download)
+  print("Check background download...")
+  try(source(paste0(aircast_path, "R/check_nams_forecast.R")), silent = T)
+     
+  # Run HYSPLIT model
+  print("Running HYSPLIT...")
+  try(source(paste0(aircast_path, "R/hysplit_traj_cloud.R")), silent = T)
+  try(source(paste0(aircast_path, "R/run_current_hysplit.R")), silent = T)
   
   # Attach background monitoring results for 17z
   print("Attaching 17Z monitoring results")
