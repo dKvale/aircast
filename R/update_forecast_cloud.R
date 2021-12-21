@@ -58,7 +58,7 @@ if (current_time > 13) {
   
   # E-mail background results
   #print("E-mailing background results")
-  try(source(paste0(aircast_path, "R/email_background.R")))
+  #try(source(paste0(aircast_path, "R/email_background.R")))
   
 }
 
