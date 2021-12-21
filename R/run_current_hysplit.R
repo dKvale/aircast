@@ -18,11 +18,13 @@ aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 if (F) {
   #aircast_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff folders/Dorian/AQI/aircast/"
   results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/Current forecast/"
+
   hysplit_path  <- "C:/users/dkvale/Desktop/aircast/hysplit/"
   
+  results_path  <- hysplit_path
   
   #Java path
-  Sys.setenv(JAVA_HOME="C:/Program Files (x86)/Java/jre1.8.0_181")
+  Sys.setenv(JAVA_HOME = "C:/Program Files (x86)/Java/jre1.8.0_181")
   
   current_time <- as.numeric(format(Sys.time(), "%H"))
   
@@ -245,8 +247,8 @@ back_forecast <- select(back_forecast, row_id, run_date, everything())
 # Save HYSPLIT results
 back_forecast
 
-write_csv(back_forecast, 
-          paste0(results_path, "/", Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv"))
+try(write_csv(back_forecast, 
+          paste0(results_path, "/", Sys.Date() - days_past, "_AQI_raw_HYSPLIT.csv")))
 
 unlink(list.files()[grepl("traj-", list.files())], force = T, recursive = T)
 

@@ -37,7 +37,7 @@ aqi_team <- c(paste0(c("dorian.kvale",
                        "nicholas.witcraft",
                        "matthew.taraldsen"), "@state.mn.us"), 
               "kvaled@gmail.com")
-              #"sirwin.mobile@gmail.com") 
+#"sirwin.mobile@gmail.com") 
 
 #aqi_team <- aqi_team[1]
 #aqi_team <- c("dorian.kvale@state.mn.us", "david.l.brown@state.mn.us", "nicholas.witcraft@state.mn.us")
@@ -50,7 +50,7 @@ Sys.setenv(RSTUDIO_PANDOC = "C:/Program Files/RStudio/bin/pandoc")
 md_file <- readLines(paste0(aircast_path, "R/aqi_message.Rmd"))
 
 writeLines(md_file, paste0(results_path, "Verification/daily_results.Rmd"))
-  
+
 rmarkdown::render(input = paste0(results_path, "Verification/daily_results.Rmd"))
 
 
@@ -86,41 +86,41 @@ send_msg <- function(x) {
             send         = TRUE)
   
   if(F) {
-  # Outlook
-  smtp = list(host.name = "smtp-mail.outlook.com", 
-              port      = 465,
-              ssl       = TRUE, 
-              user.name = "dorian.kvale@state.mn.us",
-              passwd    = creds$mpca_pwd)
-  
-  send.mail(from         = "dorian.kvale@state.mn.us",
-            to           = x,
-            subject      = "AQI report",
-            body         = msg_body,
-            html         = TRUE,
-            inline       = TRUE,
-            smtp         = smtp,
-            authenticate = TRUE,
-            send         = TRUE)
+    # Outlook
+    smtp = list(host.name = "smtp-mail.outlook.com", 
+                port      = 465,
+                ssl       = TRUE, 
+                user.name = "dorian.kvale@state.mn.us",
+                passwd    = creds$mpca_pwd)
+    
+    send.mail(from         = "dorian.kvale@state.mn.us",
+              to           = x,
+              subject      = "AQI report",
+              body         = msg_body,
+              html         = TRUE,
+              inline       = TRUE,
+              smtp         = smtp,
+              authenticate = TRUE,
+              send         = TRUE)
   }
-
+  
 }
-                  
+
 #-- Send e-mail one person at a time
 for(i in aqi_team) {
-
+  
   #i <- aqi_team
   print(i)
   
   setwd("~")
   setwd("../Desktop/credents")
-
+  
   run_count <- 0
-
+  
   send_fail <- NA
   
   while( (is.null(send_fail) || is.na(send_fail)) & run_count < 1) {
-
+    
     #-- Set time limit on run time
     send_fail <- tryCatch(withTimeout(send_msg(i), timeout = 8, onTimeout = "error"), 
                           TimeoutException = function(ex) NA, 
@@ -131,10 +131,10 @@ for(i in aqi_team) {
     Sys.sleep(2)
     
     if(is.null(send_fail) || !is.na(send_fail)) print("Success!")
-
+    
   }
 }
- 
+
 
 # Update Github table
 
@@ -145,10 +145,10 @@ verify <- filter(verify, forecast_date > (Sys.Date() - 8), forecast_date < Sys.D
 
 # Filter to one forecast per day for each site
 verify <- group_by(verify, forecast_date, site_catid) %>%
-          mutate(forecast_day = ifelse(forecast_day == 0, 99, forecast_day)) %>%
-          arrange(forecast_day) %>%
-          slice(1) %>%
-          mutate(forecast_day = ifelse(forecast_day == 99, 0, forecast_day))
+  mutate(forecast_day = ifelse(forecast_day == 0, 99, forecast_day)) %>%
+  arrange(forecast_day) %>%
+  slice(1) %>%
+  mutate(forecast_day = ifelse(forecast_day == 99, 0, forecast_day))
 
 # Round - set signif digits
 verify <- verify %>% mutate_at(vars(matches("mod_")), round, 3)
@@ -158,7 +158,7 @@ write_csv(verify, "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluati
 
 # Create git commands
 git_exe <- "\"C:/Program Files/Git/bin/git.exe\""
-  
+
 git <- paste0("C: & X: & CD \"X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/\" & ",
               git_exe, " ")
 

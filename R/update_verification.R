@@ -37,7 +37,6 @@ sites <- dplyr::filter(sites, !fcst_region %in% c("CA", "ND", "SD", "WI", "IA"))
 
 # Yesterday's official submitted forecast
 #--------------------------------#
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values")
 
 print("Loading official forecasts...")
 
@@ -130,13 +129,20 @@ aqi_forc <- unique(aqi_forc_all)
 
 
 # Load internal forecasts for missing sites
-aqi_forc_int <- read_csv("All_Values_gen2.csv")
+aqi_forc_int <- tryCatch(read_csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values/All_Values_gen2.csv"),
+                         error = function(e) NA)
+
+if (is.na(aqi_forc_int)) { 
+  aqi_forc_int <- read_csv("~/../Desktop/aircast/forecast/Forecast_Values.csv")
+  }
 
 
 # Update Leech Lake name
-aqi_forc <- aqi_forc %>% mutate(Group = gsub("Leech Lake Nation: Cass Lake",  "Leech Lake", Group))
+aqi_forc <- aqi_forc %>% 
+            mutate(Group = gsub("Leech Lake Nation: Cass Lake",  "Leech Lake", Group))
 
-aqi_forc_int <- aqi_forc_int %>% mutate(Group = gsub("Leech Lake Nation: Cass Lake",  "Leech Lake", Group))
+aqi_forc_int <- aqi_forc_int %>% 
+                mutate(Group = gsub("Leech Lake Nation: Cass Lake",  "Leech Lake", Group))
 
 
 # Date format
@@ -161,7 +167,8 @@ sort(unique(aqi_forc_int$Group))
 aqi_forc_original <- left_join(aqi_forc_int, 
                                select(aqi_forc, Group, OZONE, `PM2.5`, DayIndex, Date))
 
-aqi_forc_updates <- select(aqi_forc, Group, OZONE, `PM2.5`, DayIndex, Date) %>%
+aqi_forc_updates <- aqi_forc %>%
+                    select(Group, OZONE, `PM2.5`, DayIndex, Date) %>%
                     dplyr::filter(!paste(Date, DayIndex, Group) %in%
                             paste(aqi_forc_original$Date, 
                                   aqi_forc_original$DayIndex, 
@@ -169,7 +176,8 @@ aqi_forc_updates <- select(aqi_forc, Group, OZONE, `PM2.5`, DayIndex, Date) %>%
 
 
 aqi_forc_updates <- left_join(aqi_forc_updates,
-                              select(aqi_forc_int, Group:Longitude) %>% unique())
+                              select(aqi_forc_int, Group, Latitude, Longitude) %>% 
+                    unique())
 
 
 aqi_forc <- bind_rows(aqi_forc_original, aqi_forc_updates)
@@ -201,14 +209,15 @@ aqi_forc  <- aqi_forc %>%
 
 # Yesterday's model output forecast
 #------------------------------------#
-setwd("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values")
-
 if (FALSE) {
 
 print("Loading modeling forecasts...")
 
-mod_o3   <- read.csv("All_Values_O3.csv", stringsAsFactors = FALSE)
-mod_pm   <- read.csv("All_Values_PM.csv", stringsAsFactors = FALSE)
+mod_o3   <- read.csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values/All_Values_O3.csv",
+                     stringsAsFactors = FALSE)
+mod_pm   <- read.csv("X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/Air_Modeling/AQI_Forecasting/Tree_Data/Forecast/AQI_Solutions/Values/All_Values_PM.csv",
+                     stringsAsFactors = FALSE)
+
 mod_forc <- full_join(mod_o3, mod_pm)
 
 
@@ -271,13 +280,9 @@ names(all_inputs)[1:3] <- c("forecast_day", "short_name", "site_catid")
 
 #-- Check for "/" slash in date
 if (grepl("[/]", all_inputs$Date[1])) {
-  
    all_inputs$Date <- as.Date(all_inputs$Date, "%m/%d/%Y")
-   
 } else {
-  
    all_inputs$Date <- as.Date(all_inputs$Date, "%Y-%m-%d")
-   
 }
 
 #-- Set date column name
@@ -289,6 +294,7 @@ class(verify$forecast_day)
 
 #-- Join all
 verify$site_catid
+
 all_inputs$site_catid
 
 verify   <- left_join(verify, select(all_inputs, -short_name))
@@ -434,7 +440,9 @@ verify$fcst_pm25_aqi  <- as.character(verify$fcst_pm25_aqi)
 all_verify <- bind_rows(verify, all_verify)
 
 #-- Remove duplicates and NA forecast days
-all_verify <- dplyr::filter(all_verify, !is.na(forecast_day), !is.na(forecast_date))
+all_verify <- dplyr::filter(all_verify, 
+                            !is.na(forecast_day), 
+                            !is.na(forecast_date))
 
 
 ##-- Take Max value to use numeric forecast instead of color when both available
@@ -452,7 +460,8 @@ first_value <- function(values) {
 
 
 # Get only current and future dates
-collapse <- filter(all_verify, forecast_date %in% seq(today-days_past, today+5, 1))
+collapse <- filter(all_verify, 
+                   forecast_date %in% seq(today-days_past, today+5, 1))
 
 
 # Collapse down to single forecast row
@@ -463,7 +472,8 @@ collapse <- collapse %>%
 
 
 # Add back to full table
-all_verify <- filter(all_verify, !forecast_date %in% seq(today-days_past, today+5, 1))
+all_verify <- filter(all_verify, 
+                     !forecast_date %in% seq(today-days_past, today+5, 1))
 
 all_verify <- bind_rows(all_verify, collapse)
 

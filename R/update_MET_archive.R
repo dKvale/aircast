@@ -7,7 +7,6 @@ library(darksky) #devtools::install_github("hrbrmstr/darksky")
 options(digits = 12)
 
 
-
 aircast_path  <- "https://raw.githubusercontent.com/dKvale/aircast/master/"
 aqiwatch_path <- "https://raw.githubusercontent.com/dKvale/aqi-watch/master/"
 results_path  <- "X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/"
@@ -34,7 +33,7 @@ Sys.setenv(DARKSKY_API_KEY = d_key)
 
 
 # Create date table
-days <- tibble(date = seq(as.Date("2006-12-31"), as.Date("2021-01-02"), 1),
+days <- tibble(date = seq(as.Date("2019-12-31"), as.Date("2021-08-02"), 1),
                join = 1)
 
 days[1:5, ]
@@ -138,14 +137,14 @@ sites <- filter(sites, !site_catid %in% "27-007-2303")
 
 # Drop sites with similar coordinates
 sites2 <- sites %>%
-          group_by(round(monitor_lat, 1), round(monitor_long, 1)) %>%
+          group_by(round(monitor_lat, 1), round(monitor_long, 1), 
+                   site_catid == "27-137-7549") %>% # Keeps Duluth Mich. St. seperate from WDSE
           slice(1)
 
 sites$air_monitor[!sites$site_catid %in% sites2$site_catid]
 
 
 sites <- sites2
-
 
 
 # Join sites to calendar
@@ -164,7 +163,11 @@ sites$site_date <- paste(sites$site_catid, sites$date)
 # Put AQI sites first
 sites$run_order <- ifelse(sites$site_catid %in% aqi_sites$site_catid, 1.1, sites$run_order)
 
-sites <- arrange(sites, -run_order, site_catid, desc(date))
+# Put PFAS sites first
+sites$run_order <- ifelse(sites$site_catid %in% c("27-037-0465", "27-031-7810", "27-053-2006", "27-137-7549", "27-137-7555"), 1, sites$run_order)
+
+
+sites <- arrange(sites, run_order, site_catid, desc(date))
 
 
 # Drop dates already downloaded 
