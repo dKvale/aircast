@@ -26,7 +26,7 @@ current_time <- as.numeric(format(Sys.time(), "%H"))
 print(paste0("The current time is ", current_time))
 
 
-if(current_time < 12) {
+if(current_time < 16) {
   
   # Update background NAMS data
   print("Downloading NAMS data...")
