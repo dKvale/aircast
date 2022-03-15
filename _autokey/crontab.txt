@@ -1,0 +1,3 @@
+24 17 * * * cd ~ && sh run_aqi.sh
+
+41 18 * * * cd ~ && sh run_aqi.sh
