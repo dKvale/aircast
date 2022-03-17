@@ -162,13 +162,16 @@ git_exe <- "\"C:/Program Files/Git/bin/git.exe\""
 git <- paste0("C: & X: & CD \"X:/Agency_Files/Outcomes/Risk_Eval_Air_Mod/_Air_Risk_Evaluation/Staff Folders/Dorian/AQI/aircast/\" & ",
               git_exe, " ")
 
-
 # Add account credentials
 system(paste0(git, "config --global user.name dkvale"), show.output.on.console = T, invisible = F)
-
 system(paste0(git, "config --global user.email ", creds$email), show.output.on.console = T, invisible = F)
 
+pull <-  paste0(git, "pull origin master")
 
+cat(pull)
+
+shell(pull)     
+                          
 add <- paste0(git, 'add', ' "data/model_performance.csv"')
 
 cat(add)
